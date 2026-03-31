@@ -34,12 +34,12 @@ sleep |>
 
 The package is designed around three ideas:
 
-1.  **Declarative models** — describe the structure of your data with
+1.  **Declarative models**: describe the structure of your data with
     `define_model()` and model IDs like `x_by()`, `rel()`, and
     `pairwise()`
-2.  **Composable pipeline** — build up a test specification lazily, then
+2.  **Composable pipeline**: build up a test specification lazily, then
     execute with `conclude()`
-3.  **Extensible implementations** — every test is a `test_define()`
+3.  **Extensible implementations**: every test is a `test_define()`
     object; bring your own engine, your own method, your own
     implementation
 
