@@ -33,6 +33,8 @@ ttest_def_two = test_define(
         )
     },
     print = function(x, ...) {
+        rlang::check_installed(c("broom", "pander"),
+            reason = "to print t-test results in tabular form")
         pander::pander(broom::tidy(x$data))
         invisible(x)
     }
@@ -152,6 +154,9 @@ ttest_def_permute_rfast = test_define(
         group = function(p) p$group_data[[1]]
     ),
     run = function(self) {
+        rlang::check_installed("Rfast2",
+            reason = "to run the Rfast2-backed permutation t-test engine")
+
         B = ic_method_arg(self, "B")
         grp = as.character(ic_pull(self, "group"))
         resp = ic_pull(self, "x")
