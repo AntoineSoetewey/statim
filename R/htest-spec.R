@@ -59,6 +59,7 @@ test_define = S7::new_class(
         impl_class = S7::class_character,
         engine = S7::new_property(class = S7::class_character, default = "default"),
         method = S7::new_property(default = NULL),
+        fun_args = S7::new_property(default = NULL),
         compatible_params = S7::new_property(default = character(0)),
         vars = S7::new_property(default = list()),
         run = S7::class_function,

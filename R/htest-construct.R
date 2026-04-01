@@ -37,6 +37,7 @@ run_htest = function(defs, args, cls, model_id, .data, .name) {
         args = args,
         extractors = def@vars,
         claims = NULL,
+        fun_args = def@fun_args,
         method_args = list()
     )
 
@@ -121,7 +122,7 @@ print.htest_spec = function(x, ...) {
 
 #' Build a hypothesis test function
 #'
-#' `new_htest_fn()` is a developer-interface function, a constructor for user-facing
+#' `HTEST_FN()` is a developer-interface function, a constructor for user-facing
 #' test functions like [TTEST()]. It returns a function with a consistent
 #' signature that routes to the correct implementation based on the model ID
 #' and method variant.
@@ -136,7 +137,7 @@ print.htest_spec = function(x, ...) {
 #' @seealso [test_define()], [prepare_test()], [via()], [conclude()]
 #'
 #' @examples
-#' MY_TEST = new_htest_fn(
+#' MY_TEST = HTEST_FN(
 #'     cls = "mytest",
 #'     defs = list(my_def_two),
 #'     .name = "My Test"
@@ -158,4 +159,84 @@ HTEST_FN = function(cls, defs, .name) {
             .name = .name
         )
     }
+}
+
+#' Declare arguments for a test implementation
+#'
+#' `fun_args()` declares the arguments accepted by a [test_define()] `run`
+#' function, along with their default values. Pass the result to the
+#' `fun_args` property of [test_define()].
+#'
+#' Arguments are declared in one of two ways:
+#' - `name = value` — argument with a default value
+#' - `~name` — required argument with no default
+#'
+#' Declared defaults are used by [ic_arg()] as fallbacks when the user
+#' does not supply a value. Required arguments cause [ic_arg()] to error
+#' if not supplied.
+#'
+#' @param ... Named arguments with defaults (`name = value`) or one-sided
+#'   formulas for required arguments (`~name`).
+#'
+#' @return A `fun_args` object — a named list where each element carries
+#'   `name`, `default`, and `required` fields.
+#'
+#' @seealso [test_define()], [ic_arg()]
+#'
+#' @examples
+#' # all with defaults
+#' fun_args(.paired = TRUE, .mu = 0, .alt = "two.sided", .ci = 0.95)
+#'
+#' # mixed — .ci has a default, .paired is required
+#' fun_args(.ci = 0.95, ~.paired)
+#'
+#' # used inside test_define()
+#' \dontrun{
+#' new_def = test_define(
+#'     model_type = "x_by",
+#'     impl_class = "new_def_in_two",
+#'     fun_args = fun_args(
+#'         .paired = TRUE,
+#'         .mu = 0,
+#'         .alt = "two.sided",
+#'         .ci = 0.95
+#'     ),
+#'     vars = list(
+#'         x = function(p) p$x_data[[1]],
+#'         group = function(p) p$group_data[[1]]
+#'     ),
+#'     run = function(self) {
+#'         paired = ic_arg(self, ".paired")
+#'         ci = ic_arg(self, ".ci")
+#'     }
+#' )
+#' }
+#'
+#' @export
+fun_args = function(...) {
+    dots = rlang::enquos(...)
+
+    out = lapply(seq_along(dots), function(i) {
+        nm = names(dots)[[i]]
+        q = dots[[i]]
+        expr = rlang::quo_get_expr(q)
+
+        if (rlang::is_formula(expr) && is.null(rlang::f_lhs(expr))) {
+            list(
+                name = rlang::as_label(rlang::f_rhs(expr)),
+                default = NULL,
+                required = TRUE
+            )
+        } else {
+            list(
+                name = nm,
+                default = rlang::eval_tidy(q),
+                required = FALSE
+            )
+        }
+    })
+
+    names(out) = vapply(out, `[[`, character(1), "name")
+    class(out) = "fun_args"
+    out
 }

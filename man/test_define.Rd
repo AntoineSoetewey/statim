@@ -9,6 +9,7 @@ test_define(
   impl_class = character(0),
   engine = "default",
   method = NULL,
+  fun_args = NULL,
   compatible_params = character(0),
   vars = list(),
   run = function() NULL,

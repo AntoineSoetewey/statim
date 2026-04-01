@@ -35,9 +35,9 @@ prepare_test.def_model = function(.x, .test, ...) {
 #' @export
 update.test_lazy = function(object, ...) {
     dots = list(...)
-    if (!is.null(object$replicate_spec)) {
-        object$replicate_spec$args = utils::modifyList(
-            object$replicate_spec$args, dots
+    if (!is.null(object$recalibrate_spec)) {
+        object$recalibrate_spec$args = utils::modifyList(
+            object$recalibrate_spec$args, dots
         )
     } else {
         object$test_spec$args = utils::modifyList(
