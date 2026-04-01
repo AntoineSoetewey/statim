@@ -18,10 +18,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-    purrr,
     rlang,
     cli,
-    glue,
     vctrs,
     tibble,
     tidyr,
@@ -29,7 +27,6 @@ Imports:
     tidyselect,
     stats,
     utils,
-    ggplot2,
     S7
 Suggests:
     testthat (>= 3.0.0),

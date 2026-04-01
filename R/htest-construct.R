@@ -136,11 +136,13 @@ print.htest_spec = function(x, ...) {
 #' @seealso [test_define()], [prepare_test()], [via()], [conclude()]
 #'
 #' @examples
+#' \dontrun{
 #' MY_TEST = HTEST_FN(
 #'     cls = "mytest",
 #'     defs = list(my_def_two),
 #'     .name = "My Test"
 #' )
+#' }
 #'
 #' @export
 HTEST_FN = function(cls, defs, .name) {
