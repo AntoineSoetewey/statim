@@ -3,11 +3,14 @@
 \name{conclude}
 \alias{conclude}
 \alias{conclude.test_lazy}
+\alias{conclude.engine_set}
 \title{Running conclusions with \code{conclude()}}
 \usage{
 conclude(.x, ...)
 
 \method{conclude}{test_lazy}(.x, ...)
+
+\method{conclude}{engine_set}(.x, ...)
 }
 \description{
 Executing the "lazy" pipeline to return the test you want to perform.
