@@ -7,8 +7,9 @@ via = function(.x, .method, ...) {
 
 #' @rdname via
 #' @export
-via.test_lazy = function(.x, .method, ..., engine = "default") {
+via.test_lazy = function(.x, .method, ..., engine = NULL) {
     dots = list(...)
+    engine = engine %||% .x$engine %||% "default"
 
     key = paste0(class(.x$model_id)[[1]], "::", .method, "::", engine)
     def = .x$test_spec$lookup[[key]] %||% cli::cli_abort(
@@ -26,4 +27,12 @@ via.test_lazy = function(.x, .method, ..., engine = "default") {
         args = method_args
     )
     .x
+}
+
+#' @rdname via
+#' @export
+via.engine_set = function(.x, .method, ..., engine = NULL) {
+    engine = engine %||% .x$engine %||% "default"
+    class(.x) = class(.x)[class(.x) != "engine_set"]
+    via.test_lazy(.x, .method, ..., engine = engine)
 }

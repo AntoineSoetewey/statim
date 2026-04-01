@@ -3,11 +3,14 @@
 \name{via}
 \alias{via}
 \alias{via.test_lazy}
+\alias{via.engine_set}
 \title{Recalibrate H-test pipeline with \code{via()}}
 \usage{
 via(.x, .method, ...)
 
-\method{via}{test_lazy}(.x, .method, ..., engine = "default")
+\method{via}{test_lazy}(.x, .method, ..., engine = NULL)
+
+\method{via}{engine_set}(.x, .method, ..., engine = NULL)
 }
 \description{
 Recalibrate H-test pipeline with \code{via()}
