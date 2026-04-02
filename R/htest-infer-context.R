@@ -31,25 +31,62 @@
 #'   [conclude()]
 #'
 #' @keywords internal
-infer_context = function(
-    processed,
-    args,
-    extractors,
-    fun_args = NULL,
-    claims = NULL,
-    method_args = NULL
-) {
-    out = list(
-        processed = processed,
-        args = args,
-        extractors = extractors,
-        fun_args = fun_args,
-        claims = claims,
-        method_args = method_args %||% list()
-    )
-    class(out) = "infer_context"
-    out
-}
+infer_context = S7::new_class(
+    "infer_context",
+    properties = list(
+        processed = S7::class_any,
+        args = S7::class_list,
+        extractors = S7::class_list,
+        fun_args = S7::new_property(
+            class = S7::class_any,
+            default = NULL,
+            validator = function(value) {
+                if (!is.null(value) && !inherits(value, "fun_args"))
+                    "must be a `fun_args` object or NULL"
+            }
+        ),
+        claims = S7::class_any,
+        method_args = S7::class_list
+    ),
+    constructor = function(
+        processed,
+        args = list(),
+        extractors = list(),
+        fun_args = NULL,
+        claims = NULL,
+        method_args = NULL
+    ) {
+        S7::new_object(
+            S7::S7_object(),
+            processed = processed,
+            args = args,
+            extractors = extractors,
+            fun_args = fun_args,
+            claims = claims,
+            method_args = method_args %||% list()
+        )
+    }
+)
+
+# infer_context = function(
+#     processed,
+#     args,
+#     extractors,
+#     fun_args = NULL,
+#     claims = NULL,
+#     method_args = NULL
+# ) {
+#     out = list(
+#         processed = processed,
+#         args = args,
+#         extractors = extractors,
+#         fun_args = fun_args,
+#         claims = claims,
+#         method_args = method_args %||% list()
+#     )
+#     class(out) = "infer_context"
+#     out
+# }
 
 #' Access data and arguments inside a test implementation
 #'
@@ -97,10 +134,10 @@ NULL
 #' @rdname infer-context-accessors
 #' @export
 ic_pull = function(x, role) {
-    extractor = x$extractors[[role]]
+    extractor = x@extractors[[role]]
     if (is.null(extractor))
         cli::cli_abort("No extractor for role {.val {role}}.")
-    extractor(x$processed)
+    extractor(x@processed)
 }
 
 #' @rdname infer-context-accessors
@@ -113,10 +150,10 @@ ic_name = function(x, role) {
 #' @rdname infer-context-accessors
 #' @export
 ic_arg = function(x, name, default = NULL) {
-    if (!is.null(x$args[[name]])) return(x$args[[name]])
+    if (!is.null(x@args[[name]])) return(x@args[[name]])
 
-    if (!is.null(x$fun_args)) {
-        decl = x$fun_args[[name]]
+    if (!is.null(x@fun_args)) {
+        decl = x@fun_args[[name]]
         if (!is.null(decl)) {
             if (decl$required) {
                 cli::cli_abort(
@@ -133,11 +170,11 @@ ic_arg = function(x, name, default = NULL) {
 #' @rdname infer-context-accessors
 #' @export
 ic_method_arg = function(x, name, default = NULL) {
-    x$method_args[[name]] %||% default
+    x@method_args[[name]] %||% default
 }
 
 #' @rdname infer-context-accessors
 #' @export
 ic_claim = function(x, name) {
-    x$claims[[name]]
+    x@claims[[name]]
 }
