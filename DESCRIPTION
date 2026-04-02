@@ -1,7 +1,7 @@
 Package: statim
 Type: Package
 Title: Higher Level Interface for Statistical Inference
-Version: 0.1.0
+Version: 0.0.0.9000
 Authors@R: c(
     person("Joshua", "Marie", 
            email = "joshua.marie.k@gmail.com", 
@@ -27,7 +27,8 @@ Imports:
     tidyselect,
     stats,
     utils,
-    S7
+    S7,
+    tabstats
 Suggests:
     testthat (>= 3.0.0),
     magrittr,
@@ -35,7 +36,8 @@ Suggests:
     rmarkdown,
     broom,
     pander,
-    Rfast2
+    Rfast2,
+    purrr
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
 Depends: 
