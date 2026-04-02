@@ -9,33 +9,99 @@ ttest_def_two = test_define(
     ),
     vars = list(
         x = function(p) p$x_data[[1]],
-        group = function(p) p$group_data[[1]]
+        group = function(p) p$group_data
     ),
     run = function(self) {
-        grp = as.character(ic_pull(self, "group"))
         resp = ic_pull(self, "x")
-        lvls = unique(grp)
+        group_df = ic_pull(self, "group")
+        ci_level = ic_arg(self, ".ci")
+        paired = ic_arg(self, ".paired")
+        mu = ic_arg(self, ".mu")
+        alt = ic_arg(self, ".alt")
 
-        if (length(lvls) != 2L) {
-            cli::cli_abort(c(
-                "Two-sample t-test requires exactly 2 groups.",
-                "i" = "Found {length(lvls)} group{{?s}} in {.val {ic_name(self, 'group')}}."
-            ))
-        }
+        tests = lapply(names(group_df), function(grp_name) {
+            grp = as.character(group_df[[grp_name]])
+            lvls = unique(grp)
 
-        stats::t.test(
-            x = resp[grp == lvls[[1]]],
-            y = resp[grp == lvls[[2]]],
-            paired = ic_arg(self, ".paired"),
-            mu = ic_arg(self, ".mu"),
-            alternative = ic_arg(self, ".alt"),
-            conf.level = ic_arg(self, ".ci")
+            if (length(lvls) != 2L) {
+                cli::cli_abort(c(
+                    "Two-sample t-test requires exactly 2 groups.",
+                    "i" = "Found {length(lvls)} group{{?s}} in {.val {grp_name}}."
+                ))
+            }
+
+            res = stats::t.test(
+                x = resp[grp == lvls[[1]]],
+                y = resp[grp == lvls[[2]]],
+                paired = paired,
+                mu = mu,
+                alternative = alt,
+                conf.level = ci_level
+            )
+
+            list(group = grp_name, ttest = res)
+        })
+
+        tibble::tibble(
+            group = vapply(tests, `[[`, character(1), "group"),
+            ttest = lapply(tests, `[[`, "ttest")
         )
     },
     print = function(x, ...) {
-        rlang::check_installed(c("broom", "pander"),
-            reason = "to print t-test results in tabular form")
-        pander::pander(broom::tidy(x$data))
+        rlang::check_installed(
+            c("broom", "purrr"),
+            reason = "to retrieve t-test results and re-store it in a data frame"
+        )
+
+        dat = x$data
+
+        tidy_rows = lapply(seq_len(nrow(dat)), function(i) {
+            td = broom::tidy(dat$ttest[[i]])
+            ci_level = attr(purrr::pluck(dat$ttest[[i]], "conf.int"), "conf.level")
+            lo_name = paste0("lower_", ci_level * 100)
+            up_name = paste0("upper_", ci_level * 100)
+
+            stat_row = dplyr::transmute(
+                td,
+                groups = dat$group[[i]],
+                diff = estimate,
+                `t-stat` = statistic,
+                pval = p.value
+            )
+            ci_row = dplyr::transmute(
+                td,
+                groups = dat$group[[i]],
+                !!lo_name := conf.low,
+                !!up_name := conf.high
+            )
+            list(stat = stat_row, ci = ci_row)
+        })
+
+        stat_out = dplyr::bind_rows(lapply(tidy_rows, `[[`, "stat"))
+        ci_out = dplyr::bind_rows(lapply(tidy_rows, `[[`, "ci"))
+
+        pval_styler = function(x) {
+            x_num = suppressWarnings(as.numeric(x$value))
+            if (is.na(x_num) || x_num > 0.05) {
+                cli::style_italic(x$value)
+            } else if (x_num > 0.01) {
+                cli::col_red(x$value)
+            } else {
+                cli::style_bold("<0.001")
+            }
+        }
+
+        cli::cat_line(cli::rule(left = "Summary", line = "-"), "\n")
+        tabstats::table_default(
+            stat_out,
+            style_columns = tabstats::td_style(pval = pval_styler)
+        )
+        cat("\n\n")
+
+        cli::cat_line(cli::rule(left = "Confidence Interval", line = "-"), "\n")
+        tabstats::table_default(ci_out)
+        cat("\n\n")
+
         invisible(x)
     }
 )
@@ -154,19 +220,22 @@ ttest_def_permute_rfast = test_define(
         group = function(p) p$group_data[[1]]
     ),
     run = function(self) {
-        rlang::check_installed("Rfast2",
-            reason = "to run the Rfast2-backed permutation t-test engine")
+        rlang::check_installed(
+            "Rfast2",
+            reason = "to run the Rfast2-backed permutation t-test engine"
+        )
 
         B = ic_method_arg(self, "B")
         grp = as.character(ic_pull(self, "group"))
         resp = ic_pull(self, "x")
         lvls = unique(grp)
 
-        if (length(lvls) != 2L)
+        if (length(lvls) != 2L) {
             cli::cli_abort(c(
                 "Permutation t-test requires exactly 2 groups.",
                 "i" = "Found {length(lvls)} group{{?s}}."
             ))
+        }
 
         x = resp[grp == lvls[[1]]]
         y = resp[grp == lvls[[2]]]
