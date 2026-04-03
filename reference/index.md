@@ -25,7 +25,7 @@ allowed.
 
 ### H-test configuration
 
-Verbs that defines the test you want to execute
+Verbs that define the test you want to execute
 
 - [`via()`](https://joshuamarie.github.io/statim/reference/via.md) :
   Recalibrate the test method variant
