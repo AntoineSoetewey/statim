@@ -41,7 +41,21 @@ prepare_test.def_model = function(.x, .test, ...) {
     out
 }
 
+#' Recalibrate arguments from the main pipeline
+#'
+#' This function is ideal to transmute and modify the parameters being used in the test
+#' under the pipeline.
+#'
+#' @examples
+#' sleep |>
+#'     define_model(extra ~ group) |>
+#'     prepare_test(TTEST) |>
+#'     update(.paired = TRUE) |>
+#'     conclude()
+#'
+#'
 #' @importFrom stats update
+#' @keywords internal
 #' @export
 update.test_lazy = function(object, ...) {
     dots = list(...)
