@@ -171,9 +171,9 @@ Acts like a storage room to store the metadata of H-test definitions
 ## Battery-ready H-test functions
 
 Functions used for Hypothesis testing. TTEST supports classical
-two-sample and paired t-tests, as well as method variants via via():
-“boot” (bootstrap confidence interval) and “permute” (permutation test,
-with a “rfast” engine backed by Rfast2).
+two-sample and paired t-tests, as well as method variants available via
+via(): “boot” (bootstrap confidence interval) and “permute” (permutation
+test, with a “rfast” engine backed by Rfast2).
 
 - [`TTEST()`](https://joshuamarie.github.io/statim/reference/TTEST.md) :
   T-Test
