@@ -56,12 +56,12 @@ define_model(x_by(extra, group), sleep)
 #> [[1]]
 #> <quosure>
 #> expr: ^extra
-#> env:  0x55daa24dfb58
+#> env:  0x55f5af898700
 #> 
 #> [[2]]
 #> <quosure>
 #> expr: ^group
-#> env:  0x55daa24dfb58
+#> env:  0x55f5af898700
 #> 
 #> attr(,"class")
 #> [1] "x_by"     "model_id"
@@ -123,12 +123,12 @@ sleep |> define_model(x_by(extra, group))
 #> [[1]]
 #> <quosure>
 #> expr: ^extra
-#> env:  0x55daa24dfb58
+#> env:  0x55f5af898700
 #> 
 #> [[2]]
 #> <quosure>
 #> expr: ^group
-#> env:  0x55daa24dfb58
+#> env:  0x55f5af898700
 #> 
 #> attr(,"class")
 #> [1] "x_by"     "model_id"
