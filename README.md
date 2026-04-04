@@ -8,8 +8,8 @@
 <!-- badges: start -->
 
 [![CRAN
-status](https://www.r-pkg.org/badges/version/kindling)](https://CRAN.R-project.org/package=kindling)
-[![R-CMD-check](https://github.com/joshuamarie/kindling/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/joshuamarie/kindling/actions/workflows/R-CMD-check.yaml)
+status](https://www.r-pkg.org/badges/version/statim)](https://CRAN.R-project.org/package=statim)
+[![R-CMD-check](https://github.com/joshuamarie/statim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/joshuamarie/statim/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/joshuamarie/statim/graph/badge.svg)](https://app.codecov.io/gh/joshuamarie/statim)
 <!-- badges: end -->
