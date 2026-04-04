@@ -5,7 +5,16 @@
 
 # statim <img src="man/figures/logo.png" align="right" height="139" />
 
-**Higer Level Interface for Statistical Inference**
+<!-- badges: start -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/kindling)](https://CRAN.R-project.org/package=kindling)
+[![R-CMD-check](https://github.com/joshuamarie/kindling/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/joshuamarie/kindling/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/joshuamarie/statim/graph/badge.svg)](https://app.codecov.io/gh/joshuamarie/statim)
+<!-- badges: end -->
+
+**Higher Level Interface for Statistical Inference**
 
 ## What does *statim* mean?
 
@@ -57,8 +66,8 @@ MIT © Joshua Marie
 
 ## Contributing
 
-We are sincerely grateful for contributions; they are beneficial for
-the project and for us as maintainers. Please read
+We are sincerely grateful for contributions; they are beneficial for the
+project and for us as maintainers. Please read
 [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, pull request
 guidelines, and workflow notes.
 
