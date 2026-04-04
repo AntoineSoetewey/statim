@@ -57,7 +57,10 @@ rel = function(x, resp) {
 pairwise = function(..., direction = "lt") {
     dots = rlang::enquos(...)
     out = list(
-        args = list(dots = rlang::expr(c(!!!dots))),
+        args = list(
+            dots = rlang::expr(c(!!!dots)),
+            dots_quos = dots
+        ),
         direction = direction
     )
     model_id_class(out, "pairwise")
