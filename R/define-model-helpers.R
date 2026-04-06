@@ -223,7 +223,7 @@ resolve_inlines = function(cl, data = NULL, role = "x") {
         rlang::set_names(list(val), nm)
     })
 
-    vctrs::new_data_frame(do.call(c, cols))
+    vctrs::new_data_frame(rlang::exec(c, !!!cols))
 }
 
 auto_name = function(role, idx) {
@@ -253,7 +253,7 @@ pairwise_data_extract = function(args, data = NULL) {
 
     # var_names = vapply(resolved, \(df) names(df)[[1]], character(1))
     var_names = unlist(lapply(resolved, names))
-    selected_data = do.call(cbind, resolved)
+    selected_data = rlang::exec(vctrs::vec_cbind, !!!resolved)
 
     pairs = pairs_generator(
         var_names,
