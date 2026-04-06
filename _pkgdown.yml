@@ -96,6 +96,7 @@ reference:
     contents:
     - model_id_class
     - model-processor
+    - model_id_info
 
   - subtitle: Inference context interactors
     desc: Functions to interact objects from the pipeline
