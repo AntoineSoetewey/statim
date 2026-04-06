@@ -7,9 +7,10 @@
 rel(x, resp)
 }
 \arguments{
-\item{x}{The predictor variable (bare name).}
+\item{x}{The predictor variable. A bare name, \code{c()} of bare names, a
+tidyselect helper (requires \code{data}), or \code{I(expr)} for inline data.}
 
-\item{resp}{The response variable (bare name).}
+\item{resp}{The response variable. Same rules as \code{x}.}
 }
 \value{
 A \code{rel} / \code{model_id} S3 object.

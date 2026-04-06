@@ -2,17 +2,28 @@
 #'
 #' Use this when you want to compare `x` by `group`.
 #'
-#' @param x The response variable (bare name).
-#' @param group The grouping variable (bare name).
+#' @param x The response variable. A bare name, `c()` of bare names, a
+#'   tidyselect helper (requires `data`), or `I(expr)` for inline data.
+#' @param group The grouping variable. Same rules as `x`.
 #'
 #' @return An `x_by` / `model_id` S3 object.
 #'
 #' @examples
+#' # bare names (resolved from environment or data)
 #' x_by(extra, group)
+#'
+#' # inline data
+#' x_by(I(rnorm(30)), I(rep(c("a", "b"), each = 15)))
+#'
+#' # named inline
+#' x_by(I(score = rnorm(30)), I(grp = rep(c("a", "b"), each = 15)))
 #'
 #' @export
 x_by = function(x, group) {
-    args = rlang::enquos(x, group)
+    args = rlang::list2(
+        x = rlang::enquo(x),
+        group = rlang::enquo(group)
+    )
     model_id_class(args, "x_by")
 }
 
@@ -20,8 +31,9 @@ x_by = function(x, group) {
 #'
 #' Use this when you want to define the relationship between two variables.
 #'
-#' @param x The predictor variable (bare name).
-#' @param resp The response variable (bare name).
+#' @param x The predictor variable. A bare name, `c()` of bare names, a
+#'   tidyselect helper (requires `data`), or `I(expr)` for inline data.
+#' @param resp The response variable. Same rules as `x`.
 #'
 #' @return A `rel` / `model_id` S3 object.
 #'
@@ -42,16 +54,17 @@ rel = function(x, resp) {
 #' Use this when you want to define all pairwise combinations of a set of
 #' variables.
 #'
-#' @param ... Bare variable names to pair up.
+#' @param ... Bare variable names, tidyselect helpers (requires `data`), or
+#'   `I(expr)` for inline data.
 #' @param direction A string controlling which pairs are kept. One of
-#'   `"lt"` (default, strict lower-triangle), `"lteq"`, `"gt"`, `"gteq"`,
-#'   `"eq"`, `"neq"`, or `"all"`.
+#'   `"lt"` (default), `"lteq"`, `"gt"`, `"gteq"`, `"eq"`, `"neq"`,
+#'   or `"all"`.
 #'
 #' @return A `pairwise` / `model_id` S3 object.
 #'
 #' @examples
 #' pairwise(a, b, c)
-#' pairwise(a, b, c, direction = "all")
+#' pairwise(I(rnorm(30)), I(rnorm(30)), I(rnorm(30)))
 #'
 #' @export
 pairwise = function(..., direction = "lt") {
@@ -68,11 +81,8 @@ pairwise = function(..., direction = "lt") {
 
 #' Attach a model-ID class to an object
 #'
-#' Low-level constructor used by [x_by()], [rel()], and [pairwise()].
-#' Extension authors can use this to register custom model-ID types.
-#'
 #' @param obj A list representing the model ID payload.
-#' @param clss A string giving the primary class name (e.g. `"x_by"`).
+#' @param clss A string giving the primary class name.
 #'
 #' @return `obj` with `class` set to `c(clss, "model_id")`.
 #'
@@ -80,4 +90,16 @@ pairwise = function(..., direction = "lt") {
 model_id_class = function(obj, clss) {
     class(obj) = c(clss, "model_id")
     obj
+}
+
+#' @keywords internal
+#' @export
+print.model_id = function(x, ...) {
+    info = model_id_info(x)
+
+    cat(cli::rule(left = "Model Definition", line = "-"), "\n\n")
+    cat("Model ID :", info$model_type, "\n")
+    cat("Args :", info$args, "\n")
+
+    invisible(x)
 }

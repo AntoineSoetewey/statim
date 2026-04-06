@@ -7,9 +7,10 @@
 x_by(x, group)
 }
 \arguments{
-\item{x}{The response variable (bare name).}
+\item{x}{The response variable. A bare name, \code{c()} of bare names, a
+tidyselect helper (requires \code{data}), or \code{I(expr)} for inline data.}
 
-\item{group}{The grouping variable (bare name).}
+\item{group}{The grouping variable. Same rules as \code{x}.}
 }
 \value{
 An \code{x_by} / \code{model_id} S3 object.
@@ -18,6 +19,13 @@ An \code{x_by} / \code{model_id} S3 object.
 Use this when you want to compare \code{x} by \code{group}.
 }
 \examples{
+# bare names (resolved from environment or data)
 x_by(extra, group)
+
+# inline data
+x_by(I(rnorm(30)), I(rep(c("a", "b"), each = 15)))
+
+# named inline
+x_by(I(score = rnorm(30)), I(grp = rep(c("a", "b"), each = 15)))
 
 }

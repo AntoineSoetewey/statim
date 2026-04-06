@@ -9,12 +9,11 @@ model_id_class(obj, clss)
 \arguments{
 \item{obj}{A list representing the model ID payload.}
 
-\item{clss}{A string giving the primary class name (e.g. \code{"x_by"}).}
+\item{clss}{A string giving the primary class name.}
 }
 \value{
 \code{obj} with \code{class} set to \code{c(clss, "model_id")}.
 }
 \description{
-Low-level constructor used by \code{\link[=x_by]{x_by()}}, \code{\link[=rel]{rel()}}, and \code{\link[=pairwise]{pairwise()}}.
-Extension authors can use this to register custom model-ID types.
+Attach a model-ID class to an object
 }

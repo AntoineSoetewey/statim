@@ -7,11 +7,12 @@
 pairwise(..., direction = "lt")
 }
 \arguments{
-\item{...}{Bare variable names to pair up.}
+\item{...}{Bare variable names, tidyselect helpers (requires \code{data}), or
+\code{I(expr)} for inline data.}
 
 \item{direction}{A string controlling which pairs are kept. One of
-\code{"lt"} (default, strict lower-triangle), \code{"lteq"}, \code{"gt"}, \code{"gteq"},
-\code{"eq"}, \code{"neq"}, or \code{"all"}.}
+\code{"lt"} (default), \code{"lteq"}, \code{"gt"}, \code{"gteq"}, \code{"eq"}, \code{"neq"},
+or \code{"all"}.}
 }
 \value{
 A \code{pairwise} / \code{model_id} S3 object.
@@ -22,6 +23,6 @@ variables.
 }
 \examples{
 pairwise(a, b, c)
-pairwise(a, b, c, direction = "all")
+pairwise(I(rnorm(30)), I(rnorm(30)), I(rnorm(30)))
 
 }
