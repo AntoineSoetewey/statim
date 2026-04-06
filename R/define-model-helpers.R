@@ -76,6 +76,8 @@ classify_quo = function(quo) {
         if (!all_symbols) ":error" else ":c_call"
     } else if (rlang::is_call(expr, "inlines")) {
         ":inlines_call"
+    } else if (rlang::is_call(expr, ":") && is.symbol(expr[[2]]) && is.symbol(expr[[3]])) {
+        ":tidyselect"
     } else if (rlang::is_call(expr)) {
         fn_name = as.character(expr[[1]])
         if (fn_name %in% getNamespaceExports("tidyselect")) {
@@ -249,7 +251,8 @@ pairwise_data_extract = function(args, data = NULL) {
         resolve_quo(dots_quos[[i]], data = data, role = "p", idx = i)
     })
 
-    var_names = vapply(resolved, \(df) names(df)[[1]], character(1))
+    # var_names = vapply(resolved, \(df) names(df)[[1]], character(1))
+    var_names = unlist(lapply(resolved, names))
     selected_data = do.call(cbind, resolved)
 
     pairs = pairs_generator(
