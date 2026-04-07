@@ -156,8 +156,21 @@ ttest_def_boot = test_define(
     },
     print = function(x, ...) {
         ci = round(x$data$ci, 4)
-        cli::cli_text("{.field Bootstrap CI} : [{ci[[1]]}, {ci[[2]]}]")
-        cli::cli_text("{.field Replicates}   : {x$data$n}")
+        summary_data = tibble::tibble(
+            names = c("CI", "n_reps"),
+            vals = c(paste0("[", ci[[1]], ", ", ci[[2]], "]"), x$data$n)
+        )
+
+        cli::cat_line(cli::rule(center = "Bootstrapped T-test", line = "="), "\n\n")
+        cli::cat_line(cli::rule(left = "Summary", line = "-"), "\n")
+        tabstats::table_summary(
+            summary_data,
+            style = tabstats::sm_style(
+                sep = ":  "
+            ),
+            center_table = TRUE
+        )
+        cat("\n\n")
         invisible(x)
     }
 )
@@ -204,9 +217,30 @@ ttest_def_permute = test_define(
         )
     },
     print = function(x, ...) {
-        cli::cli_text("{.field Observed}      : {round(x$data$observed, 4)}")
-        cli::cli_text("{.field p-value (perm)}: {round(x$data$p.value, 4)}")
-        cli::cli_text("{.field Permutations}  : {x$data$n}")
+        summary_data = tibble::tibble(
+            Statistic = round(x$data$observed, 4),
+            `p-value` = round(x$data$p.value, 4),
+            n_perms = x$data$n
+        )
+
+        pval_styler = function(x) {
+            x_num = suppressWarnings(as.numeric(x$value))
+            if (is.na(x_num) || x_num > 0.05) {
+                cli::style_italic(x$value)
+            } else if (x_num > 0.01) {
+                cli::col_red(x$value)
+            } else {
+                cli::style_bold("<0.001")
+            }
+        }
+
+        cli::cat_line(cli::rule(center = "T-test Permutation", line = "="), "\n\n")
+        cli::cat_line(cli::rule(left = "Summary", line = "-"), "\n")
+        tabstats::table_default(
+            summary_data,
+            style_columns = tabstats::td_style(`p-value` = pval_styler)
+        )
+        cat("\n\n")
         invisible(x)
     }
 )
@@ -257,9 +291,34 @@ ttest_def_permute_rfast = test_define(
         )
     },
     print = function(x, ...) {
-        cli::cli_text("{.field Statistic}            : {round(x$data$stat, 4)}")
-        cli::cli_text("{.field p-value (permutation)}: {round(x$data$p.value, 4)}")
-        cli::cli_text("{.field Permutations}         : {x$data$B}")
+        summary_data = tibble::tibble(
+            Statistic = round(x$data$stat, 4),
+            `p-value` = round(x$data$p.value, 4),
+            n_perms = x$data$B
+        )
+
+        pval_styler = function(x) {
+            x_num = suppressWarnings(as.numeric(x$value))
+            if (is.na(x_num) || x_num > 0.05) {
+                cli::style_italic(x$value)
+            } else if (x_num > 0.01) {
+                cli::col_red(x$value)
+            } else {
+                cli::style_bold("<0.001")
+            }
+        }
+
+        cli::cat_line(cli::rule(center = "T-test Permutation", line = "="), "\n\n")
+        cli::cat_line(cli::rule(left = "Summary", line = "-"), "\n")
+        tabstats::table_default(
+            summary_data,
+            style_columns = tabstats::td_style(`p-value` = pval_styler)
+        )
+        cat("\n\n")
+
+        # cli::cli_text("{.field Statistic}            : {round(x$data$stat, 4)}")
+        # cli::cli_text("{.field p-value (permutation)}: {round(x$data$p.value, 4)}")
+        # cli::cli_text("{.field Permutations}         : {x$data$B}")
         invisible(x)
     }
 )
