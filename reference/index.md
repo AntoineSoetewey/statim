@@ -23,6 +23,14 @@ allowed.
 - [`pairwise()`](https://joshuamarie.github.io/statim/reference/pairwise.md)
   : 'Pairs between variables' model mapping
 
+### Multiple Inline Codes
+
+Analogue to [`I()`](https://rdrr.io/r/base/AsIs.html), but only captures
+the expression, not evaluated, and accepts multiple inline codes.
+
+- [`inlines()`](https://joshuamarie.github.io/statim/reference/inlines.md)
+  : Inline multiple expressions in a model ID
+
 ### H-test configuration
 
 Verbs that define the test you want to execute
@@ -64,6 +72,8 @@ You can make new mappers with these functions
   : Attach a model-ID class to an object
 - [`model_processor()`](https://joshuamarie.github.io/statim/reference/model-processor.md)
   : Model evaluator
+- [`model_id_info()`](https://joshuamarie.github.io/statim/reference/model_id_info.md)
+  : Extract metadata from a model ID
 
 ### Inference context interactors
 

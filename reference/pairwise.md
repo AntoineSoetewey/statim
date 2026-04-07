@@ -13,13 +13,13 @@ pairwise(..., direction = "lt")
 
 - ...:
 
-  Bare variable names to pair up.
+  Bare variable names, tidyselect helpers (requires `data`), or
+  `I(expr)` for inline data.
 
 - direction:
 
-  A string controlling which pairs are kept. One of `"lt"` (default,
-  strict lower-triangle), `"lteq"`, `"gt"`, `"gteq"`, `"eq"`, `"neq"`,
-  or `"all"`.
+  A string controlling which pairs are kept. One of `"lt"` (default),
+  `"lteq"`, `"gt"`, `"gteq"`, `"eq"`, `"neq"`, or `"all"`.
 
 ## Value
 
@@ -29,25 +29,13 @@ A `pairwise` / `model_id` S3 object.
 
 ``` r
 pairwise(a, b, c)
-#> $args
-#> $args$dots
-#> c(~a, ~b, ~c)
+#> -- Model Definition ------------------------------------------------------------ 
 #> 
+#> Model ID : pairwise 
+#> Args : a, b, c 
+pairwise(I(rnorm(30)), I(rnorm(30)), I(rnorm(30)))
+#> -- Model Definition ------------------------------------------------------------ 
 #> 
-#> $direction
-#> [1] "lt"
-#> 
-#> attr(,"class")
-#> [1] "pairwise" "model_id"
-pairwise(a, b, c, direction = "all")
-#> $args
-#> $args$dots
-#> c(~a, ~b, ~c)
-#> 
-#> 
-#> $direction
-#> [1] "all"
-#> 
-#> attr(,"class")
-#> [1] "pairwise" "model_id"
+#> Model ID : pairwise 
+#> Args : <inline>, <inline>, <inline> 
 ```
