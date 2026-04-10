@@ -78,7 +78,7 @@ test_that("cor_test_rel respects .ci argument", {
 
 test_that("cor_test_rel spearman has no conf.int", {
     expect_warning(
-        {l
+        {
             result = cars |>
                 define_model(rel(speed, dist)) |>
                 prepare_test(CORTEST) |>
