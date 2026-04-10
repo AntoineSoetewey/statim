@@ -85,7 +85,8 @@ test_that("cor_test_rel spearman has no conf.int", {
                 update(.cor_type = "spearman") |>
                 conclude()
         },
-        regexp = "Cannot compute exact p-value with ties"
+        regexp = "Cannot compute exact p-value with ties",
+        ignore.case = TRUE
     )
 
     expect_null(result$data$res$cortest[[1]]$conf.int)
