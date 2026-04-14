@@ -166,6 +166,7 @@ HTEST_FN = function(cls, defs, .name) {
             )
         }
 
+        .extra_defs = standardize_extra_args(.extra_defs)
         build_htest(
             cls = cls,
             args = list(...),
@@ -174,6 +175,19 @@ HTEST_FN = function(cls, defs, .name) {
             .data = .data,
             .name = .name
         )
+    }
+}
+
+standardize_extra_args = function(defs) {
+    if (S7::S7_inherits(defs)) {
+        list(defs)
+    } else if (is.list(defs)) {
+        defs
+    } else {
+        cli::cli_abort(c(
+            "{.arg .extra_defs} must be a {.cls test_define} object or a list of them.",
+            "x" = "Got {.cls {class(.extra_defs)}}."
+        ))
     }
 }
 
