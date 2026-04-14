@@ -36,7 +36,16 @@ infer_context = S7::new_class(
     properties = list(
         processed = S7::class_any,
         args = S7::class_list,
-        extractors = S7::class_list,
+        extractors = S7::new_property(
+            class = S7::class_list,
+            validator = function(value) {
+                is_fn = vapply(value, is.function, logical(1))
+                if (!all(is_fn)) {
+                    bad = names(value)[!is_fn]
+                    cli::format_inline("all extractors must be functions; these are not: {.val {bad}}")
+                }
+            }
+        ),
         fun_args = S7::new_property(
             class = S7::class_any,
             default = NULL,
@@ -137,7 +146,16 @@ ic_pull = function(x, role) {
     extractor = x@extractors[[role]]
     if (is.null(extractor))
         cli::cli_abort("No extractor for role {.val {role}}.")
-    extractor(x@processed)
+
+    proc = extractor(x@processed)
+    if (is.null(proc)) {
+        cli::cli_abort(c(
+            "Extractor for role {.val {role}} returned {.val NULL}.",
+            "i" = "Does your extractor match the processed model type?"
+        ))
+    }
+
+    proc
 }
 
 #' @rdname infer-context-accessors
