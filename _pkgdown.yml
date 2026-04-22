@@ -114,6 +114,7 @@ reference:
     contents:
     - test_define
     - HTEST_FN
+    - htest-defs-modifiers
 
   - title: Battery-ready H-test functions
     desc: Functions used for Hypothesis testing
