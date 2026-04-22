@@ -34,8 +34,10 @@ via.test_lazy = function(.x, .method, ..., engine = NULL) {
     dots = list(...)
     engine = engine %||% .x$engine %||% "default"
 
+    lookup = build_lookup(c(.x$test_spec$defs, get_htest_defs(.x$test_spec$cls)))
+
     key = paste0(class(.x$model_id)[[1]], "::", .method, "::", engine)
-    def = .x$test_spec$lookup[[key]] %||% cli::cli_abort(
+    def = lookup[[key]] %||% cli::cli_abort(
         "No implementation for method {.val {(.method)}}."
     )
 

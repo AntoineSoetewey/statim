@@ -98,7 +98,13 @@ build_lookup = function(defs) {
         method_name = if (is.null(d@method)) "" else d@method@method_name
         paste0(d@model_type, "::", method_name, "::", d@engine)
     }, character(1))
-    rlang::set_names(defs, keys)
+
+    defs_rev = rev(defs)
+    keys_rev = rev(keys)
+    lookup = rlang::set_names(defs_rev, keys_rev)
+
+    # rlang::set_names(defs, keys)
+    lookup[!duplicated(names(lookup))]
 }
 
 find_def = function(lookup, model_type, method_name = "", engine = "default") {
@@ -166,11 +172,11 @@ HTEST_FN = function(cls, defs, .name) {
             )
         }
 
-        .extra_defs = standardize_extra_args(.extra_defs)
+        .extra_defs = standardize_extra_defs(.extra_defs)
         build_htest(
             cls = cls,
             args = list(...),
-            defs = c(defs, .extra_defs),
+            defs = c(defs, get_htest_defs(cls), .extra_defs),
             model_id = .model,
             .data = .data,
             .name = .name
@@ -178,7 +184,7 @@ HTEST_FN = function(cls, defs, .name) {
     }
 }
 
-standardize_extra_args = function(defs) {
+standardize_extra_defs = function(defs) {
     if (S7::S7_inherits(defs)) {
         list(defs)
     } else if (is.list(defs)) {
