@@ -7,6 +7,11 @@
 #' @param defs A [test_define] object or a list of [test_define] objects to be
 #'   referenced globally. Each element must be a valid S7 `test_define` instance —
 #'   passing anything else raises an error.
+#' @param origin Must be one of `"user"` (default) or `"package"`. Controls
+#'   the origin tag attached to each registered def. Use `"package"` inside
+#'   `.onLoad()` hook to protect defs from being wiped by [clear_htest_defs()],
+#'   which only removes `"user"`-originated defs by default. Passing
+#'   `"package"` in interactive code is discouraged.
 #' @param cls A string naming the test class to clear (e.g. `"ttest"`). When
 #'   `NULL` (default), all globally registered definitions are cleared.
 #'
@@ -65,11 +70,13 @@ NULL
 #'   each def's `impl_class` prefix (e.g. `"ttest_permute_rfast"` routes into
 #'   `"ttest"`), scoping it to the correct [HTEST_FN]-based function.
 #' @export
-add_htest_defs = function(defs) {
+add_htest_defs = function(defs, origin = c("user", "package")) {
+    origin = match.arg(origin)
     defs = standardize_extra_defs(defs)
     lapply(defs, function(def) {
         key = strsplit(def@impl_class, "_")[[1]][[1]]
-        htest_opts_global$defs[[key]] = c(htest_opts_global$defs[[key]], list(def))
+        entry = list(def = def, origin = origin)
+        htest_opts_global$defs[[key]] = c(htest_opts_global$defs[[key]], list(entry))
     })
     invisible(NULL)
 }
@@ -81,19 +88,34 @@ add_htest_defs = function(defs) {
 #' @export
 get_htest_defs = function(cls = NULL) {
     if (is.null(cls)) return(list())
-    htest_opts_global$defs[[cls]] %||% list()
+    # htest_opts_global$defs[[cls]] %||% list()
+    entries = htest_opts_global$defs[[cls]] %||% list()
+    lapply(entries, function(e) e$def)
 }
 
 #' @describeIn htest-defs-modifiers Resets the global H-test store, either
-#'   fully or scoped to a specific `cls`. Subsequent calls to [HTEST_FN]-based
-#'   functions will fall back to their built-in definitions only.
+#'   fully or scoped to a specific `cls`. Only `"user"`-originated defs are
+#'   removed — defs registered with `"package"` origin via `.onLoad()` are
+#'   always preserved. Subsequent calls to [HTEST_FN]-based functions will
+#'   fall back to built-in and package-registered definitions only.
 #' @keywords internal
 #' @export
 clear_htest_defs = function(cls = NULL) {
-    if (is.null(cls)) {
-        htest_opts_global$defs = list()
+    keys = if (is.null(cls)) {
+        names(htest_opts_global$defs)
     } else {
-        htest_opts_global$defs[[cls]] = list()
+        cls
+    }
+    for (key in keys) {
+        entries = htest_opts_global$defs[[key]] %||% list()
+        htest_opts_global$defs[[key]] = Filter(
+            # Hard-coded to keep only the defs under `origin = "package"`
+            # If users added their own `test_define()` objects in a package
+            # And they want to add their own
+            # Make sure to use `statim::add_htest_defs(<test-define>, "package")`
+            function(e) e$origin == "package",
+            entries
+        )
     }
     invisible(NULL)
 }
