@@ -27,6 +27,10 @@ x_by = function(x, group) {
     model_id_class(args, "x_by")
 }
 
+#' @rdname x_by
+#' @export
+`%by%` = x_by
+
 #' 'Relationship between two variables' model mapping
 #'
 #' Use this when you want to define the relationship between two variables.

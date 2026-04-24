@@ -2,9 +2,12 @@
 % Please edit documentation in R/define-model-ids.R
 \name{x_by}
 \alias{x_by}
+\alias{\%by\%}
 \title{'Variable compared by groups' model mapping}
 \usage{
 x_by(x, group)
+
+x \%by\% group
 }
 \arguments{
 \item{x}{The response variable. A bare name, \code{c()} of bare names, a
