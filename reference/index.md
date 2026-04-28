@@ -16,8 +16,9 @@ A verb that describes the model you want to analyze
 Basically mappers to shape the model you want to describe. Formula also
 allowed.
 
-- [`x_by()`](https://joshuamarie.github.io/statim/reference/x_by.md) :
-  'Variable compared by groups' model mapping
+- [`x_by()`](https://joshuamarie.github.io/statim/reference/x_by.md)
+  [`` `%by%` ``](https://joshuamarie.github.io/statim/reference/x_by.md)
+  : 'Variable compared by groups' model mapping
 - [`rel()`](https://joshuamarie.github.io/statim/reference/rel.md) :
   'Relationship between two variables' model mapping
 - [`pairwise()`](https://joshuamarie.github.io/statim/reference/pairwise.md)
@@ -103,6 +104,10 @@ Acts like a storage room to store the metadata of H-test definitions
   : Define a test implementation
 - [`HTEST_FN()`](https://joshuamarie.github.io/statim/reference/HTEST_FN.md)
   : Build a hypothesis test function
+- [`add_htest_defs()`](https://joshuamarie.github.io/statim/reference/htest-defs-modifiers.md)
+  [`get_htest_defs()`](https://joshuamarie.github.io/statim/reference/htest-defs-modifiers.md)
+  [`clear_htest_defs()`](https://joshuamarie.github.io/statim/reference/htest-defs-modifiers.md)
+  : H-test definition modifiers
 
 ## Battery-ready H-test functions
 
