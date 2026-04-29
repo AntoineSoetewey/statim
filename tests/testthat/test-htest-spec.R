@@ -1,57 +1,70 @@
-test_that("method_spec creates correct S7 object", {
-    ms = method_spec("boot", method_type = "bootstrap", defaults = list(n = 1000L, seed = NULL))
-    expect_true(inherits(ms, "statim::method_spec"))
-    expect_equal(ms@method_name, "boot")
-    expect_equal(ms@method_type, "bootstrap")
-    expect_equal(ms@defaults, list(n = 1000L, seed = NULL))
-})
-
-test_that("method_spec with empty defaults", {
-    ms = method_spec("permute", method_type = "replicate")
-    expect_equal(ms@defaults, list())
-})
+dummy_impl = agendas(
+    base = baseline(
+        fn = function(x, .ci = 0.95) list(mean = mean(x), ci = .ci),
+        print = function(x, ...) invisible(x)
+    ),
+    boot = variant(
+        fn = function(x, n = 1000L) list(mean = mean(x), n = n)
+    )
+)
 
 test_that("test_define creates correct S7 object", {
     td = test_define(
         model_type = "x_by",
         impl_class = "mytest_two",
-        engine = "default",
-        run = function(self) list(result = 42)
+        impl = dummy_impl
     )
-    expect_true(inherits(td, "statim::test_define"))
+    expect_true(S7::S7_inherits(td, test_define))
     expect_equal(td@model_type, "x_by")
     expect_equal(td@impl_class, "mytest_two")
-    expect_equal(td@engine, "default")
-    expect_null(td@method)
-    expect_null(td@fun_args)
+    expect_s3_class(td@impl, "agendas")
 })
 
-test_that("test_define stores method and fun_args correctly", {
-    ms = method_spec("boot", "bootstrap", defaults = list(n = 500L))
-    fa = fun_args(.ci = 0.95)
-
-    td = test_define(
-        model_type = "x_by",
-        impl_class = "mytest_boot",
-        method = ms,
-        fun_args = fa,
-        run = function(self) NULL
+test_that("test_define errors on wrong impl type", {
+    expect_error(
+        test_define(model_type = "x_by", impl_class = "t", impl = list()),
+        regexp = "agendas"
     )
-    expect_equal(td@method@method_name, "boot")
-    expect_equal(td@fun_args$.ci$default, 0.95)
 })
 
-test_that("test_define stores vars and print functions", {
-    extractor = function(p) p$x
-    printer = function(x, ...) invisible(x)
+test_that("test_define errors on non-string model_type", {
+    expect_error(
+        test_define(model_type = 1L, impl_class = "t", impl = dummy_impl)
+    )
+})
 
+test_that("test_define errors on non-string impl_class", {
+    expect_error(
+        test_define(model_type = "x_by", impl_class = 1L, impl = dummy_impl)
+    )
+})
+
+test_that("test_define stores compatible_params", {
     td = test_define(
         model_type = "x_by",
-        impl_class = "mytest_print",
-        vars = list(x = extractor),
-        run = function(self) NULL,
-        print = printer
+        impl_class = "mytest_two",
+        impl = dummy_impl,
+        compatible_params = c("MU")
     )
-    expect_identical(td@vars$x, extractor)
-    expect_identical(td@print, printer)
+    expect_equal(td@compatible_params, "MU")
+})
+
+test_that("agendas base is a baseline object", {
+    expect_true(S7::S7_inherits(dummy_impl$base, baseline))
+})
+
+test_that("agendas variants are variant objects", {
+    expect_true(S7::S7_inherits(dummy_impl$variants$boot, variant))
+})
+
+test_that("baseline stores fn correctly", {
+    fn = function(x, .ci = 0.95) x
+    b = baseline(fn = fn)
+    expect_identical(b@fn, fn)
+})
+
+test_that("variant stores fn correctly", {
+    fn = function(x, n = 100L) x
+    v = variant(fn = fn)
+    expect_identical(v@fn, fn)
 })

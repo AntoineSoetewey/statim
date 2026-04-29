@@ -7,19 +7,17 @@ test_that("via.test_lazy sets recalibrate_spec on test_lazy", {
     expect_s3_class(lazy, "test_lazy")
     expect_false(is.null(lazy$recalibrate_spec))
     expect_equal(lazy$recalibrate_spec$method_name, "boot")
-    expect_equal(lazy$recalibrate_spec$engine, "default")
     expect_equal(lazy$recalibrate_spec$args$n, 200)
 })
 
-test_that("via.test_lazy merges defaults with user args", {
-    # ttest_def_boot default n = 1000L, seed = NULL
+test_that("via.test_lazy passes user args correctly", {
     lazy = sleep |>
         define_model(x_by(extra, group)) |>
         prepare_test(TTEST) |>
-        via("boot")  # no overrides
+        via("boot", n = 500, seed = 1L)
 
-    expect_equal(lazy$recalibrate_spec$args$n, 1000L)
-    expect_null(lazy$recalibrate_spec$args$seed)
+    expect_equal(lazy$recalibrate_spec$args$n, 500)
+    expect_equal(lazy$recalibrate_spec$args$seed, 1L)
 })
 
 test_that("via.test_lazy errors on unknown method", {
@@ -30,26 +28,23 @@ test_that("via.test_lazy errors on unknown method", {
     expect_error(via(lazy, "nonexistent_method"))
 })
 
-test_that("via.engine_set removes engine_set class and sets recalibrate_spec", {
+test_that("via.test_lazy errors with available variants listed", {
     lazy = sleep |>
         define_model(x_by(extra, group)) |>
-        prepare_test(TTEST) |>
-        through("default") |>  # → engine_set
-        via("permute", n = 100)
+        prepare_test(TTEST)
 
-    # After via.engine_set, "engine_set" is removed
-    expect_false("engine_set" %in% class(lazy))
-    expect_s3_class(lazy, "test_lazy")
-    expect_equal(lazy$recalibrate_spec$method_name, "permute")
-    expect_equal(lazy$recalibrate_spec$args$n, 100)
+    expect_error(
+        via(lazy, "bayes"),
+        regexp = "boot|permute"
+    )
 })
 
-test_that("via.test_lazy uses engine from through() when set", {
-    lazy = sleep |>
+test_that("conclude respects via args", {
+    result = sleep |>
         define_model(x_by(extra, group)) |>
         prepare_test(TTEST) |>
-        through("default") |>
-        via("permute")
+        via("boot", n = 50, seed = 42) |>
+        conclude()
 
-    expect_equal(lazy$recalibrate_spec$engine, "default")
+    expect_equal(result$data$n, 50)
 })
