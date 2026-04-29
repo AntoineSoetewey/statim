@@ -2,44 +2,40 @@
 % Please edit documentation in R/htest-testcor.R
 \name{CORTEST}
 \alias{CORTEST}
-\title{Correlation test}
+\title{Correlation Test}
 \usage{
-CORTEST(.model = NULL, .data = NULL, ..., .extra_defs = list())
+CORTEST(.model = NULL, .data = NULL, ...)
 }
 \arguments{
-\item{.model}{A model ID from \code{rel()}, \code{pairwise()}, or a formula.
-When supplied, the test executes immediately. When \code{NULL} (default),
-returns a \code{test_spec} for use in the pipeline via \code{\link[=prepare_test]{prepare_test()}}.}
+\item{.model}{A model ID from \code{rel()}. When supplied, the test executes
+immediately. When \code{NULL} (default), returns a \code{test_spec} for use in
+the pipeline via \code{\link[=prepare_test]{prepare_test()}}.}
 
 \item{.data}{A data frame. Only used on the standalone path.}
 
 \item{...}{Additional arguments passed to the implementation:
-\code{.method}, \code{.ci} for the classical path.}
-
-\item{.extra_defs}{A list of additional \code{test_define} objects supplied
-by the user. These extend the available implementations and engines.}
+\code{.cor_type}, \code{.alt}, \code{.ci} for the classical path.}
 }
 \value{
 An \code{htest_spec} object (standalone or eager), or a \code{test_spec}
 object (pipeline).
 }
 \description{
-\code{CORTEST()} performs a t-test for one-sample, two-sample, paired, pairwise,
-or formula-based comparisons.
+\code{CORTEST()} performs a correlation test for one-to-one or many-to-one
+variable relationships.
 }
 \section{Supported model IDs}{
 
 \itemize{
-\item \code{rel()}: Many-to-one correlation test
-\item \code{pairwise()}: Pairwise correlation test
+\item \code{rel()} — many-to-one correlation test
 }
 }
 
 \examples{
-# standalone
+# eager
 CORTEST(rel(speed, dist), cars)
 
-# Main pipeline
+# pipeline
 cars |>
     define_model(rel(speed, dist)) |>
     prepare_test(CORTEST) |>
