@@ -109,7 +109,7 @@ model_id_info.pairwise = function(model_id, processed = NULL) {
 #' @export
 model_id_info.formula = function(model_id, processed = NULL) {
     f = model_id$formula
-    trms = terms(f)
+    trms = stats::terms(f)
     lhs_vars = all.vars(rlang::f_lhs(f))
     rhs_vars = attr(trms, "term.labels")
 
