@@ -20,14 +20,8 @@ home:
 navbar:
   type: light
   structure:
-    # left: [intro, reference, articles, tutorials, news]
     left: [intro, reference]
     right: [search, github, lightswitch, blog]
-  # TODO: uncomment and update href once a vignette is created
-  # components:
-  #   intro:
-  #     text: Get started
-  #     href: articles/statim.html
   components:
     blog:
       text: Blog
@@ -40,99 +34,69 @@ navbar:
 
 reference:
   - title: High Level API
-    desc: Main functions for interactive uses
+    desc: Main functions for interactive use
 
-  - subtitle: Model definition construction verb
-    desc: A verb that describes the model you want to analyze
+  - subtitle: Model definition
+    desc: Verbs that describe the model you want to analyze
     contents:
     - model-define-base
 
   - subtitle: Model IDs
-    desc: Basically mappers to shape the model you want to describe. Formula also allowed.
+    desc: Mappers to shape the model you want to describe. Formula also allowed.
     contents:
     - x_by
     - rel
     - pairwise
 
   - subtitle: Multiple Inline Codes
-    desc: Analogue to `I()`, but only captures the expression, not evaluated, and accepts multiple inline codes.
+    desc: Analogue to `I()`, but only captures the expression and accepts multiple inline codes.
     contents:
     - inlines
 
-  - subtitle: H-test configuration
-    desc: Verbs that define the test you want to execute
-    contents:
-    - via
-    - through
-    - update.test_lazy
-
-  - subtitle: H-test executioner
-    desc: Execute the prepared test pipeline
-    contents:
-    - conclude
-
-
-  - title: Grammatical verbs
-    desc: Functions that signifies "grammar of statistical inference"
-
   - subtitle: H-test pipeline
-    desc: Functions to express the grammar for H-test pipeline
+    desc: Verbs that build and execute the test pipeline
     contents:
     - prepare_test
-    # - write_claim
+    - via
+    - update.test_lazy
+    - conclude
 
-  # TODO: Null Hypotheses handlers section — uncomment when write_claims / generate_null are implemented
-  # - subtitle: Null Hypotheses handlers
-  #   desc: Functions to express the grammar for generating, modifying, and describing null hypothesis models
-  #   contents:
-  #   - write_claims
-  #   - generate_null
-
-  - title: Low Level API
-    desc: Main functions to interact with 'statim' API
-
-  - subtitle: Model ID helpers
-    desc: You can make new mappers with these functions
-    contents:
-    - model_id_class
-    - model-processor
-    - model_id_info
-
-  - subtitle: Inference context interactors
-    desc: Functions to interact objects from the pipeline
-    contents:
-    - infer-context-accessors
-
-  - subtitle: Parameter definers
-    desc: Functions to define function for inference's parameters
-    contents:
-    - fun_args
-    - method_spec
-
-  - subtitle: H-test storage
-    desc: Acts like a storage room to store the metadata of H-test definitions
-    contents:
-    - test_define
-    - HTEST_FN
-    - htest-defs-modifiers
-
-  - title: Battery-ready H-test functions
-    desc: Functions used for Hypothesis testing
-    # desc: >
-    #   Functions used for Hypothesis testing. TTEST supports classical two-sample
-    #   and paired t-tests, as well as method variants available via via(): "boot"
-    #   (bootstrap confidence interval) and "permute" (permutation test, with a
-    #   "rfast" engine backed by Rfast2).
-
+  - subtitle: H-test executioner
+    desc: Eager execution of a prepared test
     contents:
     - TTEST
     - CORTEST
 
-# articles:
-#   - title: Get started
-#     navbar: ~
-#     contents:
-#     - statim
+  - title: Low-level/Implementation API
+    desc: Functions for building and extending test implementations
+
+  - subtitle: Implementation containers
+    desc: Declare how a test runs
+    contents:
+    - agendas
+    - baseline
+    - variant
+
+  - subtitle: Test definition
+    desc: Register a new test implementation
+    contents:
+    - test_define
+    - HTEST_FN
+
+  - subtitle: Session-scoped variant management
+    desc: Add or replace variants on existing test functions
+    contents:
+    - htest-defs-modifiers
+
+  - title: Low Level API
+    desc: Functions to interact with the statim internals
+
+  - subtitle: Model ID helpers
+    desc: Build new model ID mappers
+    contents:
+    - model_id_class
+    - model-processor
+    - model_id_info
 
 footer:
   structure:
