@@ -1,118 +1,139 @@
-#' H-test definition modifiers
+#' Add or replace variants on a test function
 #'
-#' A family of functions for managing globally registered [test_define] objects
-#' across all [HTEST_FN]-based functions (e.g. [TTEST]) for the duration of
-#' the session.
+#' A family of functions for managing globally registered [variant()] objects
+#' across all [HTEST_FN]-based functions for the duration of the session.
 #'
-#' @param defs A [test_define] object or a list of [test_define] objects to be
-#'   referenced globally. Each element must be a valid S7 `test_define` instance —
-#'   passing anything else raises an error.
-#' @param origin Must be one of `"user"` (default) or `"package"`. Controls
-#'   the origin tag attached to each registered def. Use `"package"` inside
-#'   `.onLoad()` hook to protect defs from being wiped by [clear_htest_defs()],
-#'   which only removes `"user"`-originated defs by default. Passing
-#'   `"package"` in interactive code is discouraged.
-#' @param cls A string naming the test class to clear (e.g. `"ttest"`). When
-#'   `NULL` (default), all globally registered definitions are cleared.
+#' @param test A test function built with [HTEST_FN()], e.g. [TTEST].
+#' @param name A string naming the variant to add or replace.
+#' @param impl A [variant()] object.
+#' @param origin One of `"user"` (default, session-scoped) or `"package"`
+#'   (permanent, intended for `.onLoad()`).
+#' @param cls A string naming the test class to clear (e.g. `"ttest"`).
+#'   When `NULL` (default), all globally registered variants are cleared.
 #'
 #' @section Precedence:
-#' Globally registered defs sit between built-in definitions and per-call
-#' overrides. The full priority order, from lowest to highest, is:
+#' Globally registered variants sit between built-in definitions and the
+#' pipeline. The full priority order, from lowest to highest, is:
 #'
 #' \enumerate{
-#'   \item Built-in defs (declared inside [HTEST_FN])
-#'   \item Global defs registered via `add_htest_defs()`
-#'   \item Per-call defs passed via `.extra_defs`
+#'   \item Built-in variants (declared inside [HTEST_FN])
+#'   \item Global variants registered via `plug_variant()` or `swap_variant()`
 #' }
-#'
-#' When two defs share the same key (`model_type::method::engine`), the
-#' higher-priority entry wins at lookup time.
 #'
 #' @return
-#' - `add_htest_defs()` and `clear_htest_defs()` return `NULL` invisibly,
-#'   called for their side effects on `htest_opts_global$defs`.
-#' - `get_htest_defs()` returns a list of [test_define] objects, or an empty
-#'   list if none have been registered for the given `cls`.
+#' `plug_variant()`, `swap_variant()`, and `clear_htest_defs()` return
+#' `NULL` invisibly, called for their side effects.
+#' `get_htest_defs()` returns a list of [test_define()] objects, or an
+#' empty list if none have been registered for the given `cls`.
 #'
-#' @seealso [HTEST_FN()], [test_define()]
-#'
-#' @examples
-#' \donttest{
-#' \dontrun{
-#' my_def = test_define(
-#'     model_type = "x_by",
-#'     engine = "custom",
-#'     # ...
-#' )
-#'
-#' add_htest_defs(my_def)
-#'
-#' # my_def is now available in a current environment
-#' # no `.extra_defs` needed
-#' TTEST(x_by(extra, group), sleep)
-#'
-#' # Inspect what is registered under "ttest"
-#' get_htest_defs("ttest")
-#'
-#' # Clear only ttest-scoped defs
-#' clear_htest_defs("ttest")
-#'
-#' # Clear everything
-#' clear_htest_defs()
-#' }
-#' }
+#' @seealso [HTEST_FN()], [test_define()], [variant()]
 #'
 #' @name htest-defs-modifiers
 NULL
 
-#' @describeIn htest-defs-modifiers Registers one or more [test_define] objects
-#'   into the global H-test store. The `cls` key is derived automatically from
-#'   each def's `impl_class` prefix (e.g. `"ttest_permute_rfast"` routes into
-#'   `"ttest"`), scoping it to the correct [HTEST_FN]-based function.
+#' @describeIn htest-defs-modifiers Adds a new named [variant()] to an
+#'   existing test function. Hard-errors if the name already exists or
+#'   if name is `"default"`.
 #' @export
-add_htest_defs = function(defs, origin = c("user", "package")) {
+plug_variant = function(test, name, impl, origin = c("user", "package")) {
     origin = match.arg(origin)
-    defs = standardize_extra_defs(defs)
-    lapply(defs, function(def) {
-        key = strsplit(def@impl_class, "_")[[1]][[1]]
-        entry = list(def = def, origin = origin)
-        htest_opts_global$defs[[key]] = c(htest_opts_global$defs[[key]], list(entry))
+
+    if (identical(name, "default")) {
+        cli::cli_abort(
+            "{.val default} is frozen and cannot be added via {.fn plug_variant}."
+        )
+    }
+    if (!S7::S7_inherits(impl, variant)) {
+        cli::cli_abort("{.arg impl} must be a {.cls variant} object.")
+    }
+
+    cls = attr(test, "cls") %||% cli::cli_abort(
+        "{.arg test} must be a function built with {.fn HTEST_FN}."
+    )
+
+    entries = htest_opts_global$variants[[cls]] %||% list()
+    already_exists = any(vapply(entries, function(e) identical(e$name, name), logical(1)))
+    if (already_exists) {
+        if (origin == "package") {
+            # silent replace: .onLoad() hook re-registration on reload is expected
+            # Once 'statim' is extended with different package
+            # The registered different variation won't simply vanish
+            # (Not yet tested)
+            htest_opts_global$variants[[cls]] = lapply(entries, function(e) {
+                if (identical(e$name, name)) {
+                    list(name = name, impl = impl, origin = origin)
+                } else
+                    e
+            })
+            return(invisible(NULL))
+        }
+
+        cli::cli_abort(c(
+            "Variant {.val {name}} already exists.",
+            "i" = "Use {.fn swap_variant} to replace it."
+        ))
+    }
+
+    entry = list(name = name, impl = impl, origin = origin)
+    htest_opts_global$variants[[cls]] = c(entries, list(entry))
+    invisible(NULL)
+}
+
+#' @describeIn htest-defs-modifiers Replaces an existing named [variant()].
+#'   Hard-errors if the name does not exist or if name is `"default"`.
+#' @export
+swap_variant = function(test, name, impl, origin = c("user", "package")) {
+    origin = match.arg(origin)
+
+    if (identical(name, "default")) {
+        cli::cli_abort(
+            "{.val default} is frozen and cannot be swapped via {.fn swap_variant}."
+        )
+    }
+    if (!S7::S7_inherits(impl, variant)) {
+        cli::cli_abort("{.arg impl} must be a {.cls variant} object.")
+    }
+
+    cls = attr(test, "cls") %||% cli::cli_abort(
+        "{.arg test} must be a function built with {.fn HTEST_FN}."
+    )
+
+    entries = htest_opts_global$variants[[cls]] %||% list()
+    found = any(vapply(entries, function(e) identical(e$name, name), logical(1)))
+    if (!found) {
+        cli::cli_abort(c(
+            "Variant {.val {name}} does not exist.",
+            "i" = "Use {.fn plug_variant} to add it."
+        ))
+    }
+
+    htest_opts_global$variants[[cls]] = lapply(entries, function(e) {
+        if (identical(e$name, name)) list(name = name, impl = impl, origin = origin)
+        else e
     })
     invisible(NULL)
 }
 
-#' @describeIn htest-defs-modifiers Returns the list of [test_define] objects
-#'   currently registered under the given `cls` key. Primarily used internally
-#'   by [HTEST_FN()] but exported for inspection and testing.
-#' @keywords internal
-#' @export
-get_htest_defs = function(cls = NULL) {
-    if (is.null(cls)) return(list())
-    # htest_opts_global$defs[[cls]] %||% list()
-    entries = htest_opts_global$defs[[cls]] %||% list()
-    lapply(entries, function(e) e$def)
-}
+#' #' @describeIn htest-defs-modifiers Returns registered [test_define()] objects
+#' #'   for the given `cls`. Used internally by [HTEST_FN()].
+#' #' @keywords internal
+#' #' @export
+#' get_htest_defs = function(cls = NULL) {
+#'     if (is.null(cls)) return(list())
+#'     entries = htest_opts_global$defs[[cls]] %||% list()
+#'     lapply(entries, function(e) e$def)
+#' }
 
-#' @describeIn htest-defs-modifiers Resets the global H-test store, either
-#'   fully or scoped to a specific `cls`. Only `"user"`-originated defs are
-#'   removed — defs registered with `"package"` origin via `.onLoad()` are
-#'   always preserved. Subsequent calls to [HTEST_FN]-based functions will
-#'   fall back to built-in and package-registered definitions only.
+#' @describeIn htest-defs-modifiers Resets globally registered variants,
+#'   either fully or scoped to a specific `cls`. Only `"user"`-originated
+#'   entries are removed — `"package"` entries are always preserved.
 #' @keywords internal
 #' @export
 clear_htest_defs = function(cls = NULL) {
-    keys = if (is.null(cls)) {
-        names(htest_opts_global$defs)
-    } else {
-        cls
-    }
+    keys = if (is.null(cls)) names(htest_opts_global$variants) else cls
     for (key in keys) {
-        entries = htest_opts_global$defs[[key]] %||% list()
-        htest_opts_global$defs[[key]] = Filter(
-            # Hard-coded to keep only the defs under `origin = "package"`
-            # If users added their own `test_define()` objects in a package
-            # And they want to add their own
-            # Make sure to use `statim::add_htest_defs(<test-define>, "package")`
+        entries = htest_opts_global$variants[[key]] %||% list()
+        htest_opts_global$variants[[key]] = Filter(
             function(e) e$origin == "package",
             entries
         )
@@ -120,20 +141,8 @@ clear_htest_defs = function(cls = NULL) {
     invisible(NULL)
 }
 
-#' H-test global definitions store
-#'
-#' A private, package-level environment that acts as a mutable global store
-#' for [test_define] objects across all [HTEST_FN]-based functions.
-#'
-#' @details
-#' `htest_opts_global` is intentionally unexported. Users interact with it
-#' only through [add_htest_defs()], [get_htest_defs()], and
-#' [clear_htest_defs()]. It holds a single field, `defs`, which is a named
-#' list of [test_define] objects keyed by their `cls` prefix, accumulated
-#' over the session.
-#'
 #' @keywords internal
 #' @noRd
 htest_opts_global = new.env(parent = emptyenv())
-htest_opts_global$defs = list()
-
+# htest_opts_global$defs = list()
+htest_opts_global$variants = list()
