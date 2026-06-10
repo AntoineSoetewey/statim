@@ -12,7 +12,8 @@ An object of class \code{S7_external_generic} of length 4.
 anova(object, ..., test = "F")
 }
 \arguments{
-\item{object}{An \code{anova_lazy}, \code{model_lazy}, or \code{cld_exec} object.}
+\item{object}{A \code{multi_lazy}, \code{anova_lazy}, \code{model_lazy}, or \code{cld_exec}
+object.}
 
 \item{...}{Additional \code{model_lazy} or \code{cld_exec} objects.}
 
@@ -23,11 +24,13 @@ A \code{cld_anova} object, invisibly.
 }
 \description{
 \code{anova()} computes an incremental F-test across two or more fitted linear
-models. It dispatches on three input types:
+models. It dispatches on four input types:
 }
 \details{
 \itemize{
-\item An \code{anova_lazy} from \code{write_models() |> prepare_model()}.
+\item A \code{multi_lazy} from \code{write_models() |> prepare_model()}.
+\item An \code{anova_lazy} from \code{write_models() |> prepare_model()} (legacy path,
+kept for backward compatibility).
 \item One or more \code{model_lazy} objects from \code{prepare_model()}.
 \item One or more \code{cld_exec} objects from \code{conclude()}.
 }

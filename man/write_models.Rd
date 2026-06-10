@@ -10,8 +10,8 @@ write_models(.data, ...)
 \item{.data}{A data frame.}
 
 \item{...}{Named model expressions. Each must evaluate to a formula or
-a \code{model_id} object. Names are used as row labels in \code{\link[=anova]{anova()}}
-output.}
+a \code{model_id} object. Names are used as row labels in \code{\link[=anova]{anova()}} output
+and as the \code{model} column in \code{\link[=tidy]{tidy()}}.}
 }
 \value{
 An \code{expanded_model} object.
@@ -39,7 +39,7 @@ LifeCycleSavings |>
     prepare_model(LINEAR_REG) |>
     anova()
 
-# update() chain
+# update() chain (formulas only)
 LifeCycleSavings |>
     write_models(
         f1 = sr ~ 1,
@@ -51,17 +51,31 @@ LifeCycleSavings |>
     prepare_model(LINEAR_REG) |>
     anova()
 
-# mixed model_id types
+# conclude() — returns a multi_exec
 LifeCycleSavings |>
     write_models(
-        mod0 = rel(pop15, sr),
         f1 = sr ~ 1,
-        f2 = update(f1, ~. + pop15)
+        f2 = sr ~ pop15,
+        f3 = sr ~ pop15 + pop75
     ) |>
     prepare_model(LINEAR_REG) |>
-    anova()
+    conclude()
+
+# display() — show up to n models in full
+LifeCycleSavings |>
+    write_models(
+        f1 = sr ~ 1,
+        f2 = sr ~ pop15,
+        f3 = sr ~ pop15 + pop75,
+        f4 = sr ~ pop15 + pop75 + dpi,
+        f5 = sr ~ pop15 + pop75 + dpi + ddpi
+    ) |>
+    prepare_model(LINEAR_REG) |>
+    conclude() |>
+    display(5)
 
 }
 \seealso{
-\code{\link[=prepare_model]{prepare_model()}}, \code{\link[=anova]{anova()}}
+\code{\link[=prepare_model]{prepare_model()}}, \code{\link[=prepare_test]{prepare_test()}}, \code{\link[=anova]{anova()}}, \code{\link[=conclude]{conclude()}},
+\code{\link[=display]{display()}}
 }

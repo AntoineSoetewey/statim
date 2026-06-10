@@ -6,6 +6,24 @@ expanded_model = S7::new_class(
     )
 )
 
+multi_lazy = S7::new_class(
+    "multi_lazy",
+    properties = list(
+        models = S7::class_list,
+        labels = S7::new_property(class = S7::class_character, default = character(0)),
+        args = S7::new_property(class = S7::class_list, default = list())
+    )
+)
+
+multi_exec = S7::new_class(
+    "multi_exec",
+    properties = list(
+        results = S7::new_property(class = S7::class_list),
+        labels = S7::new_property(class = S7::class_character, default = character(0)),
+        stat_name = S7::new_property(class = S7::class_character, default = "")
+    )
+)
+
 #' Write multiple model definitions from a data frame
 #'
 #' `write_models()` evaluates named model expressions sequentially against
@@ -18,12 +36,13 @@ expanded_model = S7::new_class(
 #'
 #' @param .data A data frame.
 #' @param ... Named model expressions. Each must evaluate to a formula or
-#'   a `model_id` object. Names are used as row labels in [anova()]
-#'   output.
+#'   a `model_id` object. Names are used as row labels in [anova()] output
+#'   and as the `model` column in [tidy()].
 #'
 #' @return An `expanded_model` object.
 #'
-#' @seealso [prepare_model()], [anova()]
+#' @seealso [prepare_model()], [prepare_test()], [anova()], [conclude()],
+#'   [display()]
 #'
 #' @examples
 #' # explicit formulas
@@ -38,7 +57,7 @@ expanded_model = S7::new_class(
 #'     prepare_model(LINEAR_REG) |>
 #'     anova()
 #'
-#' # update() chain
+#' # update() chain (formulas only)
 #' LifeCycleSavings |>
 #'     write_models(
 #'         f1 = sr ~ 1,
@@ -50,15 +69,28 @@ expanded_model = S7::new_class(
 #'     prepare_model(LINEAR_REG) |>
 #'     anova()
 #'
-#' # mixed model_id types
+#' # conclude() — returns a multi_exec
 #' LifeCycleSavings |>
 #'     write_models(
-#'         mod0 = rel(pop15, sr),
 #'         f1 = sr ~ 1,
-#'         f2 = update(f1, ~. + pop15)
+#'         f2 = sr ~ pop15,
+#'         f3 = sr ~ pop15 + pop75
 #'     ) |>
 #'     prepare_model(LINEAR_REG) |>
-#'     anova()
+#'     conclude()
+#'
+#' # display() — show up to n models in full
+#' LifeCycleSavings |>
+#'     write_models(
+#'         f1 = sr ~ 1,
+#'         f2 = sr ~ pop15,
+#'         f3 = sr ~ pop15 + pop75,
+#'         f4 = sr ~ pop15 + pop75 + dpi,
+#'         f5 = sr ~ pop15 + pop75 + dpi + ddpi
+#'     ) |>
+#'     prepare_model(LINEAR_REG) |>
+#'     conclude() |>
+#'     display(5)
 #'
 #' @export
 write_models = S7::new_generic("write_models", ".data")
@@ -94,10 +126,47 @@ S7::method(print, expanded_model) = function(x, ...) {
     for (i in seq_along(x@models)) {
         m = x@models[[i]]
         lbl = x@labels[[i]]
-        cat(sprintf("  %s : %s\n", lbl, model_id_info(m@model_id)@args))
+        cat(sprintf("  %s : %s\n", lbl, model_id_info(m@model_id)$args))
     }
     cat("\n")
     invisible(x)
+}
+
+S7::method(print, multi_exec) = function(x, ...) {
+    n_models = length(x@results)
+    header = sprintf("%d model%s \u00b7 %s", n_models, if (n_models == 1L) "" else "s", x@stat_name)
+
+    cat("\n")
+    cat(cli::rule(left = header), "\n\n")
+    for (i in seq_along(x@results)) {
+        cat(sprintf("%s : <cld_exec>\n", x@labels[[i]]))
+    }
+    cat("\n")
+    cli::cat_line(cli::col_silver("Use display() to inspect individual results."))
+    cat("\n")
+    invisible(x)
+}
+
+S7::method(conclude, multi_lazy) = function(.x, ...) {
+    results = lapply(.x@models, conclude)
+    stat_name = if (length(.x@models) > 0L) {
+        results[[1L]]@cld_meta$stat_name %||% ""
+    } else {
+        ""
+    }
+    multi_exec(
+        results = rlang::set_names(results, .x@labels),
+        labels = .x@labels,
+        stat_name = stat_name
+    )
+}
+
+S7::method(tidy, multi_exec) = function(.x, ...) {
+    tidied = lapply(.x@results, function(r) tidy(r, ...))
+    tibble::tibble(
+        model = .x@labels,
+        outs = tidied
+    )
 }
 
 S7::method(prepare_model, list(expanded_model, S7::class_function)) = function(.x, .model_fn, ...) {
@@ -109,7 +178,7 @@ S7::method(prepare_model, list(expanded_model, S7::class_function)) = function(.
             model_spec = spec
         )
     })
-    anova_lazy(models = models, labels = .x@labels, args = list())
+    multi_lazy(models = models, labels = .x@labels, args = list())
 }
 
 S7::method(prepare_test, list(expanded_model, S7::class_function)) = function(.x, .test, ...) {
@@ -121,5 +190,17 @@ S7::method(prepare_test, list(expanded_model, S7::class_function)) = function(.x
             test_spec = spec
         )
     })
-    anova_lazy(models = models, labels = .x@labels, args = list())
+    multi_lazy(models = models, labels = .x@labels, args = list())
+}
+
+S7::method(print, multi_lazy) = function(x, ...) {
+    cat("\n")
+    cat(cli::rule(left = "Models", line = "-"), "\n\n")
+    for (i in seq_along(x@models)) {
+        m = x@models[[i]]
+        lbl = x@labels[[i]]
+        cat(sprintf("  %s : %s\n", lbl, model_id_info(m@model_id)@args))
+    }
+    cat("\n")
+    invisible(x)
 }

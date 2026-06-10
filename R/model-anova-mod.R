@@ -1,82 +1,21 @@
 anova_lazy = S7::new_class(
     "anova_lazy",
-    properties = list(
-        models = S7::class_list,
-        labels = S7::new_property(class = S7::class_character, default = character(0)),
-        args = S7::new_property(class = S7::class_list, default = list())
-    )
+    parent = multi_lazy
 )
-
-cld_anova = S7::new_class(
-    "cld_anova",
-    parent = cld_exec,
-    properties = list(
-        labels = S7::new_property(class = S7::class_character, default = character(0))
-    )
-)
-
-S7::method(update, anova_lazy) = function(object, ...) {
-    dots = list(...)
-    object@models = lapply(object@models, function(m) {
-        if (!is.null(m@recalibrate_spec)) {
-            m@recalibrate_spec$args = utils::modifyList(
-                m@recalibrate_spec$args,
-                dots
-            )
-        } else {
-            m@model_spec@args = utils::modifyList(
-                m@model_spec@args,
-                dots
-            )
-        }
-        m
-    })
-
-    object
-}
-
-S7::method(print, cld_anova) = function(x, ...) {
-    stat_label = if (identical(x@cld_meta$method, "default")) {
-        x@cld_meta$stat_name
-    } else {
-        paste0(x@cld_meta$stat_name, " \u00b7 ", x@cld_meta$method)
-    }
-
-    cat("\n")
-    cat(cli::rule(left = stat_label, line = "="), "\n\n")
-
-    pval_styler = function(x) {
-        x_num = suppressWarnings(as.numeric(x$value))
-        if (is.na(x_num) || x_num > 0.05) {
-            cli::style_italic(x$value)
-        } else if (x_num > 0.01) {
-            cli::col_red(x$value)
-        } else {
-            cli::style_bold("<0.001")
-        }
-    }
-
-    cli::cat_line(cli::rule(left = "ANOVA Table", line = "-"), "\n")
-    tabstats::table_default(
-        x@data,
-        style_columns = tabstats::td_style(p_value = pval_styler),
-        nrows = nrow(x@data)
-    )
-    cat("\n\n")
-
-    invisible(x)
-}
 
 #' ANOVA table for linear model comparisons
 #'
 #' `anova()` computes an incremental F-test across two or more fitted linear
-#' models. It dispatches on three input types:
+#' models. It dispatches on four input types:
 #'
-#' - An `anova_lazy` from `write_models() |> prepare_model()`.
+#' - A `multi_lazy` from `write_models() |> prepare_model()`.
+#' - An `anova_lazy` from `write_models() |> prepare_model()` (legacy path,
+#'   kept for backward compatibility).
 #' - One or more `model_lazy` objects from `prepare_model()`.
 #' - One or more `cld_exec` objects from `conclude()`.
 #'
-#' @param object An `anova_lazy`, `model_lazy`, or `cld_exec` object.
+#' @param object A `multi_lazy`, `anova_lazy`, `model_lazy`, or `cld_exec`
+#'   object.
 #' @param ... Additional `model_lazy` or `cld_exec` objects.
 #' @param test A string. One of `"F"` (default), `"LRT"`, or `"Chisq"`.
 #'
@@ -115,6 +54,12 @@ S7::method(print, cld_anova) = function(x, ...) {
 #' @name anova-mod
 #' @export
 anova = S7::new_external_generic("stats", "anova", "object")
+
+S7::method(anova, multi_lazy) = function(object, ..., test = "F") {
+    valid_tests(test)
+    fitted = lapply(object@models, run_model_lazy_raw)
+    build_anova(fitted, labels = object@labels, test = test)
+}
 
 S7::method(anova, anova_lazy) = function(object, ..., test = "F") {
     valid_tests(test)
@@ -172,7 +117,7 @@ S7::method(print, anova_lazy) = function(x, ...) {
     for (i in seq_along(x@models)) {
         m = x@models[[i]]
         lbl = x@labels[[i]]
-        formula_str = model_id_info(m@model_id)@args
+        formula_str = model_id_info(m@model_id)$args
         cat(sprintf("  %s : %s\n", lbl, formula_str))
     }
 
@@ -199,16 +144,6 @@ S7::method(print, anova_lazy) = function(x, ...) {
 
     cat("\n")
     invisible(x)
-}
-
-valid_tests = function(test) {
-    valid = c("F", "LRT", "Chisq")
-    if (!test %in% valid) {
-        cli::cli_abort(c(
-            "{.arg test} must be one of {.val {valid}}.",
-            "x" = "Got {.val {test}}."
-        ))
-    }
 }
 
 build_anova = S7::new_generic("build_anova", "fitted")
@@ -294,6 +229,111 @@ S7::method(build_anova, S7::class_list) = function(fitted, labels, test) {
     )
 }
 
+#' Protocol class for ANOVA participation
+#'
+#' Any model result container that should participate in [anova()] must
+#' inherit from `anova_able`. Subclasses fill the four required slots;
+#' `build_anova()` reads only those slots and dispatches the test statistic
+#' computation on `@family`.
+#'
+#' @slot terms The model terms object. Used to verify response consistency.
+#' @slot df_residual Residual degrees of freedom.
+#' @slot deviance Scalar deviance measure. For Gaussian LMs this is the
+#'   residual sum of squares. For GLMs this is the model deviance from
+#'   [stats::deviance()].
+#' @slot dispersion Scalar dispersion parameter. For Gaussian LMs this is
+#'   `sigma^2` (`rss / df_residual`). For GLMs with a known dispersion
+#'   (binomial, Poisson) set to `1`. For quasi-families use the estimated
+#'   Pearson dispersion.
+#' @slot family A string identifying the error family, e.g. `"gaussian"`,
+#'   `"binomial"`, `"poisson"`. Used by `build_anova()` to select the
+#'   correct test statistic. Must be consistent across all models passed to
+#'   a single [anova()] call.
+#'
+#' @seealso [anova()]
+#'
+#' @keywords internal
+anova_able = S7::new_class(
+    "anova_able",
+    parent = class_stat_infer,
+    properties = list(
+        terms = S7::new_property(class = S7::class_any),
+        df_residual = S7::class_numeric,
+        deviance = S7::class_numeric,
+        dispersion = S7::class_numeric,
+        family = S7::new_property(class = S7::class_character, default = "gaussian")
+    )
+)
+
+S7::method(update, anova_lazy) = function(object, ...) {
+    dots = list(...)
+    object@models = lapply(object@models, function(m) {
+        if (!is.null(m@recalibrate_spec)) {
+            m@recalibrate_spec$args = utils::modifyList(
+                m@recalibrate_spec$args,
+                dots
+            )
+        } else {
+            m@model_spec@args = utils::modifyList(
+                m@model_spec@args,
+                dots
+            )
+        }
+        m
+    })
+    object
+}
+
+cld_anova = S7::new_class(
+    "cld_anova",
+    parent = cld_exec,
+    properties = list(
+        labels = S7::new_property(class = S7::class_character, default = character(0))
+    )
+)
+
+S7::method(print, cld_anova) = function(x, ...) {
+    stat_label = if (identical(x@cld_meta$method, "default")) {
+        x@cld_meta$stat_name
+    } else {
+        paste0(x@cld_meta$stat_name, " \u00b7 ", x@cld_meta$method)
+    }
+
+    cat("\n")
+    cat(cli::rule(left = stat_label, line = "="), "\n\n")
+
+    pval_styler = function(x) {
+        x_num = suppressWarnings(as.numeric(x$value))
+        if (is.na(x_num) || x_num > 0.05) {
+            cli::style_italic(x$value)
+        } else if (x_num > 0.01) {
+            cli::col_red(x$value)
+        } else {
+            cli::style_bold("<0.001")
+        }
+    }
+
+    cli::cat_line(cli::rule(left = "ANOVA Table", line = "-"), "\n")
+    tabstats::table_default(
+        x@data,
+        style_columns = tabstats::td_style(p_value = pval_styler),
+        nrows = nrow(x@data)
+    )
+    cat("\n\n")
+
+    invisible(x)
+}
+
+valid_tests = function(test) {
+    valid = c("F", "LRT", "Chisq")
+    if (!test %in% valid) {
+        cli::cli_abort(c(
+            "{.arg test} must be one of {.val {valid}}.",
+            "x" = "Got {.val {test}}."
+        ))
+    }
+}
+
 #' Compute ANOVA test statistics from a list of anova_able objects
 #'
 #' Dispatches on family to select the right test statistic. Gaussian models
@@ -323,6 +363,7 @@ compute_anova_stats = function(fitted, labels, family, test) {
             "!" = "F-test is only valid for Gaussian models.",
             "i" = "Switching to LRT for family {.val {family}}."
         ))
+
         test = "LRT"
     }
 
@@ -418,39 +459,3 @@ run_model_lazy_raw = function(m) {
     )
     inject_and_run(impl = def@impl$base, processed = m@processed, args = all_args)
 }
-
-#' Protocol class for ANOVA participation
-#'
-#' Any model result container that should participate in [anova()] must
-#' inherit from `anova_able`. Subclasses fill the four required slots;
-#' `build_anova()` reads only those slots and dispatches the test statistic
-#' computation on `@family`.
-#'
-#' @slot terms The model terms object. Used to verify response consistency.
-#' @slot df_residual Residual degrees of freedom.
-#' @slot deviance Scalar deviance measure. For Gaussian LMs this is the
-#'   residual sum of squares. For GLMs this is the model deviance from
-#'   [stats::deviance()].
-#' @slot dispersion Scalar dispersion parameter. For Gaussian LMs this is
-#'   `sigma^2` (`rss / df_residual`). For GLMs with a known dispersion
-#'   (binomial, Poisson) set to `1`. For quasi-families use the estimated
-#'   Pearson dispersion.
-#' @slot family A string identifying the error family, e.g. `"gaussian"`,
-#'   `"binomial"`, `"poisson"`. Used by `build_anova()` to select the
-#'   correct test statistic. Must be consistent across all models passed to
-#'   a single [anova()] call.
-#'
-#' @seealso [anova()]
-#'
-#' @keywords internal
-anova_able = S7::new_class(
-    "anova_able",
-    parent = class_stat_infer,
-    properties = list(
-        terms = S7::new_property(class = S7::class_any),
-        df_residual = S7::class_numeric,
-        deviance = S7::class_numeric,
-        dispersion = S7::class_numeric,
-        family = S7::new_property(class = S7::class_character, default = "gaussian")
-    )
-)
