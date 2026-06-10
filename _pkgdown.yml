@@ -78,10 +78,11 @@ reference:
     - write_models
     - prepare_model
 
-  - subtitle: Result retrieval
+  - subtitle: Output retriever and displayer
     desc: Verbs used to retrieve outputs in standard R's data structure
     contents:
     - tidy
+    - display
 
   - subtitle: H-test container and executioner
     desc: Container and an eager executioner of a prepared H-test function
