@@ -169,9 +169,9 @@ S7::method(validate_one_param_node, PI) = function(node, x_vars, by_vars) {
     check_x_and_given(node@x, node@given, x_vars, by_vars, "PI")
 }
 
-S7::method(validate_one_param_node, SIGMA) = function(node, x_vars, by_vars) {
-    check_x_and_given(node@x, node@given, x_vars, by_vars, "SIGMA")
-}
+# S7::method(validate_one_param_node, SIGMA) = function(node, x_vars, by_vars) {
+#     check_x_and_given(node@x, node@given, x_vars, by_vars, "SIGMA")
+# }
 
 S7::method(validate_one_param_node, RHO) = function(node, x_vars, by_vars) {
     errors = character(0)

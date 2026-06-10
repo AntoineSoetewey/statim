@@ -1,8 +1,8 @@
 #' Base class for population parameters
 #'
 #' `param_obj` is the abstract base S7 class for all population parameter
-#' objects, analogous to [model_id()]. Concrete subclasses (`MU`, `PI`,
-#' `SIGMA`, `RHO`) inherit from it. The base class is a pure marker — each
+#' objects, analogous to [model_id()]. Concrete subclasses (`MU`, `PI`,`RHO`)
+#' inherit from it. The base class is a pure marker — each
 #' subclass declares its own properties.
 #'
 #' @export
@@ -65,33 +65,33 @@ PI = S7::new_class(
     }
 )
 
-#' Variance of a variable, optionally conditioned on a subgroup
-#'
-#' @param x A bare variable name.
-#' @param given An optional filter predicate as a bare expression.
-#'
-#' @return A `SIGMA` / `param_obj` S7 object.
-#'
-#' @examples
-#' SIGMA(score)
-#' SIGMA(score, group == "control")
-#'
-#' @export
-SIGMA = S7::new_class(
-    "SIGMA",
-    parent = param_obj,
-    properties = list(
-        x = S7::class_any,
-        given = S7::class_any
-    ),
-    constructor = function(x, given = NULL) {
-        S7::new_object(
-            S7::S7_object(),
-            x = rlang::enquo(x),
-            given = if (missing(given)) NULL else rlang::enquo(given)
-        )
-    }
-)
+# #' Variance of a variable, optionally conditioned on a subgroup
+# #'
+# #' @param x A bare variable name.
+# #' @param given An optional filter predicate as a bare expression.
+# #'
+# #' @return A `SIGMA` / `param_obj` S7 object.
+# #'
+# #' @examples
+# #' SIGMA(score)
+# #' SIGMA(score, group == "control")
+# #'
+# #' @export
+# SIGMA = S7::new_class(
+#     "SIGMA",
+#     parent = param_obj,
+#     properties = list(
+#         x = S7::class_any,
+#         given = S7::class_any
+#     ),
+#     constructor = function(x, given = NULL) {
+#         S7::new_object(
+#             S7::S7_object(),
+#             x = rlang::enquo(x),
+#             given = if (missing(given)) NULL else rlang::enquo(given)
+#         )
+#     }
+# )
 
 #' Population correlation between two variables
 #'
@@ -174,18 +174,18 @@ S7::method(parse_param_call, PI) = function(x, args, env) {
     obj
 }
 
-S7::method(parse_param_call, SIGMA) = function(x, args, env) {
-    if (length(args) < 1L || length(args) > 2L) {
-        cli::cli_abort(c(
-            "{.fn SIGMA} requires 1 or 2 arguments.",
-            "i" = "Usage: {.code SIGMA(x)} or {.code SIGMA(x, given)}."
-        ))
-    }
-    obj = SIGMA(x = !!rlang::new_quosure(quote(.dummy), emptyenv()))
-    S7::prop(obj, "x") = rlang::new_quosure(args[[1]], env)
-    S7::prop(obj, "given") = if (length(args) == 2L) rlang::new_quosure(args[[2]], env) else NULL
-    obj
-}
+# S7::method(parse_param_call, SIGMA) = function(x, args, env) {
+#     if (length(args) < 1L || length(args) > 2L) {
+#         cli::cli_abort(c(
+#             "{.fn SIGMA} requires 1 or 2 arguments.",
+#             "i" = "Usage: {.code SIGMA(x)} or {.code SIGMA(x, given)}."
+#         ))
+#     }
+#     obj = SIGMA(x = !!rlang::new_quosure(quote(.dummy), emptyenv()))
+#     S7::prop(obj, "x") = rlang::new_quosure(args[[1]], env)
+#     S7::prop(obj, "given") = if (length(args) == 2L) rlang::new_quosure(args[[2]], env) else NULL
+#     obj
+# }
 
 S7::method(parse_param_call, RHO) = function(x, args, env) {
     if (length(args) != 2L) {
@@ -228,14 +228,14 @@ S7::method(param_id_label, PI) = function(x) {
     }
 }
 
-S7::method(param_id_label, SIGMA) = function(x) {
-    x_lbl = rlang::as_label(x@x)
-    if (is.null(x@given)) {
-        paste0("SIGMA(", x_lbl, ")")
-    } else {
-        paste0("SIGMA(", x_lbl, ", ", rlang::as_label(x@given), ")")
-    }
-}
+# S7::method(param_id_label, SIGMA) = function(x) {
+#     x_lbl = rlang::as_label(x@x)
+#     if (is.null(x@given)) {
+#         paste0("SIGMA(", x_lbl, ")")
+#     } else {
+#         paste0("SIGMA(", x_lbl, ", ", rlang::as_label(x@given), ")")
+#     }
+# }
 
 S7::method(param_id_label, RHO) = function(x) {
     paste0("RHO(", rlang::as_label(x@x), ", ", rlang::as_label(x@y), ")")

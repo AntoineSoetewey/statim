@@ -68,7 +68,7 @@ reference:
     - equal-op
     - MU
     - PI
-    - SIGMA
+    # - SIGMA
     - RHO
 
   - subtitle: ANOVA for Linear Models
