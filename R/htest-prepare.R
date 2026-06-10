@@ -36,9 +36,6 @@ test_lazy = S7::new_class(
 #' @name prepare-test
 #' @export
 prepare_test = S7::new_generic("prepare_test", dispatch_args = c(".x", ".test"))
-# prepare_test = function(.x, .test, ...) {
-#     UseMethod("prepare_test")
-# }
 
 S7::method(prepare_test, list(def_model, S7::class_function)) = function(.x, .test, ...) {
     spec = as_test_spec(.test)
