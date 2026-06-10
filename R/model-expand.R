@@ -94,7 +94,7 @@ S7::method(print, expanded_model) = function(x, ...) {
     for (i in seq_along(x@models)) {
         m = x@models[[i]]
         lbl = x@labels[[i]]
-        cat(sprintf("  %s : %s\n", lbl, model_id_info(m@model_id)$args))
+        cat(sprintf("  %s : %s\n", lbl, model_id_info(m@model_id)@args))
     }
     cat("\n")
     invisible(x)

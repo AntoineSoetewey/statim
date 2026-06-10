@@ -172,7 +172,7 @@ S7::method(print, anova_lazy) = function(x, ...) {
     for (i in seq_along(x@models)) {
         m = x@models[[i]]
         lbl = x@labels[[i]]
-        formula_str = model_id_info(m@model_id)$args
+        formula_str = model_id_info(m@model_id)@args
         cat(sprintf("  %s : %s\n", lbl, formula_str))
     }
 
