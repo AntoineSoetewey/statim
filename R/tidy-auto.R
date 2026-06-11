@@ -68,3 +68,29 @@ S7::method(auto_tidy, class_ttest_two) = function(x, ...) {
         !!up_name := x@upper_ci
     )
 }
+
+S7::method(auto_tidy, class_corr_two) = function(x, ...) {
+    ci_level = x@ci_level * 100
+    has_df = length(x@df) > 0L
+    has_ci = length(x@lower_ci) > 0L
+
+    out = tibble::tibble(
+        pair = x@pairs,
+        estimate = x@estimate,
+        statistic = x@statistic,
+        p_val = x@p_val
+    )
+
+    if (has_df) {
+        out = tibble::add_column(out, df = x@df, .after = "statistic")
+    }
+
+    if (has_ci) {
+        lo_name = paste0("lower_", ci_level)
+        up_name = paste0("upper_", ci_level)
+        out[[lo_name]] = x@lower_ci
+        out[[up_name]] = x@upper_ci
+    }
+
+    out
+}

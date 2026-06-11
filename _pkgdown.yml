@@ -136,6 +136,7 @@ reference:
     - class_ttest_pairwise
     - class_ttest_two
     - class_p_test
+    - class_corr_two
     - class_lm_object
     - class_glm_object
 
