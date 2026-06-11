@@ -212,6 +212,10 @@ extract_param_name = function(node) {
         cli::cli_abort("Expected a param_obj node.")
     }
 
+    if (S7::S7_inherits(node, RHO)) {
+        return(paste0(rlang::as_label(node@x), "~", rlang::as_label(node@y)))
+    }
+
     given = node@given
 
     if (!is.null(given)) {
