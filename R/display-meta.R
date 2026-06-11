@@ -1,11 +1,11 @@
-#' Display individual results from a multi_exec
+#' Display individual results
 #'
-#' `display()` prints the first `n` concluded models from a `multi_exec` S7
-#' class in full. Useful when [conclude()] has been called on a
+#' `display()` prints the first `n` concluded models from an abstract S7
+#' class, e.g. `multi_exec`, in full. Useful when [conclude()] has been called on a
 #' [write_models()] pipeline and the default compressed print is not enough.
 #'
-#' @param x A `multi_exec` object.
-#' @param n A positive integer. The number of models to display. Defaults
+#' @param x An object yield by [conclude()].
+#' @param n A positive integer. The number of models' output to display. Defaults
 #'   to `3`.
 #' @param ... Currently unused.
 #'

@@ -2,14 +2,14 @@
 % Please edit documentation in R/display-meta.R
 \name{display}
 \alias{display}
-\title{Display individual results from a multi_exec}
+\title{Display individual results}
 \usage{
 display(x, n = 3L, ...)
 }
 \arguments{
-\item{x}{A \code{multi_exec} object.}
+\item{x}{An object yield by \code{\link[=conclude]{conclude()}}.}
 
-\item{n}{A positive integer. The number of models to display. Defaults
+\item{n}{A positive integer. The number of models' output to display. Defaults
 to \code{3}.}
 
 \item{...}{Currently unused.}
@@ -18,8 +18,8 @@ to \code{3}.}
 \code{x}, invisibly.
 }
 \description{
-\code{display()} prints the first \code{n} concluded models from a \code{multi_exec} S7
-class in full. Useful when \code{\link[=conclude]{conclude()}} has been called on a
+\code{display()} prints the first \code{n} concluded models from an abstract S7
+class, e.g. \code{multi_exec}, in full. Useful when \code{\link[=conclude]{conclude()}} has been called on a
 \code{\link[=write_models]{write_models()}} pipeline and the default compressed print is not enough.
 }
 \examples{
