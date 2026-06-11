@@ -132,7 +132,7 @@ LINEAR_REG = MODEL_FN(
 #'
 #' @export
 class_lm_object = S7::new_class(
-    "class_lm_object",
+    "lm_object",
     parent = anova_able,
     properties = list(
 

@@ -49,7 +49,7 @@ model_id_info = S7::new_generic(
 #'
 #' @export
 class_model_inform = S7::new_class(
-    name = "class_model_inform",
+    name = "model_inform",
     properties = list(
         model_id = S7::new_property(
             class = S7::class_any,

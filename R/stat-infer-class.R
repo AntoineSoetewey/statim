@@ -58,4 +58,4 @@
 #' @seealso [baseline()], [variant()], [auto_tidy()], [class_lm_object]
 #'
 #' @export
-class_stat_infer = S7::new_class("class_stat_infer", abstract = TRUE)
+class_stat_infer = S7::new_class("stat_infer", abstract = TRUE)

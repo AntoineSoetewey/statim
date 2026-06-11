@@ -104,7 +104,7 @@ P_TEST = HTEST_FN(
 #'
 #' @export
 class_p_test = S7::new_class(
-    "class_p_test",
+    "p_test",
     parent = class_stat_infer,
     properties = list(
         x = S7::class_numeric,
