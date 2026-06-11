@@ -17,7 +17,8 @@ model_lazy = S7::new_class(
 #' producing a `model_lazy` ready for optional recalibration with [via()]
 #' before being executed with [conclude()].
 #'
-#' @param .x A `def_model` object from [define_model()].
+#' @param .x An S7 object extension yielded by, e.g. `def_model` object from [define_model()],
+#'   or an `expanded_model` object from [write_models()].
 #' @param .model_fn A model function such as `LINEAR_REG()`.
 #' @param ... Additional arguments passed to methods.
 #'

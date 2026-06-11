@@ -8,7 +8,8 @@
 prepare_test(.x, .test, ...)
 }
 \arguments{
-\item{.x}{A \code{def_model} object from \code{\link[=define_model]{define_model()}}.}
+\item{.x}{An S7 object extension yielded by, e.g. \code{def_model} object from \code{\link[=define_model]{define_model()}},
+or an \code{expanded_model} object from \code{\link[=write_models]{write_models()}}.}
 
 \item{.test}{A test function such as \link{TTEST}, or a \code{test_spec} object
 returned by calling such a function with no arguments.}
