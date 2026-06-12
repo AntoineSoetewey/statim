@@ -44,7 +44,7 @@ main_cortest_rel = function(.cor_type) {
     }
 }
 
-pearson_fisher_z = function(x, y, ind_vars, resp_vars, .rho, .alt, .ci) {
+pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
     n = length(x)
 
     if (n < 4L) {
@@ -54,35 +54,43 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, .rho, .alt, .ci) {
         ))
     }
 
+    if (abs(rho) >= 1) {
+        cli::cli_abort(c(
+            "Hypothesized correlation must be strictly between -1 and 1.",
+            "i" = "Got {.val {rho}}.",
+            "i" = "Check whether the hypothesis expression or the supplied \".rho\" is written as intended."
+        ))
+    }
+
     r = stats::cor(x, y, method = "pearson")
     z_r = atanh(r)
-    z_rho = atanh(.rho)
+    z_rho = atanh(rho)
     se = 1 / sqrt(n - 3)
     z_stat = (z_r - z_rho) / se
 
     p_val = switch(
-        .alt,
+        alt,
         "two.sided" = 2 * stats::pnorm(-abs(z_stat)),
         "greater" = stats::pnorm(z_stat, lower.tail = FALSE),
         "less" = stats::pnorm(z_stat)
     )
 
-    alpha = 1 - .ci
+    alpha = 1 - ci
     z_crit = switch(
-        .alt,
+        alt,
         "two.sided" = stats::qnorm(1 - alpha / 2),
         "greater" = stats::qnorm(1 - alpha),
         "less" = stats::qnorm(1 - alpha)
     )
 
     lo_z = switch(
-        .alt,
+        alt,
         "two.sided" = z_r - z_crit * se,
         "greater" = z_r - z_crit * se,
         "less" = -Inf
     )
     up_z = switch(
-        .alt,
+        alt,
         "two.sided" = z_r + z_crit * se,
         "greater" = Inf,
         "less" = z_r + z_crit * se
@@ -97,7 +105,7 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, .rho, .alt, .ci) {
         p_val = p_val,
         lower_ci = tanh(lo_z),
         upper_ci = tanh(up_z),
-        ci_level = .ci
+        ci_level = ci
     )
 }
 
@@ -218,6 +226,13 @@ cor_test_rel = test_define(
                 x_vec = x_data[[1]]
                 y_vec = resp_data[[1]]
 
+                if (length(x_vec) < 4L) {
+                    cli::cli_abort(c(
+                        "No CI estimates generated. Correlation test requires at least 4 observations.",
+                        "i" = "Got {length(x_vec)}."
+                    ))
+                }
+
                 if (.rho == 0) {
                     res = stats::cor.test(
                         x = x_vec,
@@ -244,9 +259,9 @@ cor_test_rel = test_define(
                         y = y_vec,
                         ind_vars = x_name,
                         resp_vars = resp_name,
-                        .rho = .rho,
-                        .alt = .alt,
-                        .ci = .ci
+                        rho = .rho,
+                        alt = .alt,
+                        ci = .ci
                     )
                 }
             }
@@ -281,16 +296,7 @@ cor_test_rel = test_define(
                     ))
                 }
 
-                scalar = resolved$scalar
-                if (abs(scalar) >= 1) {
-                    cli::cli_abort(c(
-                        "Hypothesized correlation must be strictly between -1 and 1.",
-                        "i" = "Got {.val {scalar}}.",
-                        "i" = "Check whether the hypothesis expression is written as intended."
-                    ))
-                }
-
-                scalar
+                resolved$scalar
             }
         )
     )
