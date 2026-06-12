@@ -19,12 +19,14 @@
 #'     Default `"two.sided"`.}
 #'   \item{`.ci`}{Numeric. Confidence level. Default `0.95`. Only used for
 #'     Pearson; silently ignored for Kendall and Spearman.}
-#'   \item{`.rho`}{Numeric. Hypothesized population correlation. Default `0`.
-#'     Only used for Pearson; triggers Fisher-z test when non-zero.}
 #' }
 #'
 #' @section Correlation test default class:
 #' Returns a [class_corr_two] object inheriting from [class_stat_infer].
+#'
+#' @section Hypothesis claims:
+#' Not supported. Use [rel()] with the `base` variant for [state_null()]
+#' with [RHO()].
 #'
 #' @examples
 #' cars |>
@@ -47,7 +49,7 @@ cor_test_formula = test_define(
     model_type = S7::class_formula,
     impl = agendas(
         base = baseline(
-            fn = function(.proc, .cor_type = "pearson", .alt = "two.sided", .ci = 0.95, .rho = 0) {
+            fn = function(.proc, .cor_type = "pearson", .alt = "two.sided", .ci = 0.95) {
                 formula = .proc$formula
                 data = .proc$data
 
@@ -61,28 +63,11 @@ cor_test_formula = test_define(
                     ))
                 }
 
-                if (.rho != 0 && .cor_type != "pearson") {
+                if (nrow(data) < 4L) {
                     cli::cli_abort(c(
-                        "Non-zero {.arg .rho} is only supported for Pearson correlation.",
-                        "i" = "Got {.arg .cor_type} = {.val {.cor_type}}.",
-                        "i" = "Either set {.code .cor_type = \"pearson\"} or use {.code .rho = 0}."
+                        "Correlation test requires at least 4 observations.",
+                        "i" = "Got {nrow(data)}."
                     ))
-                }
-
-                if (.rho != 0) {
-                    results = lapply(rhs_labels, function(x_name) {
-                        pearson_fisher_z(
-                            x = data[[x_name]],
-                            y = data[[resp_name]],
-                            ind_vars = x_name,
-                            resp_vars = resp_name,
-                            .rho = .rho,
-                            .alt = .alt,
-                            .ci = .ci
-                        )
-                    })
-
-                    return(combine_corr_two(results, .ci))
                 }
 
                 tests = lapply(rhs_labels, function(x_name) {
@@ -126,17 +111,3 @@ cor_test_formula = test_define(
         )
     )
 )
-
-combine_corr_two = function(results, .ci) {
-    class_corr_two(
-        ind_vars = vapply(results, function(r) r@ind_vars, character(1)),
-        resp_vars = vapply(results, function(r) r@resp_vars, character(1)),
-        estimate = vapply(results, function(r) r@estimate, numeric(1)),
-        statistic = vapply(results, function(r) r@statistic, numeric(1)),
-        df = numeric(0),
-        p_val = vapply(results, function(r) r@p_val, numeric(1)),
-        lower_ci = vapply(results, function(r) r@lower_ci, numeric(1)),
-        upper_ci = vapply(results, function(r) r@upper_ci, numeric(1)),
-        ci_level = .ci
-    )
-}

@@ -24,14 +24,18 @@ The following arguments are passed via \code{...} in \code{\link[=CORTEST]{CORTE
 Default \code{"two.sided"}.}
 \item{\code{.ci}}{Numeric. Confidence level. Default \code{0.95}. Only used for
 Pearson; silently ignored for Kendall and Spearman.}
-\item{\code{.rho}}{Numeric. Hypothesized population correlation. Default \code{0}.
-Only used for Pearson; triggers Fisher-z test when non-zero.}
 }
 }
 
 \section{Correlation test default class}{
 
 Returns a \link{class_corr_two} object inheriting from \link{class_stat_infer}.
+}
+
+\section{Hypothesis claims}{
+
+Not supported. Use \code{\link[=rel]{rel()}} with the \code{base} variant for \code{\link[=state_null]{state_null()}}
+with \code{\link[=RHO]{RHO()}}.
 }
 
 \examples{
