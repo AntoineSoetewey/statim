@@ -44,6 +44,29 @@ main_cortest_rel = function(.cor_type) {
     }
 }
 
+#' Fisher-z correlation test against a non-zero null hypothesis.
+#'
+#' Tests H0: rho = .rho using the Fisher-z transformation:
+#'   z_stat = (atanh(r) - atanh(.rho)) / (1 / sqrt(n - 3))
+#' which is asymptotically standard normal under bivariate normality.
+#'
+#' The CI is computed around the sample r in z-space and back-transformed
+#' via tanh(). One-sided bounds are set to +/-Inf as appropriate.
+#'
+#' Validity conditions (Zar, 2010, s. 19.3):
+#'   - Bivariate normality of (x, y).
+#'   - n >= 4 (n - 3 >= 1 for the SE to be defined).
+#'   - |.rho| < 1 (atanh diverges at +-1).
+#'   - |r| < 1 (atanh(r) undefined at perfect correlation).
+#'
+#' @references
+#' Fisher, R. A. (1915). Frequency distribution of the values of the
+#' correlation coefficient in samples from an indefinitely large population.
+#' \emph{Biometrika}, \strong{10}(4), 507--521.
+#' \doi{10.2307/2331838}
+#'
+#' @keywords internal
+#' @noRd
 pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
     n = length(x)
 
@@ -287,6 +310,61 @@ cor_test_rel = test_define(
         ),
         kendall = variant(
             fn = main_cortest_rel("kendall")
+        ),
+        multi = variant(
+            fn = function(.proc, .cor_type = "pearson", .alt = "two.sided", .ci = 0.95) {
+                x_data = .proc$x_data
+                resp_data = .proc$resp_data
+
+                if (length(resp_data) != 1L) {
+                    cli::cli_abort(c(
+                        "{.arg resp} must be a single variable.",
+                        "i" = "Got {length(resp_data)} variable{?s}: {.val {names(resp_data)}}.",
+                        "i" = "Use a bare name or {.fn I} for a single response variable."
+                    ))
+                }
+
+                resp_name = names(resp_data)
+                resp_vec = resp_data[[1]]
+
+                tests = lapply(names(x_data), function(x_name) {
+                    res = stats::cor.test(
+                        x = x_data[[x_name]],
+                        y = resp_vec,
+                        method = .cor_type,
+                        alternative = .alt,
+                        conf.level = .ci
+                    )
+                    list(x_name = x_name, res = res)
+                })
+
+                has_ci = !is.null(tests[[1]]$res$conf.int)
+                has_df = !is.null(tests[[1]]$res$parameter)
+
+                class_corr_two(
+                    ind_vars = vapply(tests, function(x) x[["x_name"]], character(1)),
+                    resp_vars = rep(resp_name, length(tests)),
+                    estimate = vapply(tests, function(t) unname(t$res$estimate), numeric(1)),
+                    statistic = vapply(tests, function(t) unname(t$res$statistic), numeric(1)),
+                    df = if (has_df) {
+                        vapply(tests, function(t) unname(t$res$parameter), numeric(1))
+                    } else {
+                        numeric(0)
+                    },
+                    p_val = vapply(tests, function(t) t$res$p.value, numeric(1)),
+                    lower_ci = if (has_ci) {
+                        vapply(tests, function(t) t$res$conf.int[[1]], numeric(1))
+                    } else {
+                        numeric(0)
+                    },
+                    upper_ci = if (has_ci) {
+                        vapply(tests, function(t) t$res$conf.int[[2]], numeric(1))
+                    } else {
+                        numeric(0)
+                    },
+                    ci_level = .ci
+                )
+            }
         )
     ),
     compatible_params = list(RHO),

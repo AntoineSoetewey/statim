@@ -324,6 +324,100 @@ test_that("state_null() on spearman variant errors", {
     )
 })
 
+test_that("multi variant returns cld_exec with method = 'multi'", {
+    result = mtcars |>
+        define_model(rel(c(wt, hp), mpg)) |>
+        prepare_test(CORTEST) |>
+        via("multi") |>
+        conclude()
+
+    expect_s7_class(result, cld_exec)
+    expect_equal(result@cld_meta$method, "multi")
+})
+
+test_that("multi variant result is a class_corr_two with multiple rows", {
+    result = mtcars |>
+        define_model(rel(c(wt, hp), mpg)) |>
+        prepare_test(CORTEST) |>
+        via("multi") |>
+        conclude()
+
+    expect_s7_class(result@data, class_corr_two)
+    expect_length(result@data@ind_vars, 2L)
+    expect_equal(result@data@ind_vars, c("wt", "hp"))
+    expect_true(all(result@data@resp_vars == "mpg"))
+})
+
+test_that("multi variant matches base R cor.test() per variable", {
+    result = mtcars |>
+        define_model(rel(c(wt, hp), mpg)) |>
+        prepare_test(CORTEST) |>
+        via("multi") |>
+        conclude()
+
+    base_wt = cor.test(mtcars$wt, mtcars$mpg, method = "pearson")
+    base_hp = cor.test(mtcars$hp, mtcars$mpg, method = "pearson")
+
+    expect_equal(result@data@estimate[[1]], unname(base_wt$estimate), tolerance = 1e-6)
+    expect_equal(result@data@estimate[[2]], unname(base_hp$estimate), tolerance = 1e-6)
+    expect_equal(result@data@p_val[[1]], base_wt$p.value, tolerance = 1e-6)
+    expect_equal(result@data@p_val[[2]], base_hp$p.value, tolerance = 1e-6)
+})
+
+test_that("multi variant respects .cor_type for all variables", {
+    result = suppressWarnings(
+        mtcars |>
+            define_model(rel(c(wt, hp), mpg)) |>
+            prepare_test(CORTEST) |>
+            via("multi") |>
+            update(.cor_type = "spearman") |>
+            conclude()
+    )
+
+    base_wt = suppressWarnings(cor.test(mtcars$wt, mtcars$mpg, method = "spearman"))
+    base_hp = suppressWarnings(cor.test(mtcars$hp, mtcars$mpg, method = "spearman"))
+
+    expect_equal(result@data@estimate[[1]], unname(base_wt$estimate), tolerance = 1e-6)
+    expect_equal(result@data@estimate[[2]], unname(base_hp$estimate), tolerance = 1e-6)
+    expect_length(result@data@lower_ci, 0L)
+    expect_length(result@data@df, 0L)
+})
+
+test_that("multi variant has CI and df populated for pearson", {
+    result = mtcars |>
+        define_model(rel(c(wt, hp), mpg)) |>
+        prepare_test(CORTEST) |>
+        via("multi") |>
+        conclude()
+
+    expect_length(result@data@lower_ci, 2L)
+    expect_length(result@data@upper_ci, 2L)
+    expect_length(result@data@df, 2L)
+})
+
+test_that("multi variant rejects multi-variable resp", {
+    expect_error(
+        mtcars |>
+            define_model(rel(wt, c(mpg, hp))) |>
+            prepare_test(CORTEST) |>
+            via("multi") |>
+            conclude(),
+        class = "rlang_error"
+    )
+})
+
+test_that("state_null() on multi variant errors", {
+    expect_error(
+        mtcars |>
+            define_model(rel(c(wt, hp), mpg)) |>
+            prepare_test(CORTEST) |>
+            via("multi") |>
+            state_null(RHO(wt, mpg) == 0) |>
+            conclude(),
+        class = "rlang_error"
+    )
+})
+
 test_that("multi-x errors on rel()", {
     expect_error(
         CORTEST(rel(c(speed, dist), dist), cars),
