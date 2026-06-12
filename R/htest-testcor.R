@@ -37,11 +37,13 @@
 #'     conclude()
 #'
 #' # Spearman
-#' cars |>
-#'     define_model(rel(speed, dist)) |>
-#'     prepare_test(CORTEST) |>
-#'     via("spearman") |>
-#'     conclude()
+#' suppressWarnings({
+#'     cars |>
+#'         define_model(rel(speed, dist)) |>
+#'         prepare_test(CORTEST) |>
+#'         via("spearman") |>
+#'         conclude()
+#' })
 #'
 #' # Custom Hypothesis Expression
 #' cars |>
