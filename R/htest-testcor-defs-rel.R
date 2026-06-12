@@ -165,18 +165,22 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
 #'     conclude()
 #'
 #' # Spearman
-#' cars |>
-#'     define_model(rel(speed, dist)) |>
-#'     prepare_test(CORTEST) |>
-#'     via("spearman") |>
-#'     conclude()
+#' suppressWarnings({
+#'     cars |>
+#'         define_model(rel(speed, dist)) |>
+#'         prepare_test(CORTEST) |>
+#'         via("spearman") |>
+#'         conclude()
+#' })
 #'
 #' # Kendall
-#' cars |>
-#'     define_model(rel(speed, dist)) |>
-#'     prepare_test(CORTEST) |>
-#'     via("kendall") |>
-#'     conclude()
+#' suppressWarnings({
+#'     cars |>
+#'         define_model(rel(speed, dist)) |>
+#'         prepare_test(CORTEST) |>
+#'         via("kendall") |>
+#'         conclude()
+#' })
 #'
 #' # hypothesis claim: two-sided against zero
 #' cars |>
@@ -191,6 +195,18 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
 #'     prepare_test(CORTEST) |>
 #'     state_null(RHO(speed, dist) >= 0.8) |>
 #'     conclude()
+#'
+#' @references
+#' Fisher, R. A. (1915). Frequency distribution of the values of the
+#' correlation coefficient in samples from an indefinitely large population.
+#' \emph{Biometrika}, \strong{10}(4), 507--521.
+#' \doi{10.2307/2331838}
+#'
+#' Fisher, R. A. (1921). On the "probable error" of a coefficient of
+#' correlation deduced from a small sample. \emph{Metron}, \strong{1}, 3--32.
+#'
+#' Zar, J. H. (2010). \emph{Biostatistical Analysis} (5th ed.).
+#' Pearson. Section 19.3.
 #'
 #' @keywords internal
 #' @name cortest-rel
