@@ -33,9 +33,11 @@ perform, then `{statim}` immediately delivers *how*.
 
 ## Why statim?
 
-R has a rich statistical ecosystem, although it is yet for the use of S7
-into statistical analysis to be a norm, which the existing R packages
-are written based on S3, S4, Reference Class, or R6. Statistical
+R has a rich statistical ecosystem. Most of the packages in the wild
+were written at top of S3 and S4, and it is yet for the S7 to be
+prominent into statistics ecosystem — `{statim}` is glad to take the
+step (there are reasons why [S7 supersedes both S3 and
+S4](https://tidyverse.org/blog/2024/11/s7-0-2-0/)). Statistical
 inference in general is served by an assortment of disconnected
 functions: the functions you’re looking for may exist but they are
 scattered across different packages.
@@ -104,15 +106,15 @@ pak::pak("s7-stats/statim")
 ## General Usage
 
 By the way, loading a library comes with [a lot of
-preferences](https://s7-stats.com/posts/06-load-pkg/). Let us start by
-loading `{statim}` first:
+preferences](https://joshuamarie.com/posts/06-load-pkg/). Let us start
+by loading `{statim}` first:
 
 ``` r
 library(statim)
 ```
 
-All you need to know is that the usual workflow of `{statim}` comes with
-three usual steps.
+All you need to know is that the most usual usage of `{statim}` comes
+with three steps.
 
 ``` r
 sleep |>                                # 1
@@ -159,26 +161,29 @@ The package is designed around three ideas:
     provide a shortcut when the full pipeline (in a form of piped syntax
     that reads like a sentence) is not needed.
 
-2.  **Composable pipelines**: the pipeline has two forms: the eager form
-    and the piped syntax form. The eager form skips the verbs and cannot
-    be recalibrated, only skips to the output. On the other hand, the
-    piped syntax form relies on verbs and lazy loading, which comes with
-    the recalibration of the estimation method with a single `via()`
-    call, and the execution of the lazy-loaded pipeline with
-    `conclude()`.
+2.  **Composability**: the simplest way to write `{statim}` has two
+    forms: the eager form and the grammar/piped syntax form. The eager
+    form skips the verbs and cannot be recalibrated, only skips to the
+    output. On the other hand, the grammar/piped syntax form relies on
+    verbs and lazy loading, which comes with the recalibration of the
+    estimation method with a single `via()` call, and the execution of
+    the lazy-loaded pipeline with `conclude()`.
 
-3.  **Extensible by design**: to form an implementation is through
-    filling up the `stat_define()` object (then store it within list of
-    `defs` from `STAT_CONSTRUCTOR()` functions, saved as `<STAT_FN>`),
-    then `baseline()` to write the default form of `<STAT_FN>` and
-    `variant()` to extend the current `<STAT_FN>` form (only be accessed
-    with `via()` only). With these, you can bring your own engine, your
-    own method, your own implementation, or use them to extend the
-    current ones.
+3.  **Extensible by design**: the `{statim}` pipeline is extensible. For
+    instance, if you want to write new estimation method, an
+    implementation is through filling up the `stat_define()` object
+    (then store it within list of `defs` from `STAT_CONSTRUCTOR()`
+    functions, saved as `<STAT_FN>`), then `baseline()` to write the
+    default form of `<STAT_FN>` and `variant()` to extend the current
+    `<STAT_FN>` form (only be accessed with `via()` only). With these,
+    you can bring your own engine, your own method, your own
+    implementation, or use them to extend the current ones.
 
 ## License
 
-MIT © Joshua Marie
+<!-- MIT © Joshua Marie -->
+
+MIT + file LICENSE
 
 ## Contributing
 
