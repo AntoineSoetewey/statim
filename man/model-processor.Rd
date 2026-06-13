@@ -5,10 +5,13 @@
 \alias{model_processor}
 \title{Model evaluator}
 \usage{
-model_processor(x, ...)
+model_processor(x, data = NULL, ...)
 }
 \arguments{
 \item{x}{The model IDs to be extracted.}
+
+\item{data}{Optional. Only passed when a certain data structure (normally it's data frame)
+is required.}
 
 \item{...}{Passed through S7 method compatibility.}
 }

@@ -3,6 +3,8 @@
 #' A function for development use to extract the information in model IDs.
 #'
 #' @param x The model IDs to be extracted.
+#' @param data Optional. Only passed when a certain data structure (normally it's data frame)
+#'    is required.
 #' @param ... Passed through S7 method compatibility.
 #'
 #' @details
@@ -11,7 +13,11 @@
 #'
 #' @name model-processor
 #' @export
-model_processor = S7::new_generic("model_processor", "x")
+model_processor = S7::new_generic(
+    "model_processor",
+    "x",
+    fun = function(x, data = NULL, ...) S7::S7_dispatch()
+)
 
 S7::method(model_processor, model_id) = function(x, data = NULL, ...) {
     list()
