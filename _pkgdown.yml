@@ -204,7 +204,7 @@ articles:
     navbar: Writing statim extensions
     contents:
     - extend/new-est-method
-    - extend/new_tidy
+    - extend/new-tidy
 
 development:
   mode: auto
