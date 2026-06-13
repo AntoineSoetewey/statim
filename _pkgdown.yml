@@ -196,7 +196,7 @@ articles:
     contents:
     - pointers/model_id
     - pointers/stat_define
-    - pointers/hypothesis-expression
+    - pointers/hypothesis-expressions
     - pointers/recalibration-method
     - pointers/execution-methods
 
