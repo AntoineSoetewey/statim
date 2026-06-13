@@ -229,19 +229,6 @@ two_vars_extract = function(x_quo, x2_quo, data = NULL, role1 = "x", role2) {
     list(x1_data = x1_df, x2_data = x2_df)
 }
 
-# two_vars_extract = function(args, data = NULL) {
-#     if (length(args) != 2L) {
-#         cli::cli_abort("This model ID requires exactly 2 arguments.")
-#     }
-#
-#     roles = names(args)
-#
-#     x1_df = resolve_quo(args[[1]], data = data, role = roles[[1]], idx = 1L)
-#     x2_df = resolve_quo(args[[2]], data = data, role = roles[[2]], idx = 1L)
-#
-#     list(x1_data = x1_df, x2_data = x2_df)
-# }
-
 pairwise_data_extract = function(args, data = NULL) {
     direction = args@direction
     dots_quos = args@dots_quos

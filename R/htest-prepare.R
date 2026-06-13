@@ -134,16 +134,3 @@ as_test_spec = function(.test) {
 
     spec
 }
-
-# as_test_spec = function(.test) {
-#     if (inherits(.test, "test_spec")) return(.test)
-#
-#     if (is.function(.test)) {
-#         spec = .test(.model = NULL)
-#         if (!inherits(spec, "test_spec"))
-#             cli::cli_abort("{.arg .test} must return a {.cls test_spec}.")
-#         return(spec)
-#     }
-#
-#     cli::cli_abort("{.arg .test} must be a function or {.cls test_spec}.")
-# }

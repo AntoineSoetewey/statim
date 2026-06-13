@@ -102,16 +102,6 @@ find_def = function(lookup, model_type) {
     )
 }
 
-# new_stat_infer = function(res, impl_cls, stat_cls, print_fn, .name) {
-#     stat_infer_spec(
-#         data = res,
-#         impl_cls = impl_cls,
-#         stat_cls = stat_cls,
-#         print_fn = print_fn,
-#         name = .name
-#     )
-# }
-
 stat_infer_spec = S7::new_class(
     "stat_infer_spec",
     properties = list(

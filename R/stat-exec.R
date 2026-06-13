@@ -82,9 +82,6 @@
 #' @name conclude
 #' @export
 conclude = S7::new_generic("conclude", ".x")
-# conclude = function(.x, ...) {
-#     UseMethod("conclude")
-# }
 
 S7::method(conclude, test_lazy) = function(.x, ...) {
     model_type = if (inherits(.x@model_id, "formula")) {
@@ -95,14 +92,6 @@ S7::method(conclude, test_lazy) = function(.x, ...) {
     def = find_def(.x@test_spec@lookup, model_type = model_type)
 
     method_name = .x@recalibrate_spec$method_name
-
-    # impl = resolve_impl(
-    #     method_name = method_name,
-    #     def = def,
-    #     model_type = model_type,
-    #     cls = .x@test_spec@cls,
-    #     global_variants = htest_opts_global$variants
-    # )
     cls = .x@test_spec@cls
     key = variant_registry_key(cls, model_type)
     impl = def@impl$variants[[method_name %||% ""]] %||%
@@ -170,14 +159,6 @@ S7::method(conclude, model_lazy) = function(.x, ...) {
     def = find_def(.x@model_spec@lookup, model_type = model_type)
 
     method_name = .x@recalibrate_spec$method_name
-
-    # impl = resolve_impl(
-    #     method_name = method_name,
-    #     def = def,
-    #     model_type = model_type,
-    #     cls = .x@model_spec@cls,
-    #     global_variants = list()
-    # )
     cls = .x@model_spec@cls
     key = variant_registry_key(cls, model_type)
     impl = def@impl$variants[[method_name %||% ""]] %||%
@@ -232,7 +213,6 @@ wrap_exec = function(
 ) {
     cld_exec(
         data = out_raw,
-        # impl_cls = def@impl_class,
         impl_cls = impl_cls_from_model(stat_cls, model_id),
         stat_cls = stat_cls,
         print_fn = impl@print,
@@ -290,34 +270,3 @@ S7::method(print, cld_exec) = function(x, ...) {
 
     invisible(x)
 }
-
-# #' @export
-# print.cld_exec = function(x, ...) {
-#     meta = x$cld_meta
-#     info = model_id_info(meta$model_id, meta$processed)
-#
-#     cat("\n")
-#     cat(cli::rule(left = "Model", line = "="), "\n\n")
-#     cat("Model ID :", info@model_type, "\n")
-#     cat("Args     :", info@args, "\n")
-#     if (length(info@other_info) > 0L) {
-#         for (nm in names(info@other_info)) {
-#             cat("   ", nm, ":", info@other_info[[nm]], "\n")
-#         }
-#     }
-#     if (!is.null(meta$data_name) && nzchar(meta$data_name)) {
-#         cat("Data     :", meta$data_name, "\n")
-#     }
-#
-#     stat_label = if (identical(meta$method, "default")) {
-#         meta$stat_name
-#     } else {
-#         paste0(meta$stat_name, " \u00b7 ", meta$method)
-#     }
-#     cat("\n")
-#     cat(cli::rule(left = stat_label, line = "="), "\n\n")
-#
-#     print(x$result)
-#
-#     invisible(x)
-# }
