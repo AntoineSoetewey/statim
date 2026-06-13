@@ -53,6 +53,15 @@ inject_and_run = function(impl, processed, args, claims = NULL) {
 
     extra = args[!names(args) %in% fn_args]
     has_dots = "..." %in% names(formals(fn))
+
+    if (!has_dots && length(extra) > 0L) {
+        cli::cli_abort(c(
+            "Unknown argument{?s}: {.arg {names(extra)}}.",
+            "i" = "Accepted arguments: {.arg {setdiff(fn_args, '.proc')}}.",
+            "i" = "Did you misspell one of the supported arguments?"
+        ))
+    }
+
     if (has_dots) {
         rlang::exec(fn, !!!injected, !!!extra)
     } else {

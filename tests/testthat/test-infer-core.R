@@ -45,7 +45,7 @@ test_that("impl_cls_from_model() concatenates stat_cls and model name", {
     expect_equal(impl_cls_from_model("ttest", extra ~ group), "ttest_formula")
 })
 
-# inject_and_run ---------------------------------------------------------------
+# ---- testing inject_and_run ----
 
 test_that("inject_and_run() passes processed as .proc and runs fn", {
     impl = ttest_def_two@impl$base
@@ -87,6 +87,57 @@ test_that("variant() errors when fn does not start with .proc", {
     expect_error(
         variant(fn = function(x, group_data) x),
         class = "rlang_error"
+    )
+})
+
+test_that("inject_and_run() errors on unknown arg when fn has no ...", {
+    impl = ttest_def_two@impl$base
+    processed = model_processor(x_by(extra, group), sleep)
+
+    expect_error(
+        inject_and_run(impl, processed, args = list(foo = 1)),
+        class = "rlang_error"
+    )
+})
+
+test_that("inject_and_run() errors on misspelled known arg", {
+    impl = ttest_def_two@impl$base
+    processed = model_processor(x_by(extra, group), sleep)
+
+    expect_error(
+        inject_and_run(impl, processed, args = list(.cii = 0.90)),
+        class = "rlang_error"
+    )
+})
+
+test_that("inject_and_run() error message lists accepted args", {
+    impl = ttest_def_two@impl$base
+    processed = model_processor(x_by(extra, group), sleep)
+
+    err = rlang::catch_cnd(
+        inject_and_run(impl, processed, args = list(foo = 1))
+    )
+    full_msg = rlang::cnd_message(err)
+
+    expect_match(full_msg, "foo")
+    expect_match(full_msg, "\\.paired", fixed = FALSE)
+})
+
+test_that("inject_and_run() with extra args succeeds when fn has ...", {
+    impl = baseline(fn = function(.proc, ...) list(...))
+    processed = model_processor(x_by(extra, group), sleep)
+
+    result = inject_and_run(impl, processed, args = list(foo = 1, bar = 2))
+
+    expect_equal(result, list(foo = 1, bar = 2))
+})
+
+test_that("inject_and_run() does not error when args is empty", {
+    impl = ttest_def_two@impl$base
+    processed = model_processor(x_by(extra, group), sleep)
+
+    expect_no_error(
+        inject_and_run(impl, processed, args = list())
     )
 })
 
