@@ -1,6 +1,5 @@
 anova_def_xby = test_define(
     model_type = x_by,
-    # impl_class = "anova_xby",
     impl = agendas(
         base = baseline(
             fn = function(.proc, .contrasts = NULL) {
@@ -27,11 +26,11 @@ anova_def_xby = test_define(
                     }
                 }
 
-                # Do NOT pass .contrasts to stats::aov — the claim-derived matrix
+                # Do NOT pass .contrasts to stats::aov, the claim-derived matrix
                 # only contains rows for levels explicitly named in the hypothesis,
-                # which would cause aov() to silently drop unmentioned levels from
+                # which would cause `aov()` to silently drop unmentioned levels from
                 # the fit. Fit unconditionally on the full data; contrasts are
-                # applied post-fit in compute_aov_contrasts() where all levels are
+                # applied post-fit in `compute_aov_contrasts()` where all levels are
                 # available from fit$model.
                 fit = stats::aov(f, data = df)
 

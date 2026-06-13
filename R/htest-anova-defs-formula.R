@@ -109,9 +109,8 @@ anova_def_formula = test_define(
                 # Infer the grouping variable from the first claim's param nodes.
                 # For the formula variant we don't have processed$group_data, so
                 # we extract the group name from the `given` predicate of each
-                # MU() call (e.g. MU(y, group == "A") → "group").
+                # MU() call (e.g. MU(y, group == "A") -> "group").
                 grp_name = infer_group_name_from_claims(claims_list)
-
                 resolved = lapply(claims_list, claim_contrast_coefs)
 
                 # Collect all level names mentioned across all contrasts so the
@@ -141,13 +140,13 @@ anova_def_formula = test_define(
     )
 )
 
-# Infer the grouping variable name from a list of null_claim objects.
-#
-# Walks the param nodes of each claim and extracts the LHS variable name
-# from any `given` predicate of the form `var == "level"`. Errors if
-# claims reference more than one grouping variable, since a single contrast
-# matrix can only index one factor.
-#
+#' Infer the grouping variable name from a list of null_claim objects.
+#'
+#' Walks the param nodes of each claim and extracts the LHS variable name
+#' from any `given` predicate of the form `var == "level"`. Errors if
+#' claims reference more than one grouping variable, since a single contrast
+#' matrix can only index one factor.
+#'
 #' @keywords internal
 #' @noRd
 infer_group_name_from_claims = function(claims_list) {
@@ -182,8 +181,8 @@ infer_group_name_from_claims = function(claims_list) {
     grp_names[[1]]
 }
 
-# Recursively extract grouping variable names from a param node or arith_node.
-#
+#' Recursively extract grouping variable names from a param node or arith_node.
+#'
 #' @keywords internal
 #' @noRd
 extract_group_names_from_node = function(node) {
