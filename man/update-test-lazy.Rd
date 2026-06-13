@@ -19,7 +19,7 @@ changing the method variant or engine.
 sleep |>
     define_model(extra ~ group) |>
     prepare_test(TTEST) |>
-    update(.paired = TRUE) |>
+    update(.ci = 0.9) |>
     conclude()
 
 }
