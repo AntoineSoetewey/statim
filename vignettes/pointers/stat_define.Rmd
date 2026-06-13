@@ -1,0 +1,30 @@
+---
+title: "stat_define objects"
+subtitle: "Explanation"
+output: 
+    rmarkdown::html_vignette:
+        toc: true
+vignette: |
+    %\VignetteIndexEntry{stat_define objects}
+    %\VignetteEngine{knitr::rmarkdown}
+    \usepackage[utf8]{inputenc}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+
+library(statim)
+```
+
+## What are <stat_define> objects?
+
+
+## Why <stat_define> objects are required? 
+
+
+## 
+
+

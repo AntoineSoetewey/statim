@@ -1,0 +1,23 @@
+---
+title: "Writing new estimation method for inferential statistics"
+subtitle: "Explanation"
+description: "Writing statim extensions"
+output: 
+    rmarkdown::html_vignette:
+        toc: true
+vignette: |
+    %\VignetteIndexEntry{New estimation method}
+    %\VignetteEngine{knitr::rmarkdown}
+    \usepackage[utf8]{inputenc}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+
+library(statim)
+```
+
+

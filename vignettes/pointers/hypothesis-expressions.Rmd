@@ -1,0 +1,21 @@
+---
+title: "Writing Full Null Hypothesis Expression"
+subtitle: "A New Feature and Explanation"
+output: 
+    rmarkdown::html_vignette:
+        toc: true
+vignette: |
+    %\VignetteIndexEntry{Hypothesis Expressions}
+    %\VignetteEngine{knitr::rmarkdown}
+    \usepackage[utf8]{inputenc}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+
+library(statim)
+```
+

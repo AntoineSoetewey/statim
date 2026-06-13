@@ -195,10 +195,15 @@ articles:
     navbar: Pointers of statim you need to know
     contents:
     - pointers/model_id
+    - pointers/stat_define
+    - pointers/hypothesis_expression
+    - pointers/recalibration-method
+    - pointers/execution-methods
 
   - title: Writing statim extensions
     navbar: Writing statim extensions
     contents:
+    - extend/new-est-method
     - extend/new_tidy
 
 development:
