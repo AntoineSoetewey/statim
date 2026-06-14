@@ -34,6 +34,18 @@ parse_null_claim = function(quo) {
     lhs = parse_param_node(expr[[2]], env, side = "LHS")
     rhs = parse_param_node(expr[[3]], env, side = "RHS")
 
+    # The LHS must contain at least one parameter. Bare constants on the LHS
+    # are rejected so the expression direction is always unambiguous and no
+    # operator-flip heuristics are needed downstream.
+    if (!contains_param(lhs)) {
+        flipped_op = unname(FLIP_OP[op])
+        cli::cli_abort(c(
+            "The left-hand side of a hypothesis must contain a population parameter.",
+            "i" = "Found only a constant: {.code {deparse(expr[[2]])}}.",
+            "i" = "Write it the other way around: {.code {deparse(expr[[3]])} {flipped_op} {deparse(expr[[2]])}}."
+        ))
+    }
+
     null_claim(
         lhs = lhs,
         rhs = rhs,

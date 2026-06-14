@@ -31,8 +31,10 @@ test_that("parse_null_claim: parses inequality operators", {
 })
 
 test_that("parse_null_claim: flips operator when scalar is on LHS", {
-    claim = parse_null_claim(rlang::quo(0 == MU(extra)))
-    expect_equal(claim@op, "==")
+    expect_error(
+        parse_null_claim(rlang::quo(0 == MU(extra))),
+        class = "rlang_error"
+    )
 })
 
 test_that("parse_null_claim: parses %=% chain into flat node list", {
