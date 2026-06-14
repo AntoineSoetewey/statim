@@ -18,8 +18,6 @@ desc = read.dcf("DESCRIPTION")
 desc = setNames(as.list(desc), colnames(desc))
 ```
 
-> This package is under active development. APIs may change.
-
 # `r desc$Package` <img src="man/figures/logo.png" align="right" height="139" />
 
 <!-- badges: start -->
