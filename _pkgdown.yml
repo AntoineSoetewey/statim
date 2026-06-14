@@ -191,6 +191,14 @@ footer:
 
 articles:
 
+  - title: A guide on using statim R package
+    navbar: A guide on using statim R package
+    contents:
+    - usage/htest
+    - usage/model-infer
+    - usage/anova
+    - usage/multiple-exec
+
   - title: Pointers of statim you need to know
     navbar: Pointers of statim you need to know
     contents:

@@ -1,0 +1,12 @@
+---
+title: "New approach of hypothesis testing with {statim}"
+subtitle: "Definitive guide"
+description: "A guide on using statim R package"
+output: 
+    rmarkdown::html_vignette:
+        toc: true
+vignette: |
+    %\VignetteIndexEntry{Hypothesis testing with statim}
+    %\VignetteEngine{knitr::rmarkdown}
+    \usepackage[utf8]{inputenc}
+---

@@ -1,0 +1,13 @@
+---
+title: "New approach of model-based inference with {statim}"
+subtitle: "Definitive guide"
+description: "A guide on using statim R package"
+output: 
+    rmarkdown::html_vignette:
+        toc: true
+vignette: |
+    %\VignetteIndexEntry{Model-based inference with statim}
+    %\VignetteEngine{knitr::rmarkdown}
+    \usepackage[utf8]{inputenc}
+---
+

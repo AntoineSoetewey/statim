@@ -1,0 +1,13 @@
+---
+title: "Multiple executions in a single line"
+subtitle: "Definitive guide"
+description: "A guide on using statim R package"
+output: 
+    rmarkdown::html_vignette:
+        toc: true
+vignette: |
+    %\VignetteIndexEntry{Multiple executions in a single line}
+    %\VignetteEngine{knitr::rmarkdown}
+    \usepackage[utf8]{inputenc}
+---
+
