@@ -30,7 +30,7 @@ test_that("parse_null_claim: parses inequality operators", {
     }
 })
 
-test_that("parse_null_claim: flips operator when scalar is on LHS", {
+test_that("parse_null_claim: scalar is on LHS should fail", {
     expect_error(
         parse_null_claim(rlang::quo(0 == MU(extra))),
         class = "rlang_error"
