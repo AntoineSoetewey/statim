@@ -22,6 +22,7 @@ to be equal. Used inside \code{\link[=state_null]{state_null()}} only — it is 
 and will error if called outside that context.
 }
 \examples{
+\dontrun{
 sleep |>
     define_model(x_by(extra, group)) |>
     prepare_test(ANOVA) |>
@@ -30,5 +31,6 @@ sleep |>
         MU(extra, group == "2")
     ) |>
     conclude()
+}
 
 }

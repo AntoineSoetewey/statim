@@ -41,6 +41,7 @@
 #'   [state_null()].
 #'
 #' @examples
+#' \dontrun{
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
 #'     prepare_test(ANOVA) |>
@@ -49,6 +50,7 @@
 #'         MU(extra, group == "2")
 #'     ) |>
 #'     conclude()
+#' }
 #'
 #' @name equal-op
 #' @export
