@@ -50,6 +50,7 @@ The following arguments are passed via \code{...} in \code{\link[=TTEST]{TTEST()
 \item{\code{.mu}}{Numeric. Hypothesized mean difference. Default \code{0}.}
 \item{\code{.alt}}{Direction: \code{"two.sided"}, \code{"greater"}, or \code{"less"}. Default \code{"two.sided"}.}
 \item{\code{.ci}}{Confidence level. Default \code{0.95}.}
+\item{\code{.first_group}}{Only if uses \code{\link[=state_null]{state_null()}}. Considers first term as the first order. Default is \code{NULL}.}
 }
 }
 
@@ -59,6 +60,7 @@ The following arguments are passed via \code{...} in \code{\link[=TTEST]{TTEST()
 \item{\code{"boot"}}{Bootstrap CI. Accepts \code{n} (reps) and \code{seed}.}
 \item{\code{"permute"}}{Permutation test. Accepts \code{n} and \code{seed}.}
 \item{\code{"contrast"}}{Welch-Satterthwaite linear contrast test. Accepts \code{.w}, \code{.mu}, \code{.ci}, \code{.op}.}
+\item{\code{"multi"}}{Accepts multiple selected \code{group} variables}
 }
 }
 
