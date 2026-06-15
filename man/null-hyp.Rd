@@ -3,12 +3,9 @@
 \name{null-hyp}
 \alias{null-hyp}
 \alias{state_null}
-\alias{more_h0}
 \title{State a null hypothesis in the pipeline}
 \usage{
 state_null(.x, ...)
-
-more_h0(...)
 }
 \arguments{
 \item{.x}{A \code{test_lazy} object from \code{\link[=prepare_test]{prepare_test()}}.}
