@@ -42,23 +42,23 @@ There are two ways to start a pipeline:
 
 i. `define_model()` to define one model at a time.
 
-``` r
-sleep_dm = define_model(sleep, extra %by% group)
-mtcars_dm = define_model(mtcars, mpg ~ .)
-# mtcars_dm = define_model(mpg ~ ., mtcars)
-```
+    ``` r
+    sleep_dm = define_model(sleep, extra %by% group)
+    mtcars_dm = define_model(mtcars, mpg ~ .)
+    # mtcars_dm = define_model(mpg ~ ., mtcars)
+    ```
 
 ii. `write_models()` to define multiple named models at once.
 
-``` r
-sleep_wm = write_models(
-    sleep,
-    mod1 = extra %by% group,
-    mod2 = extra %by% c(group, ID),
-    mod3 = extra ~ 1
-    mod4 = extra ~ 1 + group
-)
-```
+    ``` r
+    sleep_wm = write_models(
+        sleep,
+        mod1 = extra %by% group,
+        mod2 = extra %by% c(group, ID),
+        mod3 = extra ~ 1
+        mod4 = extra ~ 1 + group
+    )
+    ```
 
 Future updates will include transformations and model updating functions.
 
@@ -70,19 +70,19 @@ Let's try with two forms of statistical inference:
 
 i.  H-test inference uses `prepare_test()`
 
-``` r
-sleep_dm = define_model(sleep, extra %by% group)
-sleep_tt = sleep_dm |> prepare_test(TTEST) |> update(.ci = 0.9)
-```
+    ``` r
+    sleep_dm = define_model(sleep, extra %by% group)
+    sleep_tt = sleep_dm |> prepare_test(TTEST) |> update(.ci = 0.9)
+    ```
 
 ii.  Model-based inference uses `prepare_model()`
 
-``` r 
-mtcars_dm = define_model(mtcars, mpg ~ .)
-mtcars_lm = mtcars_dm |> prepare_model(LINEAR_REG)
-```
-
-> Note: `prepare_test()` and `prepare_model()` can supply extra arguments from the default (base) implementation of `<STAT_FN>` functions like `TTEST()` and `LINEAR_REG()`. Using `update()` is totally optional.  
+    ``` r 
+    mtcars_dm = define_model(mtcars, mpg ~ .)
+    mtcars_lm = mtcars_dm |> prepare_model(LINEAR_REG)
+    ```
+    
+    > Note: `prepare_test()` and `prepare_model()` can supply extra arguments from the default (base) implementation of `<STAT_FN>` functions like `TTEST()` and `LINEAR_REG()`. Using `update()` is totally optional.  
 
 Later updates may include other processes, such as sensitivity analysis. 
 

@@ -51,37 +51,37 @@ Two simple steps are required:
 
 i.  To write a new `<model_id>` mapper, use `S7::new_class()` constructor, and put `statim::model_id` under `parent` argument. Using `constructor` argument is optional unless required. 
 
-```{r}
-xyz = S7::new_class(
-    "xyz",
-    parent = statim::model_id,
-    properties = list(
-        x = S7::class_numeric,
-        y = S7::class_numeric,
-        z = S7::class_numeric
+    ```{r}
+    xyz = S7::new_class(
+        "xyz",
+        parent = statim::model_id,
+        properties = list(
+            x = S7::class_numeric,
+            y = S7::class_numeric,
+            z = S7::class_numeric
+        )
     )
-)
-```
+    ```
 
 ii.  Extract the info you need by dispatching `model_processor()` with the newly created `xyz` `<model_id>` object. Two arguments needed to place within the dispatched functions: `x`, `data` (which is optional), and the unused ellipsis `...`. 
 
-```{r}
-S7::method(model_processor, xyz) = function(x, ...) {
-    list(
-        x = x@x,
-        y = x@y,
-        z = x@z
-    )
-}
-```
+    ```{r}
+    S7::method(model_processor, xyz) = function(x, ...) {
+        list(
+            x = x@x,
+            y = x@y,
+            z = x@z
+        )
+    }
+    ```
 
 At this point, `xyz` is a fully functional `<model_id>`. It can be passed straight into `define_model()`:
 
-```{r}
-m = xyz(x = 1, y = 2, z = 3)
-def = define_model(m)
-def@processed
-```
+    ```{r}
+    m = xyz(x = 1, y = 2, z = 3)
+    def = define_model(m)
+    def@processed
+    ```
 
 ## A bit more complicated: capturing unevaluated expressions
 
