@@ -21,7 +21,7 @@
 #'   \item{`"contrast"`}{Welch-Satterthwaite linear contrast test. Accepts `.w`, `.mu`, `.ci`, `.op`.}
 #' }
 #'
-#' @section Result class:
+#' @section Two-sample t-test default class:
 #' Returns a [class_ttest_two] object. All variants that also return
 #' [class_ttest_two] inherit [auto_tidy()] and [print()] automatically.
 #'
@@ -52,6 +52,18 @@
 #'     ) |>
 #'     via("contrast") |>
 #'     conclude()
+#'
+#' @section References:
+#' Welch, B. L. (1947). The generalization of "Student's" problem when
+#' several different population variances are involved. *Biometrika*,
+#' 34(1-2), 28-35. \url{https://doi.org/10.1093/biomet/34.1-2.28}
+#'
+#' Satterthwaite, F. E. (1946). An approximate distribution of estimates
+#' of variance components. *Biometrics Bulletin*, 2(6), 110-114.
+#' \url{https://doi.org/10.2307/3002019}
+#'
+#' Kutner, M. H., Nachtsheim, C. J., Neter, J., & Li, W. (2004).
+#' *Applied Linear Statistical Models* (5th ed.). McGraw-Hill/Irwin.
 #'
 #' @keywords internal
 #' @name ttest-xby

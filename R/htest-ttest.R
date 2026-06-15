@@ -27,7 +27,7 @@
 #'
 #' @inheritSection ttest-xby Arguments
 #' @inheritSection ttest-xby Variants
-#' @inheritSection ttest-xby Result class
+#' @inheritSection ttest-xby Two-sample t-test default class
 #' @inheritSection ttest-xby Hypothesis claims
 #'
 #' @examples
@@ -55,6 +55,7 @@
 #'     conclude()
 #'
 #' # Contrast t-test
+#' # This performs Welch-Satterthwaite linear contrast test for t-test
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
 #'     prepare_test(TTEST) |>
@@ -77,6 +78,8 @@
 #'     prepare_test(TTEST) |>
 #'     state_null(MU(extra) == 0) |>
 #'     conclude()
+#'
+#' @inheritSection ttest-xby References
 #'
 #' @seealso
 #' [ttest-xby], [ttest-pairwise], [ttest-formula] for per-implementation

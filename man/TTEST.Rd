@@ -62,7 +62,7 @@ The following arguments are passed via \code{...} in \code{\link[=TTEST]{TTEST()
 }
 }
 
-\section{Result class}{
+\section{Two-sample t-test default class}{
 
 Returns a \link{class_ttest_two} object. All variants that also return
 \link{class_ttest_two} inherit \code{\link[=auto_tidy]{auto_tidy()}} and \code{\link[=print]{print()}} automatically.
@@ -72,6 +72,20 @@ Returns a \link{class_ttest_two} object. All variants that also return
 
 Supports \code{\link[=MU]{MU()}} via \code{\link[=state_null]{state_null()}}. The \code{contrast} variant performs Welch-Satterthwaite linear contrast test
 and additionally accepts contrast coefficients via \code{.w}.
+}
+
+\section{References}{
+
+Welch, B. L. (1947). The generalization of "Student's" problem when
+several different population variances are involved. \emph{Biometrika},
+34(1-2), 28-35. \url{https://doi.org/10.1093/biomet/34.1-2.28}
+
+Satterthwaite, F. E. (1946). An approximate distribution of estimates
+of variance components. \emph{Biometrics Bulletin}, 2(6), 110-114.
+\url{https://doi.org/10.2307/3002019}
+
+Kutner, M. H., Nachtsheim, C. J., Neter, J., & Li, W. (2004).
+\emph{Applied Linear Statistical Models} (5th ed.). McGraw-Hill/Irwin.
 }
 
 \examples{
@@ -99,6 +113,7 @@ sleep |>
     conclude()
 
 # Contrast t-test
+# This performs Welch-Satterthwaite linear contrast test for t-test
 sleep |>
     define_model(x_by(extra, group)) |>
     prepare_test(TTEST) |>
