@@ -106,64 +106,64 @@ S7::method(print, stated_null) = function(x, ...) {
 #     )
 # }
 
-#' @rdname null-hyp
-#' @export
-more_h0 = function(...) {
-    cli::cli_abort(
-        "{.fn more_h0} must be used inside {.fn state_null}."
-    )
-}
-
-#' @keywords internal
-#' @noRd
-eval_more_h0 = function(expr, env) {
-    args = as.list(expr[-1])
-    nms = names(args)
-
-    if (is.null(nms) || any(!nzchar(nms))) {
-        cli::cli_abort(
-            "All expressions in {.fn more_h0} must be named."
-        )
-    }
-
-    ref_env = new.env(parent = env)
-
-    claims = vector("list", length(args))
-    names(claims) = nms
-
-    for (i in seq_along(args)) {
-        nm = nms[[i]]
-        raw = rlang::new_quosure(args[[i]], ref_env)
-        claim = parse_null_claim(raw)
-
-        scalar_val = tryCatch(
-            claim_scalar_diff(claim),
-            error = function(e) {
-                structure(list(msg = conditionMessage(e)), class = "unresolvable")
-            }
-        )
-
-        if (inherits(scalar_val, "unresolvable")) {
-            local({
-                captured_nm = nm
-                captured_msg = scalar_val$msg
-                makeActiveBinding(captured_nm, function() {
-                    cli::cli_abort(c(
-                        "Cannot reference {.val {captured_nm}} in a subsequent claim.",
-                        "i" = "Only scalar-reducible claims can be referenced by name.",
-                        "x" = captured_msg
-                    ))
-                }, ref_env)
-            })
-        } else {
-            assign(nm, scalar_val, envir = ref_env)
-        }
-
-        claims[[i]] = claim
-    }
-
-    null_claims(claims = claims, expr = expr)
-}
+# #' @rdname null-hyp
+# #' @export
+# more_h0 = function(...) {
+#     cli::cli_abort(
+#         "{.fn more_h0} must be used inside {.fn state_null}."
+#     )
+# }
+#
+# #' @keywords internal
+# #' @noRd
+# eval_more_h0 = function(expr, env) {
+#     args = as.list(expr[-1])
+#     nms = names(args)
+#
+#     if (is.null(nms) || any(!nzchar(nms))) {
+#         cli::cli_abort(
+#             "All expressions in {.fn more_h0} must be named."
+#         )
+#     }
+#
+#     ref_env = new.env(parent = env)
+#
+#     claims = vector("list", length(args))
+#     names(claims) = nms
+#
+#     for (i in seq_along(args)) {
+#         nm = nms[[i]]
+#         raw = rlang::new_quosure(args[[i]], ref_env)
+#         claim = parse_null_claim(raw)
+#
+#         scalar_val = tryCatch(
+#             claim_scalar_diff(claim),
+#             error = function(e) {
+#                 structure(list(msg = conditionMessage(e)), class = "unresolvable")
+#             }
+#         )
+#
+#         if (inherits(scalar_val, "unresolvable")) {
+#             local({
+#                 captured_nm = nm
+#                 captured_msg = scalar_val$msg
+#                 makeActiveBinding(captured_nm, function() {
+#                     cli::cli_abort(c(
+#                         "Cannot reference {.val {captured_nm}} in a subsequent claim.",
+#                         "i" = "Only scalar-reducible claims can be referenced by name.",
+#                         "x" = captured_msg
+#                     ))
+#                 }, ref_env)
+#             })
+#         } else {
+#             assign(nm, scalar_val, envir = ref_env)
+#         }
+#
+#         claims[[i]] = claim
+#     }
+#
+#     null_claims(claims = claims, expr = expr)
+# }
 
 #' @keywords internal
 attach_claim_to_lazy = function(lazy, claim) {
