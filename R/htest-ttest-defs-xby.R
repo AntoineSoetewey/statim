@@ -12,6 +12,7 @@
 #'   \item{`.mu`}{Numeric. Hypothesized mean difference. Default `0`.}
 #'   \item{`.alt`}{Direction: `"two.sided"`, `"greater"`, or `"less"`. Default `"two.sided"`.}
 #'   \item{`.ci`}{Confidence level. Default `0.95`.}
+#'   \item{`.first_group`}{Only if uses [state_null()]. Considers first term as the first order. Default is `NULL`.}
 #' }
 #'
 #' @section Variants:
@@ -19,6 +20,7 @@
 #'   \item{`"boot"`}{Bootstrap CI. Accepts `n` (reps) and `seed`.}
 #'   \item{`"permute"`}{Permutation test. Accepts `n` and `seed`.}
 #'   \item{`"contrast"`}{Welch-Satterthwaite linear contrast test. Accepts `.w`, `.mu`, `.ci`, `.op`.}
+#'   \item{`"multi"`}{Accepts multiple selected `group` variables}
 #' }
 #'
 #' @section Two-sample t-test default class:
@@ -74,55 +76,63 @@ ttest_def_two = test_define(
     model_type = x_by,
     impl = agendas(
         base = baseline(
-            # ---- Default implementation ----
-            fn = function(.proc, .paired = FALSE, .mu = 0, .alt = "two.sided", .ci = 0.95) {
+            # ---- Default implementation (single grouping variable) ----
+            fn = function(.proc, .paired = FALSE, .mu = 0, .alt = "two.sided", .ci = 0.95, .first_group = NULL) {
                 x = .proc$x_data[[1]]
                 group_data = .proc$group_data
 
-                tests = lapply(names(group_data), function(grp_name) {
-                    grp = as.character(group_data[[grp_name]])
-                    lvls = unique(grp)
+                if (length(group_data) != 1L) {
+                    cli::cli_abort(c(
+                        "Two-sample t-test requires exactly 1 grouping variable.",
+                        "i" = "Found {length(group_data)} grouping variable{cli::qty(length(group_data))}{?s}.",
+                        "i" = "Use {.code via(\"multi\")} to test multiple grouping variables."
+                    ))
+                }
 
-                    if (length(lvls) != 2L) {
+                grp_name = names(group_data)[[1]]
+                grp = as.character(group_data[[grp_name]])
+                lvls = unique(grp)
+
+                if (length(lvls) != 2L) {
+                    cli::cli_abort(c(
+                        "Two-sample t-test requires exactly 2 groups.",
+                        "i" = "Found {length(lvls)} group{{?s}} in {.val {grp_name}}."
+                    ))
+                }
+
+                if (!is.null(.first_group) && length(.first_group) == 1L) {
+                    if (!.first_group %in% lvls) {
                         cli::cli_abort(c(
-                            "Two-sample t-test requires exactly 2 groups.",
-                            "i" = "Found {length(lvls)} group{{?s}} in {.val {grp_name}}."
+                            "Hypothesis references group {.val {.first_group}},",
+                            "i" = "but {.val {grp_name}} only has levels {.val {lvls}}."
                         ))
                     }
+                    if (lvls[[1]] != .first_group) lvls = rev(lvls)
+                }
 
-                    res = stats::t.test(
-                        x = x[grp == lvls[[1]]],
-                        y = x[grp == lvls[[2]]],
-                        paired = .paired,
-                        mu = .mu,
-                        alternative = .alt,
-                        conf.level = .ci
-                    )
+                res = stats::t.test(
+                    x = x[grp == lvls[[1]]],
+                    y = x[grp == lvls[[2]]],
+                    paired = .paired,
+                    mu = .mu,
+                    alternative = .alt,
+                    conf.level = .ci
+                )
 
-                    list(
-                        group = grp_name,
-                        # estimate = unname(res$estimate),
-                        estimate = if (.paired) {
-                            unname(res$estimate)
-                        } else {
-                            unname(res$estimate[[1]] - res$estimate[[2]])
-                        },
-                        t_stat = unname(res$statistic),
-                        df = unname(res$parameter),
-                        p_val = res$p.value,
-                        lower_ci = res$conf.int[[1]],
-                        upper_ci = res$conf.int[[2]]
-                    )
-                })
+                estimate = if (.paired) {
+                    unname(res$estimate)
+                } else {
+                    unname(res$estimate[[1]] - res$estimate[[2]])
+                }
 
                 class_ttest_two(
-                    group = vapply(tests, \(x) x$group, character(1)),
-                    estimate = vapply(tests, \(x) x$estimate, numeric(1)),
-                    t_stat = vapply(tests, \(x) x$t_stat, numeric(1)),
-                    df = vapply(tests, \(x) x$df, numeric(1)),
-                    p_val = vapply(tests, \(x) x$p_val, numeric(1)),
-                    lower_ci = vapply(tests, \(x) x$lower_ci, numeric(1)),
-                    upper_ci = vapply(tests, \(x) x$upper_ci, numeric(1)),
+                    group = grp_name,
+                    estimate = estimate,
+                    t_stat = unname(res$statistic),
+                    df = unname(res$parameter),
+                    p_val = res$p.value,
+                    lower_ci = res$conf.int[[1]],
+                    upper_ci = res$conf.int[[2]],
                     ci_level = .ci
                 )
             }
@@ -202,6 +212,72 @@ ttest_def_two = test_define(
                     p_val = p.value,
                     lower_ci = ci[[1]],
                     upper_ci = ci[[2]],
+                    ci_level = .ci
+                )
+            }
+        ),
+        multi = variant(
+            # ---- Multiple grouping variables ----
+            # ---- variant: multi ----
+            fn = function(.proc, .paired = FALSE, .mu = 0, .alt = "two.sided", .ci = 0.95) {
+                x = .proc$x_data[[1]]
+                group_data = .proc$group_data
+                n_groups = length(group_data)
+
+                if (length(.mu) == 1L) {
+                    .mu = rep(.mu, n_groups)
+                } else if (length(.mu) != n_groups) {
+                    cli::cli_abort(c(
+                        "`.mu` must be length 1 or match the number of grouping variables.",
+                        "i" = "Found {length(group_data)} grouping variable{cli::qty(n_groups)}{?s},",
+                        "i" = "but {.arg .mu} has length {length(.mu)}."
+                    ))
+                }
+
+                tests = lapply(seq_along(group_data), function(i) {
+                    grp_name = names(group_data)[[i]]
+                    grp = as.character(group_data[[grp_name]])
+                    lvls = unique(grp)
+
+                    if (length(lvls) != 2L) {
+                        cli::cli_abort(c(
+                            "Two-sample t-test requires exactly 2 groups.",
+                            "i" = "Found {length(lvls)} group{{?s}} in {.val {grp_name}}."
+                        ))
+                    }
+
+                    res = stats::t.test(
+                        x = x[grp == lvls[[1]]],
+                        y = x[grp == lvls[[2]]],
+                        paired = .paired,
+                        mu = .mu[[i]],
+                        alternative = .alt,
+                        conf.level = .ci
+                    )
+
+                    list(
+                        group = grp_name,
+                        estimate = if (.paired) {
+                            unname(res$estimate)
+                        } else {
+                            unname(res$estimate[[1]] - res$estimate[[2]])
+                        },
+                        t_stat = unname(res$statistic),
+                        df = unname(res$parameter),
+                        p_val = res$p.value,
+                        lower_ci = res$conf.int[[1]],
+                        upper_ci = res$conf.int[[2]]
+                    )
+                })
+
+                class_ttest_two(
+                    group = vapply(tests, \(x) x$group, character(1)),
+                    estimate = vapply(tests, \(x) x$estimate, numeric(1)),
+                    t_stat = vapply(tests, \(x) x$t_stat, numeric(1)),
+                    df = vapply(tests, \(x) x$df, numeric(1)),
+                    p_val = vapply(tests, \(x) x$p_val, numeric(1)),
+                    lower_ci = vapply(tests, \(x) x$lower_ci, numeric(1)),
+                    upper_ci = vapply(tests, \(x) x$upper_ci, numeric(1)),
                     ci_level = .ci
                 )
             }
@@ -312,17 +388,22 @@ ttest_def_two = test_define(
                 coefs = resolved$coefs
 
                 valid_two_sample = length(coefs) == 2L && identical(sort(unname(coefs)), c(-1, 1))
-                valid_one_sample = length(coefs) == 1L && coefs == 1
 
-                if (!valid_two_sample && !valid_one_sample) {
+                if (!valid_two_sample) {
                     cli::cli_abort(c(
-                        "T-test only supports simple mean differences.",
+                        "T-test for `x_by()` only supports two-sample mean differences.",
                         "i" = "Found contrast coefficients: {.val {coefs}}.",
-                        "i" = "Use {.code via(\"contrast\")} for contrast hypotheses."
+                        "i" = "Use {.code via(\"contrast\")} for weighted/contrast hypotheses,",
+                        "i" = "or use a formula model for one-sample tests."
                     ))
                 }
 
                 resolved$scalar
+            },
+            .first_group = function(claim, processed) {
+                resolved = claim_contrast_coefs(claim)
+                coefs = resolved$coefs
+                names(coefs)[coefs == 1]
             },
             .alt = function(claim, processed = NULL) {
                 switch(
