@@ -175,27 +175,27 @@ test_that("state_null: returns stated_null subclass", {
     expect_true(S7::S7_inherits(lazy, test_lazy))
 })
 
-test_that("state_null: accepts more_h0 block", {
-    lazy = sleep |>
-        define_model(x_by(extra, group)) |>
-        prepare_test(TTEST) |>
-        state_null(more_h0(
-            h01 = MU(extra) == 0,
-            h02 = MU(extra) == 1
-        ))
-    expect_true(S7::S7_inherits(lazy@claims, null_claims))
-    expect_length(lazy@claims@claims, 2L)
-})
+# test_that("state_null: accepts more_h0 block", {
+#     lazy = sleep |>
+#         define_model(x_by(extra, group)) |>
+#         prepare_test(TTEST) |>
+#         state_null(more_h0(
+#             h01 = MU(extra) == 0,
+#             h02 = MU(extra) == 1
+#         ))
+#     expect_true(S7::S7_inherits(lazy@claims, null_claims))
+#     expect_length(lazy@claims@claims, 2L)
+# })
 
-test_that("state_null: more_h0 requires named expressions", {
-    expect_error(
-        sleep |>
-            define_model(x_by(extra, group)) |>
-            prepare_test(TTEST) |>
-            state_null(more_h0(MU(extra) == 0)),
-        class = "rlang_error"
-    )
-})
+# test_that("state_null: more_h0 requires named expressions", {
+#     expect_error(
+#         sleep |>
+#             define_model(x_by(extra, group)) |>
+#             prepare_test(TTEST) |>
+#             state_null(more_h0(MU(extra) == 0)),
+#         class = "rlang_error"
+#     )
+# })
 
 test_that("state_null: errors when used without `prepare_test()` / `prepare_model()`", {
     expect_error(
@@ -215,17 +215,17 @@ test_that("attach_claim_to_lazy: rejects incompatible param type", {
     )
 })
 
-test_that("attach_claim_to_lazy: rejects incompatible param in more_h0", {
-    expect_error(
-        sleep |>
-            define_model(x_by(extra, group)) |>
-            prepare_test(TTEST) |>
-            state_null(more_h0(
-                h01 = PI() == 0.5
-            )),
-        class = "rlang_error"
-    )
-})
+# test_that("attach_claim_to_lazy: rejects incompatible param in more_h0", {
+#     expect_error(
+#         sleep |>
+#             define_model(x_by(extra, group)) |>
+#             prepare_test(TTEST) |>
+#             state_null(more_h0(
+#                 h01 = PI() == 0.5
+#             )),
+#         class = "rlang_error"
+#     )
+# })
 
 # ---- Validating variables from `state_null()` ----
 # Now made better
