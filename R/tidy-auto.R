@@ -69,6 +69,29 @@ S7::method(auto_tidy, class_ttest_two) = function(x, ...) {
     )
 }
 
+S7::method(auto_tidy, class_p_test) = function(x, ...) {
+    ci_level = x@ci_level * 100
+    has_true_p = length(x@true_p) > 0L
+
+    out = tibble::tibble(
+        successes = x@x,
+        total = x@n,
+        estimate = x@estimate,
+        statistic = x@statistic,
+        p_val = x@p_val
+    )
+
+    if (has_true_p) {
+        out = tibble::add_column(out, true_p = x@true_p, .after = "total")
+    }
+
+    lo_name = paste0("lower_", ci_level)
+    up_name = paste0("upper_", ci_level)
+    out[[lo_name]] = x@lower_ci
+    out[[up_name]] = x@upper_ci
+    out
+}
+
 S7::method(auto_tidy, class_corr_two) = function(x, ...) {
     ci_level = x@ci_level * 100
     has_df = length(x@df) > 0L
