@@ -40,6 +40,17 @@ Returns a \link{class_ttest_two} object. All variants that also return
 
 Supports \code{\link[=MU]{MU()}} via \code{\link[=state_null]{state_null()}}. The \code{contrast} variant performs Welch-Satterthwaite linear contrast test
 and additionally accepts contrast coefficients via \code{.w}.
+
+Claim order is respected: writing \code{MU(x, g == "a") - MU(x, g == "b")} versus
+\code{MU(x, g == "b") - MU(x, g == "a")} flips the sign of \code{estimate} and
+\code{t_stat}, since the group with coefficient \code{+1} in the parsed claim becomes
+\code{x} in \code{stats::t.test()}. This is implemented via an internal \code{.first_group}
+argument resolved from the claim — it is not meant to be set directly by
+users. If you call \code{via("base", .first_group = ...)} or use \code{update()} to
+override it manually, note that it accepts a single group label (one of
+the two levels of the grouping variable) and silently falls back to the
+data's natural level order (\code{unique()} on the grouping variable) if \code{NULL},
+unset, or not found among the levels.
 }
 
 \section{References}{

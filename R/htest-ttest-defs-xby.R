@@ -31,6 +31,17 @@
 #' Supports [MU()] via [state_null()]. The `contrast` variant performs Welch-Satterthwaite linear contrast test
 #' and additionally accepts contrast coefficients via `.w`.
 #'
+#' Claim order is respected: writing `MU(x, g == "a") - MU(x, g == "b")` versus
+#' `MU(x, g == "b") - MU(x, g == "a")` flips the sign of `estimate` and
+#' `t_stat`, since the group with coefficient `+1` in the parsed claim becomes
+#' `x` in `stats::t.test()`. This is implemented via an internal `.first_group`
+#' argument resolved from the claim — it is not meant to be set directly by
+#' users. If you call `via("base", .first_group = ...)` or use `update()` to
+#' override it manually, note that it accepts a single group label (one of
+#' the two levels of the grouping variable) and silently falls back to the
+#' data's natural level order (`unique()` on the grouping variable) if `NULL`,
+#' unset, or not found among the levels.
+#'
 #' @examples
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
@@ -384,7 +395,7 @@ ttest_def_two = test_define(
     claim_translator = claim_translate(
         default = map_claim(
             .mu = function(claim, processed) {
-                resolved = claim_contrast_coefs(claim)
+                resolved = claim_contrast_coefs(claim, filter = "given")
                 coefs = resolved$coefs
 
                 valid_two_sample = length(coefs) == 2L && identical(sort(unname(coefs)), c(-1, 1))
@@ -401,16 +412,15 @@ ttest_def_two = test_define(
                 resolved$scalar
             },
             .first_group = function(claim, processed) {
-                resolved = claim_contrast_coefs(claim)
-                coefs = resolved$coefs
-                names(coefs)[coefs == 1]
+                resolved = claim_contrast_coefs(claim, filter = "given")
+                names(resolved$coefs)[resolved$coefs == 1]
             },
             .alt = function(claim, processed = NULL) {
                 switch(
                     claim@op,
                     "==" = , "!=" = "two.sided",
-                    ">=" = , ">" = "less", # "greater",
-                    "<=" = , "<" = "greater" # "less"
+                    ">=" = , ">" = "less",
+                    "<=" = , "<" = "greater"
                 )
             }
         ),
