@@ -163,7 +163,7 @@ reference:
     desc: Core helpers to parse the modelled hypotheses, objects from `state_null()`
     contents:
     - claim-vars-validators
-    - claim_scalar_diff
+    - claim_scalar
     - claim_contrast_coefs
 
   - subtitle: Modelled hypothesis translator and container
