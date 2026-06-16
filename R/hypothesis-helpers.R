@@ -1,19 +1,94 @@
-#' Extract the hypothesized scalar value from a null claim
+#' Extract a scalar hypothesis value from a null claim
 #'
-#' Rearranges the hypothesis by moving all `param_obj` terms to the left
-#' and all scalar terms to the right. Returns the resulting scalar and the
-#' (possibly flipped) operator.
+#' Rearranges a hypothesis of the form `c * PARAM + d == scalar` by moving
+#' all numeric terms to the right-hand side. Unlike [claim_contrast_coefs()],
+#' this does not require or validate a linear combination — it is suitable for
+#' single-parameter claims involving any [param_obj] subclass (e.g. [MU()],
+#' [PI()], [RHO()]).
 #'
-#' Only handles linear combinations of parameters.
+#' @param claim A `null_claim` object.
+#' @param solve_coef Logical. If `TRUE`, divides the scalar by the parameter's
+#'   coefficient `c`, fully solving for the parameter value `(scalar - d) / c`.
+#'   Errors if `c == 0`. If `FALSE`, returns `scalar - d` only, leaving `c`
+#'   on the parameter side. Default `FALSE`.
+#'
+#' @return A list with fields:
+#' \describe{
+#'   \item{`coefs`}{Named numeric vector of length 1: the coefficient `c` on
+#'     the parameter term.}
+#'   \item{`scalar`}{Numeric. The resolved scalar value after rearrangement.}
+#'   \item{`op`}{Character. The (possibly flipped) relational operator.}
+#' }
+#'
+#' @seealso [claim_contrast_coefs()]
+#'
+#' @export
+claim_scalar = function(claim, solve_coef = FALSE) {
+    lhs_terms = collect_terms(claim@lhs, sign = 1L)
+    rhs_terms = collect_terms(claim@rhs, sign = -1L)
+    all_terms = c(lhs_terms, rhs_terms)
+
+    param_terms = Filter(function(t) t$kind == "param", all_terms)
+    scalar_terms = Filter(function(t) t$kind == "scalar", all_terms)
+
+    if (length(param_terms) == 0L) {
+        cli::cli_abort(c(
+            "No population parameter found in hypothesis.",
+            "i" = "At least one side must contain a parameter like {.fn MU}, {.fn PI}, {.fn RHO}, etc."
+        ))
+    }
+
+    if (length(param_terms) > 1L) {
+        cli::cli_abort(c(
+            "{.fn claim_scalar} expects a single parameter term.",
+            "i" = "Found {length(param_terms)} parameter term{?s}.",
+            "i" = "Use {.fn claim_contrast_coefs} for multi-parameter hypotheses."
+        ))
+    }
+
+    coef_val = param_terms[[1]]$coef
+    node = param_terms[[1]]$node
+    nm = extract_param_name(node)
+
+    scalar_val = -Reduce("+", lapply(scalar_terms, `[[`, "value"), 0)
+
+    if (solve_coef) {
+        if (coef_val == 0) {
+            cli::cli_abort(c(
+                "Cannot solve for parameter: coefficient is zero.",
+                "i" = "A zero coefficient makes the hypothesis degenerate.",
+                "i" = "Check the hypothesis expression for {.code {nm}}."
+            ))
+        }
+        scalar_val = scalar_val / coef_val
+        coef_val = 1
+    }
+
+    op = claim@op
+    lhs_has_only_scalars = !any(vapply(lhs_terms, function(t) t$kind == "param", logical(1)))
+    if (lhs_has_only_scalars && length(lhs_terms) > 0L) {
+        op = unname(FLIP_OP[op])
+    }
+
+    coefs = c(coef_val)
+    names(coefs) = nm
+
+    list(coefs = coefs, scalar = scalar_val, op = op)
+}
+
+#' Extract contrast coefficients from a null claim
+#'
+#' Decomposes the hypothesis into a named numeric vector of coefficients,
+#' one per `param_obj` term, plus the hypothesized scalar value and operator.
 #'
 #' @param claim A `null_claim` object.
 #'
-#' @return A list with fields `scalar` and `op`.
+#' @return A list with fields `coefs`, `scalar`, and `op`.
 #'
 #' @export
-claim_scalar_diff = function(claim) {
-    assert_linear(claim@lhs, "claim_scalar_diff")
-    assert_linear(claim@rhs, "claim_scalar_diff")
+claim_contrast_coefs = function(claim, filter = NULL) {
+    assert_linear(claim@lhs, "claim_contrast_coefs")
+    assert_linear(claim@rhs, "claim_contrast_coefs")
 
     lhs_terms = collect_terms(claim@lhs, sign = 1L)
     rhs_terms = collect_terms(claim@rhs, sign = -1L)
@@ -29,42 +104,38 @@ claim_scalar_diff = function(claim) {
         ))
     }
 
-    scalar_val = -Reduce("+", lapply(scalar_terms, `[[`, "value"), 0)
+    bad = Filter(function(t) {
+        node = t$node
+        cls = S7::S7_class(node)
+        slot_name = if (is.null(filter)) {
+            fmls = names(formals(cls@constructor))
+            matched = intersect(fmls, S7::prop_names(node))
+            if (length(matched) == 0L) return(FALSE)
+            matched[[1]]
+        } else {
+            filter
+        }
+        slot_val = tryCatch(S7::prop(node, slot_name), error = function(e) NULL)
+        is.null(slot_val)
+    }, param_terms)
 
-    op = claim@op
-    lhs_has_only_scalars = !any(vapply(lhs_terms, function(t) t$kind == "param", logical(1)))
-    if (lhs_has_only_scalars && length(lhs_terms) > 0L) {
-        op = unname(FLIP_OP[op])
-    }
+    if (length(bad) > 0L) {
+        slot_name = filter %||% {
+            node = bad[[1]]$node
+            cls = S7::S7_class(node)
+            fmls = names(formals(cls@constructor))
+            intersect(fmls, S7::prop_names(node))[[1]]
+        }
+        bad_labels = vapply(bad, function(t) {
+            cls_name = S7::S7_class(t$node)@name
+            x_lbl = rlang::as_label(t$node@x)
+            paste0(cls_name, "(", x_lbl, ")")
+        }, character(1))
 
-    list(scalar = scalar_val, op = op)
-}
-
-#' Extract contrast coefficients from a null claim
-#'
-#' Decomposes the hypothesis into a named numeric vector of coefficients,
-#' one per `param_obj` term, plus the hypothesized scalar value and operator.
-#'
-#' @param claim A `null_claim` object.
-#'
-#' @return A list with fields `coefs`, `scalar`, and `op`.
-#'
-#' @export
-claim_contrast_coefs = function(claim) {
-    assert_linear(claim@lhs, "claim_contrast_coefs")
-    assert_linear(claim@rhs, "claim_contrast_coefs")
-
-    lhs_terms = collect_terms(claim@lhs, sign = 1L)
-    rhs_terms = collect_terms(claim@rhs, sign = -1L)
-    all_terms = c(lhs_terms, rhs_terms)
-
-    param_terms = Filter(function(t) t$kind == "param", all_terms)
-    scalar_terms = Filter(function(t) t$kind == "scalar", all_terms)
-
-    if (length(param_terms) == 0L) {
         cli::cli_abort(c(
-            "No population parameter found in hypothesis.",
-            "i" = "At least one side must contain a parameter like {.fn MU}, {.fn PI}, etc."
+            "All parameter terms must specify {.arg {slot_name}} when used in this context.",
+            "i" = "Ambiguous term{?s} found: {.and {.code {bad_labels}}}.",
+            "i" = "Supply a condition, e.g. {.code MU(extra, group == \"1\")}."
         ))
     }
 

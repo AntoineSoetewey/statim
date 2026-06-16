@@ -4,7 +4,7 @@
 \alias{claim_contrast_coefs}
 \title{Extract contrast coefficients from a null claim}
 \usage{
-claim_contrast_coefs(claim)
+claim_contrast_coefs(claim, filter = NULL)
 }
 \arguments{
 \item{claim}{A \code{null_claim} object.}
