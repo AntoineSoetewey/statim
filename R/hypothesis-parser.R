@@ -42,7 +42,7 @@ parse_null_claim = function(quo) {
         cli::cli_abort(c(
             "The left-hand side of a hypothesis must contain a population parameter.",
             "i" = "Found only a constant: {.code {deparse(expr[[2]])}}.",
-            "i" = "Write it the other way around: {.code {deparse(expr[[3]])} {flipped_op} {deparse(expr[[2]])}}."
+            "i" = "Write it the other way around like: {.code {deparse(expr[[3]])} {flipped_op} {deparse(expr[[2]])}}."
         ))
     }
 
