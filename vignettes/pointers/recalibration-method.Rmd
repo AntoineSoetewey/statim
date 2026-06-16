@@ -15,9 +15,9 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
-
 library(statim)
 ```
 
+## Rationale
 
-
+One estimation method, in a form of `<STAT_FN>` under `STAT_CONSTRUCTOR()` functions, have varieties of methods you can use for estimation in statistical inference. The accessibility is simple: just a one line of code under lazy-loaded objects using `via()`. 
