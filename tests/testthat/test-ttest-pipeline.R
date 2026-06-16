@@ -193,6 +193,16 @@ test_that("contrast variant result is a class_ttest_two", {
     expect_length(result@data@lower_ci, length(result@data@group))
 })
 
+test_that("state_null() with two-sample MU difference runs through to conclude()", {
+    result = sleep |>
+        define_model(extra %by% group) |>
+        prepare_test(TTEST) |>
+        state_null(MU(extra, group == "1") - MU(extra, group == "2") >= 0) |>
+        conclude()
+
+    expect_s7_class(result, cld_exec)
+})
+
 test_that("contrast variant with wrong number of groups errors", {
     expect_error(
         iris |>
@@ -204,14 +214,15 @@ test_that("contrast variant with wrong number of groups errors", {
     )
 })
 
-test_that("state_null() with MU >= 0 runs through to conclude()", {
-    result = sleep |>
-        define_model(extra %by% group) |>
-        prepare_test(TTEST) |>
-        state_null(MU(extra) >= 0) |>
-        conclude()
-
-    expect_s7_class(result, cld_exec)
+test_that("state_null() with bare MU (no given) errors for x_by()", {
+    expect_error(
+        sleep |>
+            define_model(extra %by% group) |>
+            prepare_test(TTEST) |>
+            state_null(MU(extra) >= 0) |>
+            conclude(),
+        class = "rlang_error"
+    )
 })
 
 test_that("state_null() with unsupported param type errors", {

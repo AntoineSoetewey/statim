@@ -279,23 +279,22 @@ test_that("state_null() result matches manual .rho injection numerically", {
     )
 })
 
+test_that("state_null() with scaled RHO solves through to conclude()", {
+    result = cars |>
+        define_model(rel(speed, dist)) |>
+        prepare_test(CORTEST) |>
+        state_null(2 * RHO(speed, dist) >= 0.8) |>
+        conclude()
+
+    expect_s7_class(result, cld_exec)
+})
+
 test_that("state_null() with invalid scalar errors", {
     expect_error(
         cars |>
             define_model(rel(speed, dist)) |>
             prepare_test(CORTEST) |>
             state_null(2 + RHO(speed, dist) >= 0.8) |>
-            conclude(),
-        class = "rlang_error"
-    )
-})
-
-test_that("state_null() with scaled RHO errors", {
-    expect_error(
-        cars |>
-            define_model(rel(speed, dist)) |>
-            prepare_test(CORTEST) |>
-            state_null(2 * RHO(speed, dist) >= 0.8) |>
             conclude(),
         class = "rlang_error"
     )
