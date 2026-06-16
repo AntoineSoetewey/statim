@@ -29,10 +29,19 @@ supply \code{P_TEST} as a function within i.e. \code{prepare_test(.test = P_TEST
 The following arguments are passed via \code{...} in \code{\link[=P_TEST]{P_TEST()}} or \code{\link[=via]{via()}}:
 
 \describe{
-\item{\code{.p}}{Numeric. Hypothesized proportion under H\eqn{_0}. Default \code{0.5}.}
+\item{\code{.p}}{Numeric. Hypothesized proportion under H\eqn{_0}, used directly
+in \code{\link[stats:binom.test]{stats::binom.test()}} / \code{\link[stats:prop.test]{stats::prop.test()}}. Default \code{0.5}. When a
+hypothesis is stated via \code{\link[=state_null]{state_null()}} with a scaled claim like
+\code{c * PI() == k}, \code{.p} is resolved to the solved value \code{k / c}, since
+\code{c * PI() == k} and \code{PI() == k / c} are the same hypothesis (the
+binomial likelihood is invariant under this linear reparameterization).}
 \item{\code{.alt}}{Direction: \code{"two.sided"}, \code{"greater"}, or \code{"less"}.
 Default \code{"two.sided"}.}
 \item{\code{.ci}}{Confidence level. Default \code{0.95}.}
+\item{\code{.true_p}}{Only meaningful via \code{\link[=state_null]{state_null()}}. Carries the
+hypothesis's scalar value \emph{as written} (unsolved), purely for display
+in \code{true_p}. Default \code{NULL}, in which case \code{true_p} falls back to
+\code{.p}. Not intended to be set directly by users.}
 }
 }
 
@@ -55,6 +64,15 @@ Supports \code{\link[=PI]{PI()}} via \code{\link[=state_null]{state_null()}}:
     state_null(PI() == 0.5) |>
     conclude()
 }\if{html}{\out{</div>}}
+
+Scaled claims are also supported, e.g. \code{2 * PI() == 0.3}. The test itself
+solves for \code{PI()} (\code{.p = 0.15}) and runs exactly via \code{\link[stats:binom.test]{stats::binom.test()}}
+or \code{\link[stats:prop.test]{stats::prop.test()}} — no approximation is introduced by the scaling,
+since testing \code{c * PI() == k} is mathematically identical to testing
+\code{PI() == k / c}. \code{true_p} in the printed/tidied output instead shows the
+scalar as written on the right-hand side of the claim (\code{0.3}, not the
+solved \code{0.15}), so the displayed hypothesis matches what was typed even
+though the underlying test operates on the solved proportion.
 }
 
 \examples{
@@ -75,6 +93,12 @@ define_model(prop(45, 100)) |>
 define_model(prop(45, 100)) |>
     prepare_test(P_TEST) |>
     state_null(PI() == 0.3) |>
+    conclude()
+
+# scaled hypothesis claim
+define_model(prop(45, 100)) |>
+    prepare_test(P_TEST) |>
+    state_null(2 * PI() == 0.3) |>
     conclude()
 
 }

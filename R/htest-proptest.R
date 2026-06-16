@@ -1,3 +1,4 @@
+
 #' Proportion Test
 #'
 #' `P_TEST()` performs a one-sample proportion test using either an exact
@@ -17,10 +18,19 @@
 #' The following arguments are passed via `...` in [P_TEST()] or [via()]:
 #'
 #' \describe{
-#'   \item{`.p`}{Numeric. Hypothesized proportion under H\eqn{_0}. Default `0.5`.}
+#'   \item{`.p`}{Numeric. Hypothesized proportion under H\eqn{_0}, used directly
+#'     in [stats::binom.test()] / [stats::prop.test()]. Default `0.5`. When a
+#'     hypothesis is stated via [state_null()] with a scaled claim like
+#'     `c * PI() == k`, `.p` is resolved to the solved value `k / c`, since
+#'     `c * PI() == k` and `PI() == k / c` are the same hypothesis (the
+#'     binomial likelihood is invariant under this linear reparameterization).}
 #'   \item{`.alt`}{Direction: `"two.sided"`, `"greater"`, or `"less"`.
 #'     Default `"two.sided"`.}
 #'   \item{`.ci`}{Confidence level. Default `0.95`.}
+#'   \item{`.true_p`}{Only meaningful via [state_null()]. Carries the
+#'     hypothesis's scalar value *as written* (unsolved), purely for display
+#'     in `true_p`. Default `NULL`, in which case `true_p` falls back to
+#'     `.p`. Not intended to be set directly by users.}
 #' }
 #'
 #' @section Variants:
@@ -41,6 +51,15 @@
 #'     conclude()
 #' ```
 #'
+#' Scaled claims are also supported, e.g. `2 * PI() == 0.3`. The test itself
+#' solves for `PI()` (`.p = 0.15`) and runs exactly via [stats::binom.test()]
+#' or [stats::prop.test()] — no approximation is introduced by the scaling,
+#' since testing `c * PI() == k` is mathematically identical to testing
+#' `PI() == k / c`. `true_p` in the printed/tidied output instead shows the
+#' scalar as written on the right-hand side of the claim (`0.3`, not the
+#' solved `0.15`), so the displayed hypothesis matches what was typed even
+#' though the underlying test operates on the solved proportion.
+#'
 #' @examples
 #' P_TEST(prop(45, 100))
 #'
@@ -59,6 +78,12 @@
 #' define_model(prop(45, 100)) |>
 #'     prepare_test(P_TEST) |>
 #'     state_null(PI() == 0.3) |>
+#'     conclude()
+#'
+#' # scaled hypothesis claim
+#' define_model(prop(45, 100)) |>
+#'     prepare_test(P_TEST) |>
+#'     state_null(2 * PI() == 0.3) |>
 #'     conclude()
 #'
 #' @seealso [prop()], [class_p_test], [PI()], [state_null()], [via()],
