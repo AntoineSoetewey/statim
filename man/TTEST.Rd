@@ -115,6 +115,7 @@ sleep |>
     conclude()
 
 # Contrast t-test
+# This uses `state_null()` in a higher degree
 # This performs Welch-Satterthwaite linear contrast test for t-test
 sleep |>
     define_model(x_by(extra, group)) |>
@@ -130,13 +131,6 @@ sleep |>
 iris |>
     define_model(pairwise(Sepal.Length, Sepal.Width, Petal.Length)) |>
     prepare_test(TTEST) |>
-    conclude()
-
-# hypothesis claim
-sleep |>
-    define_model(x_by(extra, group)) |>
-    prepare_test(TTEST) |>
-    state_null(MU(extra) == 0) |>
     conclude()
 
 }
