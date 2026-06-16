@@ -8,6 +8,14 @@ claim_contrast_coefs(claim, filter = NULL)
 }
 \arguments{
 \item{claim}{A \code{null_claim} object.}
+
+\item{filter}{Optional. The name of a conditioning slot (e.g. \code{"given"})
+that every \code{param_obj} term must supply. If a term's class declares
+that slot as an optional constructor argument (default \code{NULL}) but the
+slot is unset on the node, an error is raised. If \code{NULL} (the default),
+the slot to enforce is auto-detected per term by inspecting its class
+constructor's optional formals (those defaulting to \code{NULL}) and
+requiring the first such slot found.}
 }
 \value{
 A list with fields \code{coefs}, \code{scalar}, and \code{op}.
