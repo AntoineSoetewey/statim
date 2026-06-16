@@ -79,8 +79,8 @@ Supports \code{\link[=RHO]{RHO()}} via \code{\link[=state_null]{state_null()}}. 
 \itemize{
 \item The operator maps to \code{.alt}: \code{==} and \code{!=} become \code{"two.sided"},
 \code{>=} and \code{>} become \code{"less"}, \code{<=} and \code{<} become \code{"greater"}.
-\item The scalar maps to \code{.rho}: both \code{RHO(x, y) == 0.9} and
-\code{0.9 == RHO(x, y)} are handled correctly via \code{\link[=claim_scalar_diff]{claim_scalar_diff()}}.
+\item The scalar maps to \code{.rho}: \code{RHO(x, y) == 0.9}, not \code{0.9 == RHO(x, y)},
+is handled correctly via \code{\link[=claim_scalar]{claim_scalar()}}.
 }
 }
 

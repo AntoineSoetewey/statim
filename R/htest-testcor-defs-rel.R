@@ -177,8 +177,8 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
 #'
 #' - The operator maps to `.alt`: `==` and `!=` become `"two.sided"`,
 #'   `>=` and `>` become `"less"`, `<=` and `<` become `"greater"`.
-#' - The scalar maps to `.rho`: both `RHO(x, y) == 0.9` and
-#'   `0.9 == RHO(x, y)` are handled correctly via [claim_scalar_diff()].
+#' - The scalar maps to `.rho`: `RHO(x, y) == 0.9`, not `0.9 == RHO(x, y)`,
+#'   is handled correctly via [claim_scalar()].
 #'
 #' @examples
 #' # base (Pearson)
@@ -379,13 +379,12 @@ cor_test_rel = test_define(
                 )
             },
             .rho = function(claim, processed) {
-                resolved = claim_contrast_coefs(claim)
-                coefs = resolved$coefs
+                resolved = claim_scalar(claim, solve_coef = TRUE)
 
-                if (length(coefs) != 1L || coefs != 1) {
+                if (resolved$coefs[[1]] != 1) {
                     cli::cli_abort(c(
                         "Correlation test only supports a single {.fn RHO} parameter.",
-                        "i" = "Found contrast coefficients: {.val {coefs}}.",
+                        "i" = "Found coefficient: {.val {resolved$coefs[[1]]}}.",
                         "i" = "{.fn RHO} cannot be scaled or combined with other parameters."
                     ))
                 }

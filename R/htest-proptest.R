@@ -109,6 +109,13 @@ class_p_test = S7::new_class(
     properties = list(
         x = S7::class_numeric,
         n = S7::class_numeric,
+        true_p = S7::new_property(
+            class = S7::class_numeric,
+            validator = function(value) {
+                if (!(value > 0 && value < 1))
+                    "`true_p` must be between 0 and 1 (exclusive)."
+            }
+        ),
         estimate = S7::class_numeric,
         statistic = S7::class_numeric,
         p_val = S7::class_numeric,
@@ -134,6 +141,7 @@ S7::method(print, class_p_test) = function(x, ...) {
 
     .x = x@x
     .n = x@n
+    .true_p = x@true_p
     .estimate = x@estimate
     .statistic = x@statistic
     .p_val = x@p_val
@@ -158,6 +166,7 @@ S7::method(print, class_p_test) = function(x, ...) {
     stat_out = tibble::tibble(
         x = .x,
         n = .n,
+        true_p = round(.true_p, 2),
         estimate = round(.estimate, 4),
         statistic = round(.statistic, 4),
         p_val = round(.p_val, 4)
@@ -182,10 +191,11 @@ S7::method(print, class_p_test) = function(x, ...) {
     invisible(x)
 }
 
-ptest_build = function(res, .proc, .ci) {
+ptest_build = function(res, .proc, .ci, .p) {
     class_p_test(
         x = .proc$x,
         n = .proc$n,
+        true_p = .p,
         estimate = unname(res$estimate),
         statistic = unname(res$statistic),
         p_val = res$p.value,

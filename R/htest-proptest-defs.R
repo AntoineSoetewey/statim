@@ -10,7 +10,7 @@ ptest_def = test_define(
                     alternative = .alt,
                     conf.level = .ci
                 )
-                ptest_build(res, .proc, .ci)
+                ptest_build(res, .proc, .ci, .p)
             }
         ),
         prop = variant(
@@ -23,14 +23,14 @@ ptest_def = test_define(
                     conf.level = .ci,
                     correct = correct
                 )
-                ptest_build(res, .proc, .ci)
+                ptest_build(res, .proc, .ci, .p)
             }
         )
     ),
     compatible_params = list(PI),
     claim_translator = claim_translate(
         default = map_claim(
-            .p = function(claim, processed) claim_scalar_diff(claim)$scalar,
+            .p = function(claim, processed) claim_scalar(claim, solve_coef = TRUE)$scalar,
             .alt = function(claim, processed) {
                 switch(
                     claim@op,
@@ -41,7 +41,7 @@ ptest_def = test_define(
             }
         ),
         prop = map_claim(
-            .p = function(claim, processed) claim_scalar_diff(claim)$scalar,
+            .p = function(claim, processed) claim_scalar(claim)$scalar,
             .alt = function(claim, processed) {
                 switch(
                     claim@op,
