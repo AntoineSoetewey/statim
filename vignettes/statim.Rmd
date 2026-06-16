@@ -68,21 +68,21 @@ This stage is always AFTER defining the model to be analyzed within the statisti
 
 Let's try with two forms of statistical inference: 
 
-i.  H-test inference uses `prepare_test()`
+1.  H-test inference uses `prepare_test()`
 
     ``` r
     sleep_dm = define_model(sleep, extra %by% group)
     sleep_tt = sleep_dm |> prepare_test(TTEST) |> update(.ci = 0.9)
     ```
 
-ii.  Model-based inference uses `prepare_model()`
+2.  Model-based inference uses `prepare_model()`
 
     ``` r 
     mtcars_dm = define_model(mtcars, mpg ~ .)
     mtcars_lm = mtcars_dm |> prepare_model(LINEAR_REG)
     ```
     
-    > Note: `prepare_test()` and `prepare_model()` can supply extra arguments from the default (base) implementation of `<STAT_FN>` functions like `TTEST()` and `LINEAR_REG()`. Using `update()` is totally optional.  
+> Note: `prepare_test()` and `prepare_model()` can supply extra arguments from the default (base) implementation of `<STAT_FN>` functions like `TTEST()` and `LINEAR_REG()`. Using `update()` is totally optional.
 
 Later updates may include other processes, such as sensitivity analysis. 
 
