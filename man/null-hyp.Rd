@@ -29,21 +29,10 @@ after \code{prepare_test(...)} to supply the hypothesis expression, e.g.
 }}
 
 \examples{
-sleep |>
-    define_model(extra \%by\% group) |>
-    prepare_test(TTEST) |>
-    state_null(MU(extra) == 0) |>
+# Using binomial test as a simple example
+define_model(prop(45, 100)) |>
+    prepare_test(P_TEST) |>
+    state_null(2 * PI() == 0.25) |>
     conclude()
-
-\dontrun{
-sleep |>
-    define_model(extra \%by\% group) |>
-    prepare_test(TTEST) |>
-    state_null(more_h0(
-        h01 = MU(extra) == 2,
-        h02 = MU(extra) == 3
-    )) |>
-    conclude()
-}
 
 }
