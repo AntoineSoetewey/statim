@@ -65,7 +65,7 @@ reference:
   - subtitle: \"Population parameter\" definer
     desc: Functions that emulate the population parameter, close to textbook notations
     contents:
-    - equal-op
+    # - equal-op
     - MU
     - PI
     # - SIGMA
