@@ -48,7 +48,7 @@ def_model = S7::new_class(
     properties = list(
         # model_id = S7::class_any,
         model_id = S7::new_property(
-            class = model_id
+            class = S7::new_union(model_id, S7::class_formula)
         ), 
         processed = S7::class_list
     )
