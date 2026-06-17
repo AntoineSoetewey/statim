@@ -46,7 +46,10 @@ S7::method(define_model, S7::class_data.frame) = function(.x, to_analyze, ...) {
 def_model = S7::new_class(
     "def_model",
     properties = list(
-        model_id = S7::class_any,
+        # model_id = S7::class_any,
+        model_id = S7::new_property(
+            class = model_id
+        ), 
         processed = S7::class_list
     )
 )
