@@ -174,6 +174,30 @@ S7::method(conclude, model_lazy) = function(.x, ...) {
         .x@recalibrate_spec$args %||% list()
     )
 
+    if (!is.null(def@claim_translator) && !is.null(.x@claims)) {
+        translator = def@claim_translator
+        variant_nm = method_name %||% "default"
+
+        fn = if (inherits(translator, "claim_translate")) {
+            translator[[variant_nm]] %||% cli::cli_abort(c(
+                "No claim translator defined for variant {.val {variant_nm}}.",
+                "i" = "Remove {.fn state_null} or use a supported variant."
+            ))
+        } else {
+            translator
+        }
+
+        translated = fn(.x@claims, .x@processed)
+
+        if (!inherits(translated, "claim_args")) {
+            cli::cli_abort(
+                "claim_translator must return a {.fn claim_args} object."
+            )
+        }
+
+        all_args = utils::modifyList(all_args, unclass(translated))
+    }
+
     out_raw = inject_and_run(
         impl = impl,
         processed = .x@processed,

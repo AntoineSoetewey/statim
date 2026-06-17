@@ -62,7 +62,10 @@ S7::method(via, list(model_lazy, S7::class_character)) = function(.x, .method, .
     }
     def = find_def(.x@model_spec@lookup, model_type = model_type)
 
-    available = names(def@impl$variants)
+    cls = .x@model_spec@cls
+    key = variant_registry_key(cls, model_type)
+    registry_names = names(variant_registry[[key]] %||% list())
+    available = c(names(def@impl$variants), registry_names)
 
     if (.method %notin% available) {
         cli::cli_abort(c(
