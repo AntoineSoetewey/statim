@@ -94,8 +94,7 @@ remove_variant = function(obj, model_type, name) {
     stat_cls = attr(obj, "cls") %||% cli::cli_abort(
         "{.arg obj} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
     )
-    is_model_id_class = S7::S7_inherits(model_type, model_id)
-    # is_model_id_class = inherits(model_type, "S7_class") && identical(model_type@parent, model_id)
+    is_model_id_class = inherits(model_type, "S7_class") && identical(model_type@parent, model_id)
     is_formula_class = identical(model_type, S7::class_formula)
     if (!is_model_id_class && !is_formula_class) {
         cli::cli_abort(
