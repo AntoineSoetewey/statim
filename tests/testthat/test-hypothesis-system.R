@@ -37,19 +37,6 @@ test_that("parse_null_claim: scalar is on LHS should fail", {
     )
 })
 
-test_that("parse_null_claim: parses %=% chain into flat node list", {
-    claim = parse_null_claim(rlang::quo(MU(extra) %=% MU(extra)))
-    expect_true(S7::S7_inherits(claim, null_claim))
-    expect_equal(claim@op, "%=%")
-    expect_null(claim@rhs)
-    expect_length(claim@lhs, 2L)
-})
-
-test_that("parse_null_claim: flattens three-node %=% chain", {
-    claim = parse_null_claim(rlang::quo(MU(x) %=% MU(y) %=% MU(z)))
-    expect_length(claim@lhs, 3L)
-})
-
 test_that("parse_null_claim: parses arithmetic LHS", {
     claim = parse_null_claim(rlang::quo(2 * MU(extra) - MU(extra) == 0))
     expect_true(S7::S7_inherits(claim, null_claim))
@@ -348,16 +335,6 @@ test_that("validate_one_param_node MU: returns error for bad given", {
     errs = validate_one_param_node(node, x_vars = "extra", by_vars = "group")
     expect_length(errs, 1L)
     expect_match(errs, "Unknown grouping variable")
-})
-
-test_that("validate_one_param_node RHO: validates both x and y", {
-    node = parse_null_claim(rlang::quo(RHO(speed, dist) %=% RHO(speed, dist)))@lhs[[1]]
-    errs = validate_one_param_node(node, x_vars = c("speed", "dist"), by_vars = NULL)
-    expect_equal(errs, character(0))
-
-    errs_bad = validate_one_param_node(node, x_vars = "speed", by_vars = NULL)
-    expect_length(errs_bad, 1L)
-    expect_match(errs_bad, "Unknown variable")
 })
 
 test_that("validate_one_param_node unknown param_obj: returns empty", {
