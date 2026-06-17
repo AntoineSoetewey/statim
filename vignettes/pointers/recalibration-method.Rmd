@@ -1,5 +1,5 @@
 ---
-title: "via(): Recalibrating existing methods"
+title: "via(): Switching to different mode"
 subtitle: "Explanation"
 output: 
     rmarkdown::html_vignette:
@@ -21,3 +21,102 @@ library(statim)
 ## Rationale
 
 One estimation method, in a form of `<STAT_FN>` under `STAT_CONSTRUCTOR()` functions, have varieties of methods you can use for estimation in statistical inference. The accessibility is simple: just a one line of code under lazy-loaded objects using `via()`. 
+
+For instance, a classical t-test, a bootstrap t-test, and a permutation t-test answer the same question: "Is there a difference between these two groups?", but they get there through different estimation machinery. Without `via()`, switching between them would normally mean reaching for a different function entirely, or threading a string flag through `...` and hoping the implementation underneath understands it. `{statim}` instead treats the estimation method as something you are *switching the mode* within the lazy-loaded pipeline, while the model definition, the data, and (if present) the hypothesis claim stay untouched.
+
+## How `via()` fits in the pipeline
+
+`via()` only operates on lazy objects — a `test_lazy` produced by `prepare_test()`, or a `model_lazy` produced by `prepare_model()`. It cannot be used after `conclude()`, since by then the pipeline has already executed and the result is no longer lazy.
+
+```{r}
+sleep |>
+    define_model(extra %by% group) |>
+    prepare_test(TTEST) |>
+    via("boot", n = 2000) |>
+    conclude()
+```
+
+`via()` itself does not run anything. It records two things on the lazy object's `recalibrate_spec`: the method name (`.method`) and any extra named arguments (`...`). The actual dispatch (i.e. finding the matching implementation and running it) only happens once `conclude()` is called. This is the same "defused until executed" behavior the rest of the grammar follows: `define_model()`, `prepare_test()` / `prepare_model()`, `state_null()`, and `via()` all just accumulate specification, and `conclude()` is the single point where everything is resolved together.
+
+## Where variant names come from
+
+A variant name like `"boot"` or `"permute"` from `TTEST()` in `x_by` mode is not arbitrary. It has to match a name registered for that specific model type, inside the `agendas()` object passed to `stat_define()` when the test or model was built. Two sources are checked:
+
+1.  The variants declared directly inside the matched `stat_define()`'s `agendas()`, alongside its `baseline()`. This is how `TTEST` ships with `"boot"`, `"permute"`, `"contrast"`, and `"multi"` for `x_by()` pipelines, for example.
+
+2.  Any variants registered afterwards via `add_variant()`. This is a developer-facing function, paired with the `%<-%` operator, and is meant for extending an existing `<STAT_FN>` (built with `HTEST_FN()` or `MODEL_FN()`) without touching its original definition:
+
+    ``` r
+    add_variant(<STAT_FN>, <model_id>, "<new_mode>") %<-% variant(
+        fn = function(.proc, arg1 = , arg2 = , ...) {
+            # ...
+        }
+    )
+    ```
+
+    Variants added this way carry an `origin`: `"user"` (the default) is scoped to the current session and can be removed with `remove_variant()`, while `"package"` is meant to be registered from a package's `.onLoad()` and lasts as long as that package stays loaded. Either way, the name `"default"` is frozen and cannot be added or removed through `add_variant()` / `remove_variant()`.
+
+Because matching is scoped to model type, the same variant name can mean different things (or simply do not exist) depending on which `<model_id>` you used in `define_model()`. A variant registered for `x_by()` pipelines is not automatically available to a `<formula>`-based pipeline of the same test, even if both eventually call `TTEST`.
+
+If you pass a method name that is not registered for the model type in play, `via()` fails immediately, before `conclude()` is even reached:
+
+```{r, error = TRUE}
+sleep |>
+    define_model(extra %by% group) |>
+    prepare_test(TTEST) |>
+    via("not_a_real_method")
+```
+
+The error message lists every variant available for that exact model type, so you can fix the call without digging through documentation.
+
+## Argument merging
+
+Any named arguments supplied to `via()` are not a replacement for the arguments already set in `prepare_test()` / `prepare_model()` -- they are merged on top of them. Concretely, `conclude()` combines the two argument lists with `utils::modifyList()`, where the names from `via()` win on overlap:
+
+```{r}
+sleep |>
+    define_model(extra %by% group) |>
+    prepare_test(TTEST) |>
+    update(.ci = 0.9) |>
+    via("boot", n = 2000) |>
+    conclude()
+```
+
+Here, `.ci = 0.9` came from `update()` on the baseline specification, and `n = 2000` came from `via()`. Both reach the `"boot"` implementation's `fn`, because neither name collides with the other. If `via()` had also supplied `.ci`, that value would have taken precedence over the one set earlier in the pipeline.
+
+This merging behavior is also why `via()` does not require you to repeat arguments the variant shares with the baseline. Only supply what differs for that particular variant; anything else falls through from what was already specified, or from the variant's own declared defaults in its `fn` signature.
+
+## Recalibration and hypothesis claims
+
+If a hypothesis was attached with `state_null()`, recalibrating the method does not invalidate it, as long as the variant you switch to actually has a `claim_translator` registered for it. Each `stat_define()` can register a `claim_translator` that knows how to turn a stated claim into the arguments a specific variant's `fn` expects, since different estimation methods can require the same population-parameter claim expressed differently. `TTEST`'s `x_by()` implementation, for instance, registers a `claim_translator` for its `default` method and for `"contrast"`, but not for the resampling-based `"boot"` or `"permute"` variants, since those do not take a hypothesized value as an argument in the first place.
+
+```{r}
+sleep |>
+    define_model(extra %by% group) |>
+    prepare_test(TTEST) |>
+    state_null(
+        2 * MU(extra, group == "1") - MU(extra, group == "2") <= 0
+    ) |>
+    via("contrast") |>
+    conclude()
+```
+
+At `conclude()`, the translator registered for the `"contrast"` variant runs against the stated claim, and its output (in this case, `.mu`, `.op`, and `.w`) is merged into the argument list the same way the rest of `via()`'s arguments are. If a `claim_translator` is not registered for the variant you switched to, `conclude()` reports that explicitly rather than silently ignoring the claim:
+
+```{r, error = TRUE}
+sleep |>
+    define_model(extra %by% group) |>
+    prepare_test(TTEST) |>
+    state_null(MU(extra, group == "1") == MU(extra, group == "2")) |>
+    via("permute", n = 999L) |>
+    conclude()
+```
+
+## Summary
+
+-   `via()` only works on lazy objects, before `conclude()`.
+-   It records a method name and extra arguments; nothing executes until `conclude()`.
+-   Variant names are scoped per model type, sourced from the matched `stat_define()`'s `agendas()` and any variants registered afterwards via `add_variant()`.
+-   Arguments from `via()` are merged with, not substituted for, the arguments already declared earlier in the pipeline.
+-   A stated null hypothesis survives recalibration only if the new variant has a registered `claim_translator`, not every variant needs one.
+
