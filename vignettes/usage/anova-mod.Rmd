@@ -2,7 +2,7 @@
 title: "ANOVA for Linear models with {statim}"
 subtitle: "Definitive guide"
 description: "A guide on using statim R package"
-output: 
+output:
     rmarkdown::html_vignette:
         toc: true
 vignette: |
@@ -10,3 +10,162 @@ vignette: |
     %\VignetteEngine{knitr::rmarkdown}
     \usepackage[utf8]{inputenc}
 ---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+library(statim)
+```
+
+## What inference am I declaring?
+
+When you fit a linear model with `{statim}`, the model is a `class_lm_object` stored inside a `cld_exec`. Because `class_lm_object` inherits from `anova_able`, every fitted model knows how to participate in an ANOVA comparison: it carries the residual degrees of freedom, the residual sum of squares, the model matrix, and the error family. `anova()` reads those slots directly, so no separate conversion step is needed.
+
+`{statim}` supports two distinct ANOVA questions:
+
+- **Single model (Type I)**: how much does each predictor reduce residual variance, in the order the terms were added? One row per term, plus a Residuals row.
+- **Multiple models (incremental F or LRT)**: is the extra complexity of a larger model justified over a simpler nested model? One row per model.
+
+Both questions are answered by the same `anova()` generic, dispatched on whatever object you hand it.
+
+## Single model: Type I ANOVA
+
+The pipeline follows the standard declarative grammar. Here the `cars` dataset is used, which ships with base R: `speed` predicts stopping `dist`.
+
+### Define and fit
+
+```{r}
+result = cars |>
+    define_model(dist ~ speed) |>
+    prepare_model(LINEAR_REG) |>
+    conclude()
+```
+
+`define_model()` binds the formula to the data and processes it. `prepare_model(LINEAR_REG)` attaches the linear regression specification lazily; nothing is computed yet. `conclude()` resolves that specification and returns a `cld_exec` holding a `class_lm_object`.
+
+### Run the ANOVA
+
+```{r}
+anova(result)
+```
+
+The returned `cld_anova` prints the full Type I table. The final row is always Residuals, with `f_value` and `p_value` set to `NA`. A small p-value for `speed` says that adding `speed` to the intercept-only model significantly reduced the residual variance.
+
+### Tidy the coefficients
+
+`tidy()` on the preceding `cld_exec` extracts the coefficient table from the fitted model:
+
+```{r}
+result |> tidy()
+```
+
+The same table is visible in the printed output of `result` under the Coefficients section.
+
+### From a `model_lazy` directly
+
+`anova()` also dispatches on `model_lazy`, so `conclude()` is optional:
+
+```{r}
+cars |>
+    define_model(dist ~ speed) |>
+    prepare_model(LINEAR_REG) |>
+    anova()
+```
+
+The printed result is identical.
+
+## Multiple models: incremental F-test
+
+Comparing a sequence of nested models tells you whether each additional predictor improves fit beyond what the simpler model already explains. This is the main use case for `write_models()`.
+
+### Using `write_models()`
+
+`write_models()` accepts named model expressions and evaluates them sequentially against the same data frame. Names appear as row labels in the ANOVA output:
+
+```{r}
+LifeCycleSavings |>
+    write_models(
+        null   = sr ~ 1,
+        main   = sr ~ pop15,
+        extend = sr ~ pop15 + pop75,
+        full   = sr ~ pop15 + pop75 + dpi + ddpi
+    ) |>
+    prepare_model(LINEAR_REG) |>
+    anova()
+```
+
+The first row always has `NA` test statistics because there is no simpler model to compare it against. Each subsequent row answers: "given the model above, does adding these extra predictors significantly help?"
+
+The `test` argument accepts `"F"` (default for Gaussian models), `"LRT"`, or `"Chisq"`. For non-Gaussian families such as binomial GLMs, `"F"` is automatically switched to `"LRT"` with an informational message.
+
+### Passing `model_lazy` objects directly
+
+When the models come from separate pipeline branches, pass them directly to `anova()`:
+
+```{r}
+mod1 = LifeCycleSavings |> define_model(sr ~ 1)         |> prepare_model(LINEAR_REG)
+mod2 = LifeCycleSavings |> define_model(sr ~ pop15)     |> prepare_model(LINEAR_REG)
+mod3 = LifeCycleSavings |> define_model(sr ~ pop15 + pop75) |> prepare_model(LINEAR_REG)
+
+anova(mod1, mod2, mod3)
+```
+
+### Passing `cld_exec` objects
+
+Or, after calling `conclude()` on each model:
+
+```{r}
+exec1 = LifeCycleSavings |> define_model(sr ~ 1)     |> prepare_model(LINEAR_REG) |> conclude()
+exec2 = LifeCycleSavings |> define_model(sr ~ pop15) |> prepare_model(LINEAR_REG) |> conclude()
+
+anova(exec1, exec2, test = "LRT")
+```
+
+## Multiple models: `conclude()` and `tidy()`
+
+When the goal is to fit all models and inspect each one, `conclude()` on a `multi_lazy` returns a `multi_exec` collecting all results:
+
+```{r}
+all_fits = LifeCycleSavings |>
+    write_models(
+        null = sr ~ 1,
+        main = sr ~ pop15 + pop75
+    ) |>
+    prepare_model(LINEAR_REG) |>
+    conclude()
+
+all_fits
+```
+
+`tidy()` on a `multi_exec` returns a nested tibble with one row per model:
+
+```{r}
+tidy(all_fits)
+```
+
+Use `display()` to inspect individual model outputs when there are many:
+
+```{r}
+LifeCycleSavings |>
+    write_models(
+        f1 = sr ~ 1,
+        f2 = sr ~ pop15,
+        f3 = sr ~ pop15 + pop75
+    ) |>
+    prepare_model(LINEAR_REG) |>
+    conclude() |>
+    display(2)
+```
+
+## Summary of the pipeline
+
+| Step | Function | What it does |
+|---|---|---|
+| Define | `define_model(formula)` | Binds the formula and data into a `def_model` |
+| Multiple definitions | `write_models(name = formula, ...)` | Builds a named `expanded_model` |
+| Prepare | `prepare_model(LINEAR_REG)` | Attaches the regression spec lazily |
+| Fit | `conclude()` | Executes; returns `cld_exec` or `multi_exec` |
+| ANOVA | `anova(...)` | Compares nested models or runs Type I ANOVA |
+| Coefficients | `tidy()` | Extracts the coefficient tibble |
