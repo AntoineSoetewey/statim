@@ -2,7 +2,7 @@
 % Please edit documentation in R/hypothesis-mappers.R
 \name{map_claim}
 \alias{map_claim}
-\title{Build a claim translator from named resolver functions}
+\title{Build a claim parser from named resolver functions}
 \usage{
 map_claim(...)
 }
@@ -15,8 +15,14 @@ A function of class \code{"map_claim"} with signature
 \verb{function(claim, processed)}.
 }
 \description{
-\code{map_claim()} produces a translator function by mapping impl \code{fn} formal
+\code{map_claim()} produces a parser function by mapping impl \code{fn} formal
 names to resolver functions. Each resolver receives \verb{(claim, processed)}
 and returns the value for its argument. Resolvers that only need \code{claim}
 can simply ignore \code{processed}.
+}
+\details{
+Pass the result as \code{claim_parser} to \code{\link[=baseline]{baseline()}} or \code{\link[=variant]{variant()}}. A
+variant without a \code{claim_parser} simply does not support \code{\link[=state_null]{state_null()}};
+\code{conclude()} raises an error if a claim was stated but the active variant
+has none.
 }
