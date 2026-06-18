@@ -88,7 +88,7 @@ This merging behavior is also why `via()` does not require you to repeat argumen
 
 ## Recalibration and hypothesis claims
 
-If a hypothesis was attached with `state_null()`, recalibrating the method does not invalidate it, as long as the variant you switch to actually has a `claim_translator` registered for it. Each `stat_define()` can register a `claim_translator` that knows how to turn a stated claim into the arguments a specific variant's `fn` expects, since different estimation methods can require the same population-parameter claim expressed differently. `TTEST`'s `x_by()` implementation, for instance, registers a `claim_translator` for its `default` method and for `"contrast"`, but not for the resampling-based `"boot"` or `"permute"` variants, since those do not take a hypothesized value as an argument in the first place.
+If a hypothesis was attached with `state_null()`, recalibrating the method does not invalidate it, as long as the variant you switch to actually declares a `claim_parser` of its own. `claim_parser` is an argument to `baseline()` and to each `variant()` individually — a [`map_claim()`](../../reference/map_claim.html) object that knows how to turn a stated claim into the arguments that one `fn` expects, since different estimation methods can require the same population-parameter claim expressed differently. `TTEST`'s `x_by()` implementation, for instance, gives a `claim_parser` to its `base` and to `"contrast"`, but not to the resampling-based `"boot"` or `"permute"` variants, since those do not take a hypothesized value as an argument in the first place.
 
 ```{r}
 sleep |>
@@ -101,7 +101,7 @@ sleep |>
     conclude()
 ```
 
-At `conclude()`, the translator registered for the `"contrast"` variant runs against the stated claim, and its output (in this case, `.mu`, `.op`, and `.w`) is merged into the argument list the same way the rest of `via()`'s arguments are. If a `claim_translator` is not registered for the variant you switched to, `conclude()` reports that explicitly rather than silently ignoring the claim:
+At `conclude()`, the `"contrast"` variant's own `claim_parser` runs against the stated claim, and its output (in this case, `.mu`, `.op`, and `.w`) is merged into the argument list the same way the rest of `via()`'s arguments are. If the variant you switched to has no `claim_parser`, `conclude()` reports that explicitly rather than silently ignoring the claim:
 
 ```{r, error = TRUE}
 sleep |>
@@ -112,11 +112,12 @@ sleep |>
     conclude()
 ```
 
-## Summary
+Because `claim_parser` lives on the implementation itself rather than in a separate lookup keyed by variant name, there's nothing else to update when you add a new variant via `add_variant()` — give it a `claim_parser` if it should support `state_null()`, or leave the argument out if it shouldn't. Either way `conclude()` checks whichever `impl` it actually resolved, regardless of whether that came from the original `agendas()` or from the runtime registry.
+
+## TL;DR
 
 -   `via()` only works on lazy objects, before `conclude()`.
 -   It records a method name and extra arguments; nothing executes until `conclude()`.
 -   Variant names are scoped per model type, sourced from the matched `stat_define()`'s `agendas()` and any variants registered afterwards via `add_variant()`.
 -   Arguments from `via()` are merged with, not substituted for, the arguments already declared earlier in the pipeline.
--   A stated null hypothesis survives recalibration only if the new variant has a registered `claim_translator`, not every variant needs one.
-
+-   A stated null hypothesis survives recalibration only if the new variant declares its own `claim_parser`; not every variant needs one.

@@ -23,7 +23,7 @@ library(statim)
 
 `{statim}` is designed so that writing a new estimation method never means forking the function the user calls. `TTEST()`, `P_TEST()`, `LINEAR_REG()`, every one of them is built from the same primitives: a `stat_define` per supported model shape, an `agendas()` of `baseline()` plus named `variant()` implementations inside it, and a shared dispatcher (`STAT_CONSTRUCTOR()`, `conclude()`) that neither knows nor cares what the implementation actually computes.
 
-Whether you're adding a robust-regression option to `LINEAR_REG()` or a trimmed-mean option to `TTEST()`, the mechanism is identical, because a model-based inference function and a hypothesis-test function are the same kind of object underneath — `MODEL_FN()` and `HTEST_FN()` are both thin wrappers around `STAT_CONSTRUCTOR()`. This vignette covers that mechanism. For the full anatomy of `model_type`, `impl`, `compatible_params`, and `claim_translator`, see the [`stat_define` objects](../pointers/stat_define.html) article. This one assumes that vocabulary and focuses on extending it.
+Whether you're adding a robust-regression option to `LINEAR_REG()` or a trimmed-mean option to `TTEST()`, the mechanism is identical, because a model-based inference function and a hypothesis-test function are the same kind of object underneath — `MODEL_FN()` and `HTEST_FN()` are both thin wrappers around `STAT_CONSTRUCTOR()`. This vignette covers that mechanism. For the full anatomy of `model_type`, `impl`, `compatible_params`, and `claim_parser`, see the [`stat_define` objects](../pointers/stat_define.html) article. This one assumes that vocabulary and focuses on extending it.
 
 ## Two ways to add a new estimation method
 
@@ -147,4 +147,3 @@ ii.  Remember *variants* are locked for grammar/piped syntax only: there is no w
 iii.  If `fn` returns an existing `<class_stat_infer>` class, verify `tidy()` and `print()` actually produce sensible output for your variant's specific output shape — inheriting a method is not the same as that method being *correct* for what you return, particularly for confidence intervals or degrees of freedom that your method computes differently from `base`. 
 
 iv.  Finally, if you're registering at `origin = "package"`, test the unload path too — calling `detach()` to detach the registering package and confirming the variant is genuinely gone, not just inaccessible by name, is the difference between "self-cleaning" and "looks clean until someone reloads in the same session." 
-
