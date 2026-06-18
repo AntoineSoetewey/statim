@@ -22,7 +22,7 @@ check_x_and_given(x_quo, given_quo, x_vars, by_vars, cls_name)
 \item{processed}{The processed list from \code{lazy@processed}, as returned by
 \code{\link[=model_processor]{model_processor()}}.}
 
-\item{claims}{A single \code{null_claim} or a \code{null_claims} object.}
+\item{claims}{A \code{null_claim} object.}
 
 \item{...}{Currently unused.}
 
