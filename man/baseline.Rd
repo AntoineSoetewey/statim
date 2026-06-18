@@ -4,7 +4,7 @@
 \alias{baseline}
 \title{Declare the canonical implementation of a test or model}
 \usage{
-baseline(fn, print = NULL)
+baseline(fn, print = NULL, claim_parser = NULL)
 }
 \arguments{
 \item{fn}{A function whose first argument must be \code{.proc}, the processed
@@ -40,6 +40,10 @@ Otherwise, register a tidy method via \code{\link[=making_tidy]{making_tidy()}}.
 \item{print}{A function with signature \verb{function(x, ...)} for formatting
 the result. \code{x} is a \code{cld_exec} object — read your result from \code{x@data}.
 \code{NULL} falls back to \code{print(x@data)}.}
+
+\item{claim_parser}{A \code{\link[=map_claim]{map_claim()}} object that maps a \code{null_claim} to
+named arguments injected into \code{fn} alongside \code{.proc}. \code{NULL} (the
+default) if this implementation does not support \code{\link[=state_null]{state_null()}}.}
 }
 \value{
 A \code{baseline} S7 object.
@@ -51,5 +55,5 @@ eager path.
 }
 \seealso{
 \code{\link[=variant]{variant()}}, \code{\link[=agendas]{agendas()}}, \code{\link[=stat_define]{stat_define()}}, \code{\link[=model_processor]{model_processor()}},
-\link{class_stat_infer}, \code{\link[=auto_tidy]{auto_tidy()}}
+\code{\link[=map_claim]{map_claim()}}, \link{class_stat_infer}, \code{\link[=auto_tidy]{auto_tidy()}}
 }
