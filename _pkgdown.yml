@@ -167,10 +167,11 @@ reference:
     - claim_contrast_coefs
 
   - subtitle: Modelled hypothesis translator and container
-    desc: Core function to contain the implementation to translate modelled hypothesis, placed under `claim_translator` from `stat_define`
+    desc: Core function to contain the implementation to translate modelled hypothesis, placed under `claim_parser` from `baseline()` / `variant()`
     contents:
-    - claim_translate
     - map_claim
+    - baseline
+    - variant
 
   - subtitle: Tidy implementation container
     desc: Add or replace `tidy()` method for following `STAT_CONSTRUCTOR` objects
