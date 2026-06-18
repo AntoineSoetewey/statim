@@ -7,7 +7,7 @@
 #' @param model_id A <[model_id]> object (usually carried by [define_model()]).
 #' @param processed The processed list from `lazy@processed`, as returned by
 #'   [model_processor()].
-#' @param claims A single `null_claim` or a `null_claims` object.
+#' @param claims A `null_claim` object.
 #' @param ... Currently unused.
 #'
 #' @return `invisible(NULL)`, or aborts with a consolidated error.
@@ -93,10 +93,11 @@ S7::method(validate_claim_vars, S7::class_formula) = function(model_id, processe
 #' @rdname claim-vars-validators
 #' @export
 check_param_nodes = function(claims, x_vars, by_vars) {
-    nodes = collect_param_nodes(
-        if (S7::S7_inherits(claims, null_claims))
-            claims@claims else list(claims)
-    )
+    nodes = collect_param_nodes(list(claims))
+    # nodes = collect_param_nodes(
+    #     if (S7::S7_inherits(claims, null_claims))
+    #         claims@claims else list(claims)
+    # )
     errors = lapply(
         nodes,
         validate_one_param_node,

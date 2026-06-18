@@ -28,11 +28,12 @@ S7::method(state_null, test_lazy) = function(.x, expr, ...) {
     raw = rlang::enquo(expr)
     expr_val = rlang::quo_get_expr(raw)
     env = rlang::caller_env()
-    claim = if (rlang::is_call(expr_val, "more_h0")) {
-        eval_more_h0(expr_val, env)
-    } else {
-        parse_null_claim(rlang::new_quosure(expr_val, env))
-    }
+    claim = parse_null_claim(rlang::new_quosure(expr_val, env))
+    # claim = if (rlang::is_call(expr_val, "more_h0")) {
+    #     eval_more_h0(expr_val, env)
+    # } else {
+    #     parse_null_claim(rlang::new_quosure(expr_val, env))
+    # }
     lazy = attach_claim_to_lazy(.x, claim)
     stated_null(
         model_id = lazy@model_id,
@@ -182,11 +183,12 @@ attach_claim_to_lazy = function(lazy, claim) {
     # ---- Compatible param guard ----
     allowed = def@compatible_params
     if (length(allowed) > 0L) {
-        claims_list = if (S7::S7_inherits(claim, null_claims)) {
-            claim@claims
-        } else {
-            list(claim)
-        }
+        claims_list = list(claim)
+        # claims_list = if (S7::S7_inherits(claim, null_claims)) {
+        #     claim@claims
+        # } else {
+        #     list(claim)
+        # }
 
         used_nodes = collect_param_nodes(claims_list)
         bad = Filter(
@@ -251,13 +253,13 @@ null_claim = S7::new_class(
     )
 )
 
-null_claims = S7::new_class(
-    "null_claims",
-    properties = list(
-        claims = S7::new_property(S7::class_list),
-        expr = S7::class_any
-    )
-)
+# null_claims = S7::new_class(
+#     "null_claims",
+#     properties = list(
+#         claims = S7::new_property(S7::class_list),
+#         expr = S7::class_any
+#     )
+# )
 
 S7::method(print, null_claim) = function(x, ...) {
     cat("\n")
@@ -279,24 +281,24 @@ S7::method(print, null_claim) = function(x, ...) {
     invisible(x)
 }
 
-S7::method(print, null_claims) = function(x, ...) {
-    cat("\n")
-    cat(cli::rule(left = "Null Hypotheses", line = "-"), "\n\n")
-    for (i in seq_along(x@claims)) {
-        cl = x@claims[[i]]
-        if (cl@op == "%=%") {
-            labels = vapply(cl@lhs, param_node_label, character(1))
-            cat(sprintf("  [%d] H\u2080 : %s\n", i, paste(labels, collapse = " %=% ")))
-        } else {
-            cat(sprintf(
-                "  [%d] H\u2080 : %s %s %s\n",
-                i,
-                param_node_label(cl@lhs),
-                cl@op,
-                param_node_label(cl@rhs)
-            ))
-        }
-    }
-    cat("\n")
-    invisible(x)
-}
+# S7::method(print, null_claims) = function(x, ...) {
+#     cat("\n")
+#     cat(cli::rule(left = "Null Hypotheses", line = "-"), "\n\n")
+#     for (i in seq_along(x@claims)) {
+#         cl = x@claims[[i]]
+#         if (cl@op == "%=%") {
+#             labels = vapply(cl@lhs, param_node_label, character(1))
+#             cat(sprintf("  [%d] H\u2080 : %s\n", i, paste(labels, collapse = " %=% ")))
+#         } else {
+#             cat(sprintf(
+#                 "  [%d] H\u2080 : %s %s %s\n",
+#                 i,
+#                 param_node_label(cl@lhs),
+#                 cl@op,
+#                 param_node_label(cl@rhs)
+#             ))
+#         }
+#     }
+#     cat("\n")
+#     invisible(x)
+# }
