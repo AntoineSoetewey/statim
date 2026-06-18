@@ -14,10 +14,8 @@
 #' @param compatible_params A list of S7 param classes (e.g. `list(MU, PI)`)
 #'   this implementation accepts in hypothesis claims. An empty list (the
 #'   default) disables the check entirely. Useful when a test is param-agnostic
-#'   or the restriction has not yet been declared.
-#' @param claim_translator A `claim_translate` object or function that maps a
-#'   `ClaimDef` to named arguments injected into the implementation alongside
-#'   `.proc`. `NULL` if `write_claim()` is not supported.
+#'   or the restriction has not yet been declared. Applies to every variant
+#'   in `impl`.
 #'
 #' @return A `stat_define` S7 object.
 #'
@@ -65,8 +63,7 @@ stat_define = S7::new_class(
                     )
                 }
             }
-        ),
-        claim_translator = S7::new_property(default = NULL)
+        )
     )
 )
 

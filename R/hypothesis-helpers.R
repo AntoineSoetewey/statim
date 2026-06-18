@@ -176,9 +176,9 @@ claim_contrast_coefs = function(claim, filter = NULL) {
 
 #' Package resolved claim arguments for injection
 #'
-#' Used inside a `claim_translator` to declare argument names and values
-#' merged into the impl's call. Names must match the formals of the impl's
-#' `fn`.
+#' Used inside a `claim_parser` (typically via [map_claim()]) to declare
+#' argument names and values merged into the impl's call. Names must match
+#' the formals of the impl's `fn`.
 #'
 #' @param ... Named arguments to inject.
 #'

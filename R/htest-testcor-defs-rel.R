@@ -303,7 +303,30 @@ cor_test_rel = test_define(
                         ci = .ci
                     )
                 }
-            }
+            },
+            claim_parser = map_claim(
+                .alt = function(claim, processed) {
+                    switch(
+                        claim@op,
+                        "==" = , "!=" = "two.sided",
+                        ">=" = , ">" = "less",
+                        "<=" = , "<" = "greater"
+                    )
+                },
+                .rho = function(claim, processed) {
+                    resolved = claim_scalar(claim, solve_coef = TRUE)
+
+                    if (resolved$coefs[[1]] != 1) {
+                        cli::cli_abort(c(
+                            "Correlation test only supports a single {.fn RHO} parameter.",
+                            "i" = "Found coefficient: {.val {resolved$coefs[[1]]}}.",
+                            "i" = "{.fn RHO} cannot be scaled or combined with other parameters."
+                        ))
+                    }
+
+                    resolved$scalar
+                }
+            )
         ),
         spearman = variant(
             fn = main_cortest_rel("spearman")
@@ -367,30 +390,5 @@ cor_test_rel = test_define(
             }
         )
     ),
-    compatible_params = list(RHO),
-    claim_translator = claim_translate(
-        default = map_claim(
-            .alt = function(claim, processed) {
-                switch(
-                    claim@op,
-                    "==" = , "!=" = "two.sided",
-                    ">=" = , ">" = "less",
-                    "<=" = , "<" = "greater"
-                )
-            },
-            .rho = function(claim, processed) {
-                resolved = claim_scalar(claim, solve_coef = TRUE)
-
-                if (resolved$coefs[[1]] != 1) {
-                    cli::cli_abort(c(
-                        "Correlation test only supports a single {.fn RHO} parameter.",
-                        "i" = "Found coefficient: {.val {resolved$coefs[[1]]}}.",
-                        "i" = "{.fn RHO} cannot be scaled or combined with other parameters."
-                    ))
-                }
-
-                resolved$scalar
-            }
-        )
-    )
+    compatible_params = list(RHO)
 )

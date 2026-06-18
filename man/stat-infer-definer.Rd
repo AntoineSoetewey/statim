@@ -7,26 +7,11 @@
 \alias{model_infer_define}
 \title{Define a statistical procedure implementation}
 \usage{
-stat_define(
-  model_type = NULL,
-  impl = NULL,
-  compatible_params = list(),
-  claim_translator = NULL
-)
+stat_define(model_type = NULL, impl = NULL, compatible_params = list())
 
-test_define(
-  model_type = NULL,
-  impl = NULL,
-  compatible_params = list(),
-  claim_translator = NULL
-)
+test_define(model_type = NULL, impl = NULL, compatible_params = list())
 
-model_infer_define(
-  model_type = NULL,
-  impl = NULL,
-  compatible_params = list(),
-  claim_translator = NULL
-)
+model_infer_define(model_type = NULL, impl = NULL, compatible_params = list())
 }
 \arguments{
 \item{model_type}{A model ID class this implementation handles (e.g. \code{x_by},
@@ -40,11 +25,8 @@ for the keys available on \code{.proc} per model type.}
 \item{compatible_params}{A list of S7 param classes (e.g. \code{list(MU, PI)})
 this implementation accepts in hypothesis claims. An empty list (the
 default) disables the check entirely. Useful when a test is param-agnostic
-or the restriction has not yet been declared.}
-
-\item{claim_translator}{A \code{claim_translate} object or function that maps a
-\code{ClaimDef} to named arguments injected into the implementation alongside
-\code{.proc}. \code{NULL} if \code{write_claim()} is not supported.}
+or the restriction has not yet been declared. Applies to every variant
+in \code{impl}.}
 }
 \value{
 A \code{stat_define} S7 object.

@@ -56,7 +56,7 @@ sleep |>
 
 Order matters here in a way that's easy to miss: which named term ends up with coefficient `+1` versus `-1` is decided by the order you wrote the expression in, not by any property of the groups themselves. `MU(extra, group == "1") - MU(extra, group == "2")` and `MU(extra, group == "2") - MU(extra, group == "1")` are the same hypothesis mathematically — one is just the negation of the other — but `TTEST()`'s `x_by()` translator reads whichever name has coefficient `+1` as `.first_group`, and uses it to decide which group becomes `x` in the underlying `stats::t.test()` call. 
 
-Write the groups in the opposite order and the test still runs and reports the same p-value, but `estimate` and `t_stat` come back with the opposite sign. This isn't specific to `TTEST()`, either — any `claim_translator` that reads `names(coefs)[coefs == 1]` the same way inherits the same sensitivity, since `claim_contrast_coefs()` preserves the left-to-right order terms were written in all the way through to the `coefs` vector it returns. 
+Write the groups in the opposite order and the test still runs and reports the same p-value, but `estimate` and `t_stat` come back with the opposite sign. This isn't specific to `TTEST()`, either — any `claim_parser` that reads `names(coefs)[coefs == 1]` the same way inherits the same sensitivity, since `claim_contrast_coefs()` preserves the left-to-right order terms were written in all the way through to the `coefs` vector it returns. 
 
 That guard is specific to `claim_contrast_coefs()`, though, not to non-linearity in general. `claim_scalar()` never calls `assert_linear()`, so the same mistake in a single-parameter claim doesn't get the same clean diagnostic:
 

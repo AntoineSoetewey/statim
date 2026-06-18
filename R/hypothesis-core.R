@@ -172,11 +172,11 @@ attach_claim_to_lazy = function(lazy, claim) {
 
     def = find_def(lazy@test_spec@lookup, model_type = model_type)
 
-    if (is.null(def@claim_translator)) {
+    if (is.null(def@impl$base@claim_parser)) {
         cli::cli_abort(c(
             "The {.val {lazy@test_spec@name}} implementation for {.val {model_type}}",
             "does not support hypothesis claims.",
-            "i" = "No {.fn claim_translator} is defined for this test."
+            "i" = "No {.fn claim_parser} is defined on its {.fn baseline}."
         ))
     }
 
