@@ -10,6 +10,18 @@ test_that("parse_null_claim: rejects unsupported operator", {
         parse_null_claim(rlang::quo(MU(x) %in% 0)),
         class = "rlang_error"
     )
+    expect_error(
+        parse_null_claim(rlang::quo(MU(x) %=% 0)),
+        class = "rlang_error"
+    )
+})
+
+test_that("parse_null_claim: rejects an expression that is not a call at all", {
+    expect_error(
+        parse_null_claim(rlang::quo(x)),
+        regexp = "must be a comparison expression",
+        class = "rlang_error"
+    )
 })
 
 test_that("parse_null_claim: parses simple equality claim", {
@@ -79,6 +91,12 @@ test_that("PI: constructs with x only", {
     expect_null(p@given)
 })
 
+test_that("PI: constructs with x and given", {
+    p = PI(success, group == "treatment")
+    expect_equal(rlang::as_label(p@x), "success")
+    expect_false(is.null(p@given))
+})
+
 # test_that("SIGMA: constructs with x and given", {
 #     p = SIGMA(score, group == "control")
 #     expect_equal(rlang::as_label(p@x), "score")
@@ -89,6 +107,30 @@ test_that("RHO: constructs with x and y", {
     p = RHO(speed, dist)
     expect_equal(rlang::as_label(p@x), "speed")
     expect_equal(rlang::as_label(p@y), "dist")
+})
+
+# ---- Printing `<param_obj>` ----
+
+test_that("print.param_obj: displays a single slot", {
+    output = capture.output(print(MU(extra)))
+    expect_true(any(grepl("<param: MU>", output)))
+    expect_true(any(grepl("extra", output)))
+})
+
+test_that("print.param_obj: displays both slots when given is set", {
+    output = capture.output(print(MU(extra, group == "1")))
+    expect_true(any(grepl("given", output)))
+})
+
+test_that("print.param_obj: handles all-NULL slots without error", {
+    output = capture.output(print(PI()))
+    expect_true(any(grepl("<param: PI>", output)))
+})
+
+test_that("print.param_obj: displays RHO with both variable slots", {
+    output = capture.output(print(RHO(speed, dist)))
+    expect_true(any(grepl("speed", output)))
+    expect_true(any(grepl("dist", output)))
 })
 
 test_that("param_obj: is abstract — cannot instantiate directly", {
@@ -139,6 +181,72 @@ test_that("parse_param_call RHO: rejects non-two arguments", {
         parse_param_call(RHO(x, y), args = list(quote(x)), env = rlang::base_env()),
         class = "rlang_error"
     )
+})
+
+test_that("parse_param_call PI: resolves x only", {
+    obj = parse_param_call(PI(), args = list(quote(success)), env = rlang::base_env())
+    expect_equal(rlang::as_label(obj@x), "success")
+    expect_null(obj@given)
+})
+
+test_that("parse_param_call PI: resolves x and given", {
+    obj = parse_param_call(
+        PI(),
+        args = list(quote(success), quote(group == "1")),
+        env = rlang::base_env()
+    )
+    expect_equal(rlang::as_label(obj@x), "success")
+    expect_false(is.null(obj@given))
+})
+
+test_that("parse_param_call RHO: resolves x and y", {
+    obj = parse_param_call(
+        RHO(x, y),
+        args = list(quote(speed), quote(dist)),
+        env = rlang::base_env()
+    )
+    expect_equal(rlang::as_label(obj@x), "speed")
+    expect_equal(rlang::as_label(obj@y), "dist")
+})
+
+test_that("parse_param_node: resolves a numeric symbol from the caller environment", {
+    threshold = 5
+    claim = parse_null_claim(rlang::quo(MU(extra) == threshold))
+    expect_equal(as.numeric(claim@rhs), 5)
+})
+
+test_that("parse_param_node: rejects a non-numeric, non-symbol scalar", {
+    expect_error(
+        parse_null_claim(rlang::quo(MU(extra) == "foo")),
+        class = "rlang_error"
+    )
+})
+
+test_that("parse_param_node: rejects an unsupported function call", {
+    expect_error(
+        parse_null_claim(rlang::quo(sqrt(MU(extra)) == 0)),
+        class = "rlang_error"
+    )
+})
+
+test_that("parse_null_claim: parses a RHO parameter directly", {
+    claim = parse_null_claim(rlang::quo(RHO(speed, dist) == 0))
+    expect_true(S7::S7_inherits(claim@lhs, RHO))
+    expect_equal(rlang::as_label(claim@lhs@x), "speed")
+    expect_equal(rlang::as_label(claim@lhs@y), "dist")
+})
+
+test_that("parse_null_claim: parses division arithmetic", {
+    claim = parse_null_claim(rlang::quo(MU(extra) / 2 == 5))
+    expect_true(inherits(claim@lhs, "arith_node"))
+    expect_equal(claim@lhs$op, "/")
+})
+
+test_that("parse_null_claim: parses unary minus arithmetic", {
+    claim = parse_null_claim(rlang::quo(-MU(extra) == 0))
+    expect_true(inherits(claim@lhs, "arith_node"))
+    expect_equal(claim@lhs$op, "-")
+    expect_length(claim@lhs$operands, 1L)
 })
 
 # ---- Testing `state_null()` ----
@@ -382,4 +490,80 @@ test_that("check_x_and_given: ignores given with non-== predicate", {
     given_quo = rlang::quo(group %in% c("1", "2"))
     errs = check_x_and_given(NULL, given_quo, x_vars = NULL, by_vars = "group", cls_name = "MU")
     expect_equal(errs, character(0))
+})
+
+# ---- `validate_claim_vars` for `rel`, `pairwise`, `formula`, and `prop` ----
+# These call the S7 generic directly (bypassing the full pipeline), since
+# they only need the model ID and a hand-built `processed` list matching
+# what each method reads from it.
+
+test_that("validate_claim_vars rel: rejects an unknown variable", {
+    claim = parse_null_claim(rlang::quo(MU(wrong) == 0))
+    expect_error(
+        validate_claim_vars(
+            rel(mpg, wt),
+            processed = list(x_data = list(wt = 1), resp_data = list(mpg = 1)),
+            claims = claim
+        ),
+        regexp = "Unknown variable",
+        class = "rlang_error"
+    )
+})
+
+test_that("validate_claim_vars rel: accepts a known x or response variable", {
+    claim = parse_null_claim(rlang::quo(MU(mpg) == 0))
+    expect_no_error(
+        validate_claim_vars(
+            rel(mpg, wt),
+            processed = list(x_data = list(wt = 1), resp_data = list(mpg = 1)),
+            claims = claim
+        )
+    )
+})
+
+test_that("validate_claim_vars pairwise: rejects an unknown variable", {
+    claim = parse_null_claim(rlang::quo(MU(wrong) == 0))
+    expect_error(
+        validate_claim_vars(
+            pairwise(Sepal.Length, Sepal.Width),
+            processed = list(var_names = c("Sepal.Length", "Sepal.Width")),
+            claims = claim
+        ),
+        regexp = "Unknown variable",
+        class = "rlang_error"
+    )
+})
+
+test_that("validate_claim_vars pairwise: accepts a known variable", {
+    claim = parse_null_claim(rlang::quo(MU(Sepal.Length) == 0))
+    expect_no_error(
+        validate_claim_vars(
+            pairwise(Sepal.Length, Sepal.Width),
+            processed = list(var_names = c("Sepal.Length", "Sepal.Width")),
+            claims = claim
+        )
+    )
+})
+
+test_that("validate_claim_vars formula: rejects an unknown variable", {
+    claim = parse_null_claim(rlang::quo(MU(wrong) == 0))
+    expect_error(
+        validate_claim_vars(mpg ~ wt, processed = list(vars = c("mpg", "wt")), claims = claim),
+        regexp = "Unknown variable",
+        class = "rlang_error"
+    )
+})
+
+test_that("validate_claim_vars formula: accepts a known variable", {
+    claim = parse_null_claim(rlang::quo(MU(wt) == 0))
+    expect_no_error(
+        validate_claim_vars(mpg ~ wt, processed = list(vars = c("mpg", "wt")), claims = claim)
+    )
+})
+
+test_that("validate_claim_vars prop: passes through without validation", {
+    claim = parse_null_claim(rlang::quo(PI() == 0.5))
+    expect_no_error(
+        validate_claim_vars(prop(45, 100), processed = list(), claims = claim)
+    )
 })
