@@ -1,6 +1,6 @@
 ---
 title: "Writing new `tidy()` method"
-subtitle: "The art of extensibility 1"
+subtitle: "The art of extensibility 2"
 description: "Writing statim extensions"
 output: 
     rmarkdown::html_vignette:

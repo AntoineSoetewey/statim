@@ -1,6 +1,6 @@
 ---
 title: "Writing new estimation method for inferential statistics"
-subtitle: "Explanation"
+subtitle: "The art of extensibility 1"
 description: "Writing statim extensions"
 output: 
     rmarkdown::html_vignette:
