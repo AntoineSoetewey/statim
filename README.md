@@ -14,7 +14,7 @@ coverage](https://codecov.io/gh/s7-stats/statim/graph/badge.svg)](https://app.co
 
 **A Declarative Interface for Statistical Inference**
 
-## Package Overview
+## Package Overview: Simple Fun Fact
 
 What does `{statim}` mean?
 
@@ -80,9 +80,9 @@ For a quick result, the eager form skips the piped syntax entirely:
 TTEST(x_by(extra, group), sleep)
 ```
 
-But it’s not as expressive and assertive as the piped/grammar syntax
-form as shown above, and it doesn’t have an ability to mung the output
-after executing this ([see for more details](#core-semantics)).
+The trade-off: eager forms cannot be recalibrated / switch off into
+different methods with `via()` and do not support post-execution output
+manipulation ([see for more details](#core-semantics)).
 
 ## Installation
 
@@ -116,11 +116,16 @@ All you need to know is that the most usual usage of `{statim}` comes
 with three steps.
 
 ``` r
-sleep |>                                # 1
-    define_model(extra %by% group) |>   # 1              
-    prepare_test(TTEST) |>              # 2            
-    conclude() |>                       # 3           
-    tidy()                              # 3          
+data |>                                                       # 1
+    define_model(<model_id>(var1, var2, ...)) |>              # 1  
+    # Lazy loading begins after
+    prepare_<test/model>(<STAT_FN>) |>                        # 2  
+    # Must come after `prepare_test()` / prepare_model()` 
+    via() |>                                                  # 2
+    state_null() |>                                           # 2 
+    # End of lazy loading
+    conclude() |>                                             # 3            
+    <output-to-process>()                                     # 3          
 ```
 
 Brief explanation of the code above:
@@ -151,22 +156,23 @@ about how `{statim}` works.
 
 The package is designed around three ideas:
 
-1.  **A shared grammar**: every inferential procedure follows the same
-    shape — `define_model()`, `prepare_test()`, `conclude()`, regardless
-    of which test or model ID is used. The model ID objects
-    (e.g. `x_by`, `rel`, `pairwise`) defines the shape of the
-    statistical inference throughout `{statim}` pipeline, while the
-    grammar stays the same. Eager forms (`TTEST()`, `CORTEST()`, …)
-    provide a shortcut when the full pipeline (in a form of piped syntax
-    that reads like a sentence) is not needed.
-
-2.  **Composability**: the simplest way to write `{statim}` has two
+1.  **Composability**: the simplest way to write `{statim}` has two
     forms: the eager form and the grammar/piped syntax form. The eager
     form skips the verbs and cannot be recalibrated, only skips to the
     output. On the other hand, the grammar/piped syntax form relies on
     verbs and lazy loading, which comes with the recalibration of the
     estimation method with a single `via()` call, and the execution of
     the lazy-loaded pipeline with `conclude()`.
+
+2.  **A shared grammar**: Only applied on the main `{statim}` semantics:
+    piped/grammar syntax. `define_model()` =\> `prepare_*()` =\>
+    `conclude()` is the same shape for every inferential procedure. The
+    `<model_id>` objects (`x_by`, `rel`, `pairwise`, …) describe the
+    statistical structure of the problem; the verbs stay constant.
+
+    > Eager forms (`TTEST()`, `CORTEST()`, …) provide a shortcut when
+    > the full pipeline (in a form of piped syntax that reads like a
+    > sentence) is not needed.
 
 3.  **Extensible by design**: the `{statim}` pipeline is extensible. For
     instance, if you want to write new estimation method, an
