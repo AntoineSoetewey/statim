@@ -150,3 +150,30 @@ test_that("class_glm_object inherits from anova_able", {
 
     expect_true(S7::S7_inherits(obj, anova_able))
 })
+
+test_that("formula and rel() pipelines produce identical coefficients", {
+    rel_result = cars |>
+        define_model(rel(speed, dist)) |>
+        prepare_model(GLM) |>
+        conclude()
+
+    formula_result = cars |>
+        define_model(dist ~ speed) |>
+        prepare_model(GLM) |>
+        conclude()
+
+    expect_equal(
+        rel_result@data@coefficients$estimate,
+        formula_result@data@coefficients$estimate,
+        tolerance = 1e-8
+    )
+})
+
+test_that("rel() pipeline with multiple predictors runs without error", {
+    expect_no_error(
+        LifeCycleSavings |>
+            define_model(rel(c(pop15, pop75, dpi, ddpi), sr)) |>
+            prepare_model(GLM) |>
+            conclude()
+    )
+})

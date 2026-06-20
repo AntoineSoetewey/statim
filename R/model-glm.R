@@ -47,7 +47,7 @@
 #' @export
 GLM = MODEL_FN(
     cls = "glm",
-    defs = list(glm_def_formula),
+    defs = list(glm_def_rel, glm_def_formula),
     .name = "Generalized Linear Model"
 )
 
