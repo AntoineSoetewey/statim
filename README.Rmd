@@ -2,8 +2,6 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
     collapse = FALSE,
@@ -18,7 +16,7 @@ desc = read.dcf("DESCRIPTION")
 desc = setNames(as.list(desc), colnames(desc))
 ```
 
-# `r desc$Package` <img src="man/figures/logo.png" align="right" height="139" />
+# `r desc$Package` <img src="man/figures/logo.png" align="right" height="139"/>
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/statim)](https://CRAN.R-project.org/package=statim)
@@ -34,18 +32,19 @@ What does `{statim}` mean?
 
 `{statim}` is a Latin word for "immediately, at once". The name carries a double meaning:
 
-- *stat*: as in statistics, the domain this package lives in
-- *im* (*statim*): as in "immediate", signalling that inference should be expressible as a direct declaration, not somewhat a sequence of mechanical steps
+-   *stat*: as in statistics, the domain this package lives in
+
+-   *im* (*statim*): as in "immediate", signalling that inference should be expressible as a direct declaration, not somewhat a sequence of mechanical steps
 
 This simply means: you declare *what* statistical inference you want to perform, then `{statim}` immediately delivers *how*.
 
 ## Why statim?
 
-R has a rich statistical ecosystem. Most of the packages in the wild were written at top of S3 and S4, and it is yet for the S7 to be prominent into statistical ecosystem — `{statim}` is glad to take the step (there are reasons why [S7 supersedes both S3 and S4](https://tidyverse.org/blog/2024/11/s7-0-2-0/)). Statistical inference in general is served by an assortment of disconnected functions: the functions you're looking for may exist but they are scattered across different packages. 
+R has a rich statistical ecosystem. Statistical inference in general is served by an assortment of disconnected functions: the functions you're looking for may exist but they are scattered across different packages.
 
-R gained a grammar for graphics (`{ggplot2}`), and one for data manipulation (`{dplyr}`). And then there's `{statim}`, an attempt to re-imagine the "grammar of statistical inference" from the ground up. The core idea of `{statim}` in general is it's fully declarative, and that any inferential procedure can be described in [three steps](#general-usage). 
+R gained a grammar for graphics (`{ggplot2}`), and one for data manipulation (`{dplyr}`). And then there's `{statim}`, an attempt to re-imagine the "grammar of statistical inference" from the ground up. The core idea of `{statim}` in general is it's fully declarative, and that any inferential procedure can be described in [three steps](#general-usage).
 
-What makes `{statim}` *composable* for statistical workflows is the *verbs* and the *accessibility* of the methods you're looking for. For example, you want to write a t-test pipeline, and you want to use the classical one and then the permutation method. `{statim}` lets you do that with `via()`, and while you can use t-test from `default` (classical), you can access its permutation method through `... |> via(permute)` (or whatever the keyword is) with one line of code only. You won't need you to do a lot of work (which sometimes require rewriting your code), just a single addition to the syntax. 
+What makes `{statim}` *composable* for statistical workflows is the *verbs* and the *accessibility* of the methods you're looking for. For example, you want to write a t-test pipeline, and you want to use the classical one and then the permutation method. `{statim}` lets you do that with `via()`, and while you can use t-test from `default` (classical), you can access its permutation method through `... |> via(permute)` (or whatever the keyword is) with one line of code only. You won't need you to do a lot of work (which sometimes require rewriting your code), just a single addition to the syntax.
 
 ``` r
 # Classical t-test
@@ -70,7 +69,7 @@ For a quick result, the eager form skips the piped syntax entirely:
 TTEST(x_by(extra, group), sleep)
 ```
 
-The trade-off: eager forms cannot be recalibrated / switch off into different methods with `via()` and do not support post-execution output manipulation ([see for more details](#core-semantics)). 
+The trade-off: eager forms cannot be recalibrated / switch off into different methods with `via()` and do not support post-execution output manipulation ([see for more details](#core-semantics)).
 
 ## Installation
 
@@ -81,7 +80,7 @@ The package is yet to be submitted into CRAN.
 install.packages("statim")
 ```
 
-For the time being, you can install the current implementation on GitHub: 
+For the time being, you can install the current implementation on GitHub:
 
 ``` r
 # Development version from GitHub
@@ -89,9 +88,9 @@ For the time being, you can install the current implementation on GitHub:
 pak::pak("s7-stats/statim")
 ```
 
-## General Usage
+## General Usage {#general-usage}
 
-By the way, loading a library comes with [a lot of preferences](https://joshuamarie.com/posts/06-load-pkg/). Let us start by loading `{statim}` first: 
+Let us start by loading `{statim}` first:
 
 ```{r}
 library(statim)
@@ -104,39 +103,41 @@ data |>                                                       # 1
     define_model(<model_id>(var1, var2, ...)) |>              # 1  
     # Lazy loading begins after
     prepare_*(<STAT_FN>) |>                                   # 2  
-    # Must come after `prepare_test()` / prepare_model()` 
     via() |>                                                  # 2
-    state_null() |>                                           # 2 
+    state_null(<expr>) |>                                     # 2 
     # End of lazy loading
-    conclude() |>                                             # 3            
-    <output-to-process>()                                     # 3          
+    conclude() |>                                             # 3         
+    <output-to-process>()                                     # 3         
 ```
 
-Brief explanation of the code above: 
+Explanation of the code above: 
 
 1. *Model processor and definition*, where defining the shape of model *to be analyzed* happens at the beginning during statistical inference. Typically, this step where supplying either a data frame or a `<model_id>` objects into `define_model()` occurs, and then some functions to be appended in the future updates. 
 
 2. *Parameterization*, where the estimation process of the statistical inference pipeline is defined lazily. Our usual statistical inference application can be either a model-based inference (e.g. linear regression through `prepare_model()`) or H-test inference (e.g. t-test through `prepare_test()`). With that said, the execution is lazy-loaded, and only executed if needed. 
 
+    > `state_null()` is one of the reasons why `{statim}` — it's astronomical way of writing null hypothesis expressed mathematically. Learn more about it on `vignette("hypothesis-expressions", package = "statim")`. 
+
 3. *Execution and retrieval*, where the first 2 steps is (re-)executed and then retrieve the output. The most common function is `conclude()`. There are several techniques to retrieve the output, e.g. through `tidy()`. This is functional if there are available methods are registered, automatically or from a manual step. 
 
 For more information, see through `vignette("statim")`, and learn more about how `{statim}` works. 
 
-## Core Semantics
+## Core Semantics {#core-semantics}
 
 The package is designed around three ideas:
 
-1. **Composability**: the simplest way to write `{statim}` has two forms: the eager form and the grammar/piped syntax form. The eager form skips the verbs and cannot be recalibrated, only skips to the output. On the other hand, the grammar/piped syntax form relies on verbs and lazy loading, which comes with the recalibration of the estimation method with a single `via()` call, and the execution of the lazy-loaded pipeline with `conclude()`.
+1.  **Composability**: the simplest way to write `{statim}` has two forms: the eager form and the grammar/piped syntax form. The eager form skips the verbs and cannot be recalibrated, only skips to the output. On the other hand, the grammar/piped syntax form relies on verbs and lazy loading, which comes with the recalibration of the estimation method with a single `via()` call, and the execution of the lazy-loaded pipeline with `conclude()`.
 
-2. **A shared grammar**: Only applied on the main `{statim}` semantics: piped/grammar syntax. `define_model()` => `prepare_*()` => `conclude()` is the same shape for every inferential procedure. The `<model_id>` objects (`x_by`, `rel`, `pairwise`, ...) describe the statistical structure of the problem; the verbs stay constant.
+2.  **A shared grammar**: Only applied on the main `{statim}` semantics: piped/grammar syntax. `define_model()` =\> `prepare_*()` =\> `conclude()` is the same shape for every inferential procedure. The `<model_id>` objects (`x_by`, `rel`, `pairwise`, ...) describe the statistical structure of the problem; the verbs stay constant.
 
     > Eager forms (`TTEST()`, `CORTEST()`, ...) provide a shortcut when the full pipeline (in a form of piped syntax that reads like a sentence) is not needed.
 
-3. **Extensible by design**: the `{statim}` pipeline is extensible. For instance, if you want to write new estimation method, an implementation is through filling up the `stat_define()` object (then store it within list of `defs` from `STAT_CONSTRUCTOR()` functions, saved as `<STAT_FN>`), then `baseline()` to write the default form of `<STAT_FN>` and `variant()` to extend the current `<STAT_FN>` form (only be accessed with `via()` only). With these, you can bring your own engine, your own method, your own implementation, or use them to extend the current ones. 
+3.  **Extensible by design**: the `{statim}` pipeline is extensible. For instance, if you want to write new estimation method, an implementation is through filling up the `stat_define()` object (then store it within list of `defs` from `STAT_CONSTRUCTOR()` functions, saved as `<STAT_FN>`), then `baseline()` to write the default form of `<STAT_FN>` and `variant()` to extend the current `<STAT_FN>` form (only be accessed with `via()` only). With these, you can bring your own engine, your own method, your own implementation, or use them to extend the current ones.
 
 ## License
 
 <!-- MIT © Joshua Marie -->
+
 MIT + file LICENSE
 
 ## Contributing
@@ -146,4 +147,3 @@ We are sincerely grateful for contributions; they are beneficial for the project
 ## Code of Conduct
 
 Please note that the statim project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
-
