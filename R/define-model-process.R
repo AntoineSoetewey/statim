@@ -44,7 +44,7 @@ S7::method(model_processor, S7::class_formula) =
 
         list(
             data = data,
-            vars = all.vars(x),
+            vars = vars,
             formula = x
         )
     }
