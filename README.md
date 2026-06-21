@@ -105,18 +105,23 @@ library(statim)
 ```
 
 All you need to know is that the most usual usage of `{statim}` comes
-with three steps.
+with three steps. Here’s the general anatomy of the main `{statim}`
+semantics:
 
 ``` r
-data |>                                                       # 1
-    define_model(<model_id>(var1, var2, ...)) |>              # 1  
-    # Lazy loading begins after
-    prepare_*(<STAT_FN>) |>                                   # 2  
-    via() |>                                                  # 2
-    state_null(<expr>) |>                                     # 2 
-    # End of lazy loading
-    conclude() |>                                             # 3         
-    <output-to-process>()                                     # 3         
+# Data can be piped in or passed as argument to `define_model()`
+... |>                                   # Possible extensions  
+    define_model(
+        <model_id>(var1, var2, ...), 
+        data, ...
+    ) |>                                 # 1. Model definition
+    # ... |>                             # Possible extensions  
+    prepare_*(<STAT_FN>) |>              # 2. Prepare method (lazy)
+    via(...) |>                          # Optional: method variant  (*)
+    state_null(<expr>) |>                # Optional: null hypothesis (*)
+    # ... |>                             # Possible extensions  
+    conclude() |>                        # 3. Execute
+    <output_handler>()                   # e.g. tidy(), display()    
 ```
 
 Explanation of the code above:
@@ -132,7 +137,8 @@ Explanation of the code above:
     inference application can be either a model-based inference
     (e.g. linear regression through `prepare_model()`) or H-test
     inference (e.g. t-test through `prepare_test()`). With that said,
-    the execution is lazy-loaded, and only executed if needed.
+    the execution is lazy-loaded, and only executed if needed. (The
+    `(*)` mark means they are interchangeable. )
 
     > `state_null()` is one of the reasons why `{statim}` — it’s
     > astronomical way of writing null hypothesis expressed
@@ -145,8 +151,9 @@ Explanation of the code above:
     e.g. through `tidy()`. This is functional if there are available
     methods are registered, automatically or from a manual step.
 
-For more information, see through `vignette("statim")`, and learn more
-about how `{statim}` works.
+The `...` before the pipe above means the possible future extensions for
+this package. For more information, see through `vignette("statim")`,
+and learn more about how `{statim}` works.
 
 ## Core Semantics
 
