@@ -132,7 +132,7 @@ S7::method(model_processor, xyz) = function(x, data = NULL, ...) {
 }
 ```
 
-To register a friendlier summary, with custom `args`, extra metadata in `other_info`, and variable previews in `vars`, write a method for your class. Return a `<class_model_inform>` object via `class_model_inform()`, and set `registered = TRUE`:
+To register a friendlier summary, with custom `args`, extra metadata in `other_info`, and variable previews in `vars`, write a method for your class. Return a `<class_var_inform>` object via `class_var_inform()`, and set `registered = TRUE`:
 
 ```{r}
 S7::method(var_id_info, xyz) = function(.var_id, processed = NULL, ...) {
@@ -150,7 +150,7 @@ S7::method(var_id_info, xyz) = function(.var_id, processed = NULL, ...) {
         })
     }
 
-    class_model_inform(
+    class_var_inform(
         var_id = .var_id,
         args = paste0(
             "x = ", rlang::as_label(.var_id@x),
@@ -177,6 +177,6 @@ To write a new `<var_id>` object:
 1.  Define an S7 class with `S7::new_class()`, with `parent = statim::var_id`.
 2.  Register a `model_processor()` method for your class. This is the only required step, and it's what `define_model()` dispatches on to populate `processed`.
 3.  If the `<var_id>` should capture bare variable names lazily (recommended for anything that will be paired with a `data` frame), use a custom `constructor` that wraps each argument with `rlang::enquo()`, and resolve the quosures inside `model_processor()`.
-4.  Optionally, register a `var_id_info()` method for a friendlier `print()` summary, returning a `class_model_inform` object with `registered = TRUE`.
+4.  Optionally, register a `var_id_info()` method for a friendlier `print()` summary, returning a `class_var_inform` object with `registered = TRUE`.
 
 With these in place, your new `<var_id>` works seamlessly with `define_model()` and the rest of the `{statim}` pipeline — exactly like `x_by()`, `rel()`, `pairwise()`, and `prop()`.
