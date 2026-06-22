@@ -20,7 +20,7 @@ library(statim)
 
 ## What are <stat_define> objects?
 
-`stat_define` is an S7 object used as a unit of registration that tells a top-level function like `TTEST()` or `LINEAR_REG()` how to behave for one particular shape of model. "Shape of model" means the model ID under `<model_id>` class: `x_by()`, `pairwise()`, `rel()`, a `<formula>`, and so on. Each shape implies a different procedure, a different set of arguments, and often a different result structure, even though the user calls the same top-level function regardless of which shape they pass in.
+`stat_define` is an S7 object used as a unit of registration that tells a top-level function like `TTEST()` or `LINEAR_REG()` how to behave for one particular shape of model. "Shape of model" means the variable mapper `<var_id>` under `<var_id>` class: `x_by()`, `pairwise()`, `rel()`, a `<formula>`, and so on. Each shape implies a different procedure, a different set of arguments, and often a different result structure, even though the user calls the same top-level function regardless of which shape they pass in.
 
 `stat_define()` is exported under three names, and all three build the exact same S7 class:
 
@@ -34,7 +34,7 @@ The alias is purely a readability convention, not a different type. `ptest_def`,
 
 ```{r, eval = FALSE}
 ptest_def = test_define(
-    model_type = <model_id>,                 # Which is `prop`
+    model_type = <var_id>,                 # Which is `prop`
     impl = agendas(
         base = baseline(fn = ..., claim_parser = map_claim(...)),
         ...
@@ -43,7 +43,7 @@ ptest_def = test_define(
 )
 
 linear_reg_def_rel = model_infer_define(
-    model_type = <model_id>,                 # Which is `rel`
+    model_type = <var_id>,                 # Which is `rel`
     impl = agendas(...),
     compatible_params = list()
 )
@@ -74,7 +74,7 @@ LINEAR_REG = MODEL_FN(
 )
 ```
 
-When you call `TTEST(x_by(extra, group), sleep)`, the dispatcher looks at the class of the model ID you passed, finds the matching `stat_define` (i.e. `ttest_def_two` in this case), and runs that implementation. The exact same lookup runs when you call `LINEAR_REG(rel(mpg, wt), mtcars)`, only the exception that is the registry being searched differs.
+When you call `TTEST(x_by(extra, group), sleep)`, the dispatcher looks at the class of the variable mapper `<var_id>` you passed, finds the matching `stat_define` (i.e. `ttest_def_two` in this case), and runs that implementation. The exact same lookup runs when you call `LINEAR_REG(rel(mpg, wt), mtcars)`, only the exception that is the registry being searched differs.
 
 ## Why are <stat_define> objects required?
 
@@ -91,7 +91,7 @@ Each argument is explain by each section.
 
 ```{r, eval = FALSE}
 stat_define(
-    model_type = <model_id>,
+    model_type = <var_id>,
     impl = agendas(...),
     compatible_params = list(<param_obj>, ...)
 )
@@ -99,7 +99,7 @@ stat_define(
 
 1.  `model_type`
 
-    The `<model_id>` class this implementation handles — `x_by`, `rel`, `pairwise`, `prop`, or `S7::class_formula` for formula-based dispatch. This is the key `find_def()` uses to route an incoming model ID to the right `stat_define`, via `S7::S7_class(model_id)@name` (or the literal string `"formula"` when the model ID is a formula rather than an S7 model ID object).
+    The `<var_id>` class this implementation handles — `x_by`, `rel`, `pairwise`, `prop`, or `S7::class_formula` for formula-based dispatch. This is the key `find_def()` uses to route an incoming variable mapper `<var_id>` to the right `stat_define`, via `S7::S7_class(var_id)@name` (or the literal string `"formula"` when the variable mapper `<var_id>` is a formula rather than an S7 variable mapper `<var_id>` object).
 
 2.  `impl`
 
@@ -175,7 +175,7 @@ Both families of top-level function reach `stat_define` through a mirrored pair 
 
 Both pipelines converge on the same terminal generic. There are two paths into a `stat_define`'s `impl`, and both end at `inject_and_run()`.
 
-1.  Eager path: `TTEST(x_by(extra, group), sleep)` or `LINEAR_REG(rel(mpg, wt), mtcars)` calls `run_stat()`, which finds the matching `stat_define` via `find_def()`, processes the model ID through `model_processor()`, and runs `def@impl$base` directly. There is no variant resolution on this path — only `base` is reachable.
+1.  Eager path: `TTEST(x_by(extra, group), sleep)` or `LINEAR_REG(rel(mpg, wt), mtcars)` calls `run_stat()`, which finds the matching `stat_define` via `find_def()`, processes the variable mapper `<var_id>` through `model_processor()`, and runs `def@impl$base` directly. There is no variant resolution on this path — only `base` is reachable.
 
 2.  Lazy path: `sleep |> define_model(x_by(extra, group)) |> prepare_test(TTEST) |> via("boot", n = 2000) |> conclude()` and `mtcars |> define_model(rel(mpg, wt)) |> prepare_model(LINEAR_REG) |> conclude()` both defer execution until `conclude()`, which has separate `S7::method()` implementations for `test_lazy` and `model_lazy`. The `test_lazy` method does four things: resolve the variant's `fn` (falling back to `base` only when no variant was requested), merge `via()`'s arguments over whatever was supplied at `prepare_test()` time, run that resolved implementation's own `claim_parser` if a claim is present, and call `inject_and_run()` once with the assembled argument list. The `model_lazy` method does the same, minus the claim step — `model_lazy` objects have no `claims` slot at all, since `state_null()` only ever dispatches on `test_lazy`.
 

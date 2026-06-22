@@ -47,7 +47,7 @@ A variant name like `"boot"` or `"permute"` from `TTEST()` in `x_by` mode is not
 2.  Any variants registered afterwards via `add_variant()`. This is a developer-facing function, paired with the `%<-%` operator, and is meant for extending an existing `<STAT_FN>` (built with `HTEST_FN()` or `MODEL_FN()`) without touching its original definition:
 
     ``` r
-    add_variant(<STAT_FN>, <model_id>, "<new_mode>") %<-% variant(
+    add_variant(<STAT_FN>, <var_id>, "<new_mode>") %<-% variant(
         fn = function(.proc, arg1 = , arg2 = , ...) {
             # ...
         }
@@ -56,7 +56,7 @@ A variant name like `"boot"` or `"permute"` from `TTEST()` in `x_by` mode is not
 
     Variants added this way carry an `origin`: `"user"` (the default) is scoped to the current session and can be removed with `remove_variant()`, while `"package"` is meant to be registered from a package's `.onLoad()` and lasts as long as that package stays loaded. Either way, the name `"default"` is frozen and cannot be added or removed through `add_variant()` / `remove_variant()`.
 
-Because matching is scoped to model type, the same variant name can mean different things (or simply do not exist) depending on which `<model_id>` you used in `define_model()`. A variant registered for `x_by()` pipelines is not automatically available to a `<formula>`-based pipeline of the same test, even if both eventually call `TTEST`.
+Because matching is scoped to model type, the same variant name can mean different things (or simply do not exist) depending on which `<var_id>` you used in `define_model()`. A variant registered for `x_by()` pipelines is not automatically available to a `<formula>`-based pipeline of the same test, even if both eventually call `TTEST`.
 
 If you pass a method name that is not registered for the model type in play, `via()` fails immediately, before `conclude()` is even reached:
 
