@@ -246,3 +246,29 @@ test_that("print.class_p_test() returns invisibly", {
 
     expect_invisible(print(test_out@data))
 })
+
+# ---- tidy ----
+test_that("`P_TEST()`'s `tidy()` method is functional", {
+    test_out = define_model(prop(45, 100)) |>
+        prepare_test(P_TEST) |>
+        via("prop", correct = FALSE) |>
+        state_null(PI() == 0.3) |>
+        conclude()
+
+    expect_no_error(test_out |> tidy())
+    expect_no_error({
+        auto_tidy(P_TEST(prop(45, 100))@data)
+    })
+})
+
+test_that("`P_TEST()`'s `tidy()` method expects to be 'tibble' with expected columns", {
+    test_out = define_model(prop(45, 100)) |>
+        prepare_test(P_TEST) |>
+        via("prop", correct = FALSE) |>
+        state_null(PI() == 0.3) |>
+        conclude() |>
+        tidy()
+
+    expect_s3_class(test_out, "tbl_df")
+    expect_true(all(c("successes", "statistic", "p_val") %in% names(test_out)))
+})
