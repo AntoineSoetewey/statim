@@ -31,10 +31,10 @@
 via = S7::new_generic("via", dispatch_args = c(".x", ".method"))
 
 S7::method(via, list(test_lazy, S7::class_character)) = function(.x, .method, ...) {
-    model_type = if (inherits(.x@model_id, "formula")) {
+    model_type = if (inherits(.x@var_id, "formula")) {
         "formula"
     } else {
-        S7::S7_class(.x@model_id)@name
+        S7::S7_class(.x@var_id)@name
     }
     def = find_def(.x@test_spec@lookup, model_type = model_type)
 
@@ -55,10 +55,10 @@ S7::method(via, list(test_lazy, S7::class_character)) = function(.x, .method, ..
 }
 
 S7::method(via, list(model_lazy, S7::class_character)) = function(.x, .method, ...) {
-    model_type = if (inherits(.x@model_id, "formula")) {
+    model_type = if (inherits(.x@var_id, "formula")) {
         "formula"
     } else {
-        S7::S7_class(.x@model_id)@name
+        S7::S7_class(.x@var_id)@name
     }
     def = find_def(.x@model_spec@lookup, model_type = model_type)
 
