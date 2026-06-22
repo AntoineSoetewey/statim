@@ -39,9 +39,10 @@ Results are printed as a pairwise matrix via \code{\link[tabstats:pairwise_matri
 
 \section{One-sample mode}{
 
-When \code{\link[=pairwise]{pairwise()}} is constructed with a \code{direction = "eq"} argument, each
-variable is tested against its own \code{.mu} value rather than against another
-variable. The result matrix displays diagonal entries only.
+When \code{\link[=pairwise]{pairwise()}} has equal referred columns, made by \code{direction = "<eq, lteq, gteq>"}
+argument, each variable is tested against its own \code{.mu} value rather than against another
+variable, resonating to a one-sample test. The pairwise t-test output matrix displays
+diagonal entries only.
 }
 
 \examples{

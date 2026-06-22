@@ -29,9 +29,10 @@
 #' Results are printed as a pairwise matrix via [tabstats::pairwise_matrix()].
 #'
 #' @section One-sample mode:
-#' When [pairwise()] is constructed with a `direction = "eq"` argument, each
-#' variable is tested against its own `.mu` value rather than against another
-#' variable. The result matrix displays diagonal entries only.
+#' When [pairwise()] has equal referred columns, made by `direction = "<eq, lteq, gteq>"`
+#' argument, each variable is tested against its own `.mu` value rather than against another
+#' variable, resonating to a one-sample test. The pairwise t-test output matrix displays
+#' diagonal entries only.
 #'
 #' @examples
 #' iris |>
@@ -53,7 +54,6 @@ ttest_def_pairwise = test_define(
                 pairs = .proc$pairs
                 data = .proc$data
                 direction = .proc$direction %||% "lt"
-                is_one_sample = direction == "eq"
 
                 n_vars = length(var_names)
 
@@ -71,6 +71,7 @@ ttest_def_pairwise = test_define(
                 tests = lapply(seq_along(pairs), function(i) {
                     a = pairs[[i]][[1]]
                     b = pairs[[i]][[2]]
+                    is_one_sample = rlang::exec(identical, !!!pairs[[i]])
 
                     res = if (is_one_sample) {
                         stats::t.test(
@@ -103,9 +104,13 @@ ttest_def_pairwise = test_define(
                     df = vapply(tests, function(t) t$ttest$parameter[["df"]], numeric(1)),
                     t_stat = vapply(tests, function(t) t$ttest$statistic[["t"]], numeric(1)),
                     p_value = vapply(tests, function(t) t$ttest$p.value, numeric(1)),
-                    method_name = unique(
-                        vapply(tests, function(t) t$ttest$method, character(1))
-                    )
+                    lower_ci = vapply(tests, function(t) t$ttest$conf.int[[1L]], numeric(1)),
+                    upper_ci = vapply(tests, function(t) t$ttest$conf.int[[2L]], numeric(1)),
+                    ci_level = .ci,
+                    method_name = vapply(tests, function(t) t$ttest$method, character(1))
+                    # method_name = unique(
+                    #     vapply(tests, function(t) t$ttest$method, character(1))
+                    # )
                 )
             }
         )
