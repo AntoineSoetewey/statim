@@ -5,7 +5,7 @@ output:
     rmarkdown::html_vignette:
         toc: true
 vignette: |
-    %\VignetteIndexEntry{Hypothesis Expressions}
+    %\VignetteIndexEntry{Execution and Retrieval of Outputs}
     %\VignetteEngine{knitr::rmarkdown}
     \usepackage[utf8]{inputenc}
 ---
