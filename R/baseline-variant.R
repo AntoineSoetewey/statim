@@ -6,13 +6,13 @@
 #'
 #' @param fn A function whose first argument must be `.proc`, the processed
 #'   model output from [model_processor()]. The keys available on `.proc`
-#'   depend on the model ID used:
+#'   depend on the variable mapper `<var_id>` used:
 #'   - `x_by`: `$x_data`, `$group_data`
 #'   - `rel`: `$x_data`, `$resp_data`
 #'   - `pairwise`: `$var_names`, `$pairs`, `$data`
 #'   - `formula`: `$data`, `$vars`, `$formula`
 #'
-#'   Try run this to explore the structure: `names(model_processor(<model_id>, <data>))`.
+#'   Try run this to explore the structure: `names(model_processor(<var_id>, <data>))`.
 #'
 #'   \cr
 #'
@@ -87,13 +87,13 @@ baseline = S7::new_class(
 #'
 #' @param fn A function whose first argument must be `.proc`, the processed
 #'   model output from [model_processor()]. The keys available on `.proc`
-#'   depend on the model ID used:
+#'   depend on the variable mapper `<var_id>` used:
 #'   - `x_by`: `$x_data`, `$group_data`
 #'   - `rel`: `$x_data`, `$resp_data`
 #'   - `pairwise`: `$var_names`, `$pairs`, `$data`
 #'   - `formula`: `$data`, `$vars`, `$formula`
 #'
-#'   Try run this to explore the structure: `names(model_processor(<model_id>, <data>))`.
+#'   Try run this to explore the structure: `names(model_processor(<var_id>, <data>))`.
 #'
 #'   \cr
 #'

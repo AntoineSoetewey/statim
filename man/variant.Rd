@@ -9,7 +9,7 @@ variant(fn, print = NULL, claim_parser = NULL)
 \arguments{
 \item{fn}{A function whose first argument must be \code{.proc}, the processed
 model output from \code{\link[=model_processor]{model_processor()}}. The keys available on \code{.proc}
-depend on the model ID used:
+depend on the variable mapper \verb{<var_id>} used:
 \itemize{
 \item \code{x_by}: \verb{$x_data}, \verb{$group_data}
 \item \code{rel}: \verb{$x_data}, \verb{$resp_data}
@@ -17,7 +17,7 @@ depend on the model ID used:
 \item \code{formula}: \verb{$data}, \verb{$vars}, \verb{$formula}
 }
 
-Try run this to explore the structure: \verb{names(model_processor(<model_id>, <data>))}.
+Try run this to explore the structure: \verb{names(model_processor(<var_id>, <data>))}.
 
 \cr
 
