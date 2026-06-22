@@ -5,7 +5,7 @@
 #' [HTEST_FN()] or [MODEL_FN()] via `defs`. This is the main extension point
 #' for adding new tests or models.
 #'
-#' @param model_type A model ID class this implementation handles (e.g. `x_by`,
+#' @param model_type A variable mapper `<var_id>` class this implementation handles (e.g. `x_by`,
 #'   `S7::class_formula`).
 #' @param impl An [agendas()] object collecting all implementations. The `fn`
 #'   of each [baseline()] and [variant()] inside receives `.proc` as its first
@@ -30,10 +30,10 @@ stat_define = S7::new_class(
         model_type = S7::new_property(
             class = S7::class_any,
             validator = function(value) {
-                is_model_id_class = inherits(value, "S7_class") && identical(value@parent, model_id)
+                is_var_id_class = inherits(value, "S7_class") && identical(value@parent, var_id)
                 is_formula_class = identical(value, S7::class_formula)
-                if (!is_model_id_class && !is_formula_class)
-                    "must be a class that inherits from `model_id`, or `S7::class_formula`"
+                if (!is_var_id_class && !is_formula_class)
+                    "must be a class that inherits from `var_id`, or `S7::class_formula`"
             }
         ),
         # impl_class = S7::class_character,

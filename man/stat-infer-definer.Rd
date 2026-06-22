@@ -14,7 +14,7 @@ test_define(model_type = NULL, impl = NULL, compatible_params = list())
 model_infer_define(model_type = NULL, impl = NULL, compatible_params = list())
 }
 \arguments{
-\item{model_type}{A model ID class this implementation handles (e.g. \code{x_by},
+\item{model_type}{A variable mapper \verb{<var_id>} class this implementation handles (e.g. \code{x_by},
 \code{S7::class_formula}).}
 
 \item{impl}{An \code{\link[=agendas]{agendas()}} object collecting all implementations. The \code{fn}
