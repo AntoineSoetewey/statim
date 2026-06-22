@@ -4,20 +4,20 @@
 \alias{TTEST}
 \title{T-Test}
 \usage{
-TTEST(.model = NULL, .data = NULL, ...)
+TTEST(.var_id = NULL, .data = NULL, ...)
 }
 \arguments{
-\item{.model}{A model ID from \code{x_by()}, \code{pairwise()}, or a formula.
+\item{.var_id}{A variable mapper \verb{<var_id>} from \code{x_by()}, \code{pairwise()}, or a formula.
 When supplied, the test executes immediately.}
 
 \item{.data}{A data frame. Only used on the standalone path.}
 
 \item{...}{Additional arguments passed to the implementation. See the
-\strong{Arguments by model ID} section for the full list per path.}
+\strong{Arguments by variable mapper} section for the full list per path.}
 }
 \value{
 A \code{cld_exec} object (in \code{\link[=conclude]{conclude()}}), a \code{stat_infer_spec} object, or a
-\code{test_spec} when \code{.model = NULL}. Depending on the implementation you wrote, it returns
+\code{test_spec} when \code{.var_id = NULL}. Depending on the implementation you wrote, it returns
 any class. However, by default, some implementations use base \code{{statim}} S7 classes.
 For instance:
 \itemize{
@@ -30,9 +30,9 @@ For instance:
 formula-based comparisons. If \code{TTEST} is supplied within the lazy-loaded pipeline,
 supply \code{TTEST} as a function within i.e. \code{prepare_test(.test = TTEST)} call.
 }
-\section{Supported model IDs}{
+\section{Supported variable mapper \verb{<var_id>}s}{
 
-Each model ID routes to a separate implementation. See the linked pages
+Each variable mapper \verb{<var_id>} routes to a separate implementation. See the linked pages
 for full argument lists, variants, and result class details:
 \itemize{
 \item \code{x_by()}: two-sample or paired t-test. See details from \link{ttest-xby}.

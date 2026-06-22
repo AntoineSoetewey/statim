@@ -9,7 +9,7 @@
 #' 2. `y ~ 1`: one-sample t-test against `.mu`.
 #' 3. `y ~ group + 1`" both tests in a single call.
 #'
-#' Use a formula directly as the model ID to select this implementation.
+#' Use a formula directly as the variable mapper `<var_id>` to select this implementation.
 #'
 #' @section Arguments:
 #' The following arguments are passed via `...` in [TTEST()]:

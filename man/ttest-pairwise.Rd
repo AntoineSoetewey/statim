@@ -8,7 +8,7 @@ The \code{pairwise} implementation performs pairwise t-tests across a set of
 numeric variables. Each pair of variables is compared independently, and
 results are presented as a matrix.
 
-Use \code{\link[=pairwise]{pairwise()}} as the model ID to select this implementation.
+Use \code{\link[=pairwise]{pairwise()}} as the variable mapper \verb{<var_id>} to select this implementation.
 }
 \section{Arguments}{
 

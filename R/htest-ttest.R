@@ -4,21 +4,21 @@
 #' formula-based comparisons. If `TTEST` is supplied within the lazy-loaded pipeline,
 #' supply `TTEST` as a function within i.e. `prepare_test(.test = TTEST)` call.
 #'
-#' @param .model A model ID from `x_by()`, `pairwise()`, or a formula.
+#' @param .var_id A variable mapper `<var_id>` from `x_by()`, `pairwise()`, or a formula.
 #'   When supplied, the test executes immediately.
 #' @param .data A data frame. Only used on the standalone path.
 #' @param ... Additional arguments passed to the implementation. See the
-#'   **Arguments by model ID** section for the full list per path.
+#'   **Arguments by variable mapper** section for the full list per path.
 #'
 #' @return A `cld_exec` object (in [conclude()]), a `stat_infer_spec` object, or a
-#'   `test_spec` when `.model = NULL`. Depending on the implementation you wrote, it returns
+#'   `test_spec` when `.var_id = NULL`. Depending on the implementation you wrote, it returns
 #'   any class. However, by default, some implementations use base `{statim}` S7 classes.
 #'   For instance:
 #'   - `ttest_x_by`, by default, returns a [class_ttest_two] object
 #'   - `ttest_pairwise`, by default, returns a [class_ttest_pairwise] object
 #'
-#' @section Supported model IDs:
-#' Each model ID routes to a separate implementation. See the linked pages
+#' @section Supported variable mapper `<var_id>`s:
+#' Each variable mapper `<var_id>` routes to a separate implementation. See the linked pages
 #' for full argument lists, variants, and result class details:
 #'
 #' - `x_by()`: two-sample or paired t-test. See details from [ttest-xby].
@@ -89,7 +89,7 @@ TTEST = HTEST_FN(
 #' Structured result container for two-sample t-tests
 #'
 #' @description
-#' An S7 class produced by [TTEST] pipelines using [x_by()] as the model ID.
+#' An S7 class produced by [TTEST] pipelines using [x_by()] as the variable mapper `<var_id>`.
 #' Not constructed manually — use the pipeline instead.
 #'
 #' Inherits from [class_stat_infer], so [auto_tidy()] dispatches on it
@@ -193,7 +193,7 @@ S7::method(print, class_ttest_two) = function(x, ...) {
 #'
 #' @description
 #' An S7 class produced by [TTEST] pipelines using [pairwise()] as the
-#' model ID. Not constructed manually — use the pipeline instead.
+#' variable mapper `<var_id>`. Not constructed manually — use the pipeline instead.
 #'
 #' Inherits from [class_stat_infer], so [auto_tidy()] dispatches on it
 #' automatically. Downstream packages can use it as a `parent` in

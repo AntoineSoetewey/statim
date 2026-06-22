@@ -5,7 +5,7 @@
 #' numeric variables. Each pair of variables is compared independently, and
 #' results are presented as a matrix.
 #'
-#' Use [pairwise()] as the model ID to select this implementation.
+#' Use [pairwise()] as the variable mapper `<var_id>` to select this implementation.
 #'
 #' @section Arguments:
 #' The following arguments are passed via `...` in [TTEST()]:

@@ -5,7 +5,7 @@
 \title{Structured result container for pairwise t-tests}
 \description{
 An S7 class produced by \link{TTEST} pipelines using \code{\link[=pairwise]{pairwise()}} as the
-model ID. Not constructed manually — use the pipeline instead.
+variable mapper \verb{<var_id>}. Not constructed manually — use the pipeline instead.
 
 Inherits from \link{class_stat_infer}, so \code{\link[=auto_tidy]{auto_tidy()}} dispatches on it
 automatically. Downstream packages can use it as a \code{parent} in

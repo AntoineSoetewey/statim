@@ -4,7 +4,7 @@
 \alias{class_ttest_two}
 \title{Structured result container for two-sample t-tests}
 \description{
-An S7 class produced by \link{TTEST} pipelines using \code{\link[=x_by]{x_by()}} as the model ID.
+An S7 class produced by \link{TTEST} pipelines using \code{\link[=x_by]{x_by()}} as the variable mapper \verb{<var_id>}.
 Not constructed manually — use the pipeline instead.
 
 Inherits from \link{class_stat_infer}, so \code{\link[=auto_tidy]{auto_tidy()}} dispatches on it

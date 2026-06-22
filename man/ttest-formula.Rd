@@ -13,7 +13,7 @@ the left-hand side; the right-hand side determines the test type:
 \item \code{y ~ group + 1}" both tests in a single call.
 }
 
-Use a formula directly as the model ID to select this implementation.
+Use a formula directly as the variable mapper \verb{<var_id>} to select this implementation.
 }
 \section{Arguments}{
 
