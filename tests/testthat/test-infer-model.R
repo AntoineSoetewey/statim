@@ -6,12 +6,12 @@ test_that("prepare_model() returns a model_lazy", {
     expect_s7_class(ml, statim:::model_lazy)
 })
 
-test_that("prepare_model() stores model_id, processed, model_spec", {
+test_that("prepare_model() stores var_id, processed, model_spec", {
     ml = cars |>
         define_model(rel(speed, dist)) |>
         prepare_model(LINEAR_REG)
 
-    expect_s7_class(ml@model_id, statim::rel)
+    expect_s7_class(ml@var_id, statim::rel)
     expect_s7_class(ml@model_spec, statim:::model_spec)
     expect_named(ml@processed, c("x_data", "resp_data"))
 })
@@ -22,7 +22,7 @@ test_that("prepare_model() with formula dispatches correctly", {
         prepare_model(LINEAR_REG)
 
     expect_s7_class(ml, statim:::model_lazy)
-    expect_true(inherits(ml@model_id, "formula"))
+    expect_true(inherits(ml@var_id, "formula"))
 })
 
 test_that("prepare_model() with a test function errors", {
