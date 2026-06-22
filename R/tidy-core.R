@@ -94,7 +94,7 @@ S7::method(tidy, cld_exec) = function(.x, ...) {
 #'
 #' @param obj A stat function built with [HTEST_FN()] or [MODEL_FN()]
 #'   (e.g. `TTEST`).
-#' @param model_type An S7 model ID class (e.g. `x_by`, `S7::class_formula`).
+#' @param model_type An S7 variable mapper `<var_id>` class (e.g. `x_by`, `S7::class_formula`).
 #'
 #' @return A `making_tidy_call` object, consumed by `%<-%`.
 #'
@@ -124,12 +124,12 @@ making_tidy_register = function(lhs, rhs) {
     stat_cls = attr(obj, "cls") %||% cli::cli_abort(
         "{.arg obj} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
     )
-    is_model_id_class = inherits(model_type, "S7_class") &&
-        identical(model_type@parent, model_id)
+    is_var_id_class = inherits(model_type, "S7_class") &&
+        identical(model_type@parent, var_id)
     is_formula_class = identical(model_type, S7::class_formula)
-    if (!is_model_id_class && !is_formula_class) {
+    if (!is_var_id_class && !is_formula_class) {
         cli::cli_abort(
-            "{.arg model_type} must be a class inheriting from {.cls model_id}, or {.code S7::class_formula}."
+            "{.arg model_type} must be a class inheriting from {.cls var_id}, or {.code S7::class_formula}."
         )
     }
     if (!S7::S7_inherits(rhs, method_tidy)) {
