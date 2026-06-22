@@ -8,7 +8,7 @@
 prepare_test(.x, .test, ...)
 }
 \arguments{
-\item{.x}{An S7 object extension yielded by, e.g. \code{def_model} object from \code{\link[=define_model]{define_model()}},
+\item{.x}{An S7 object extension yielded by, e.g. \code{def_var} object from \code{\link[=define_model]{define_model()}},
 or an \code{expanded_model} object from \code{\link[=write_models]{write_models()}}.}
 
 \item{.test}{A test function such as \link{TTEST}, or a \code{test_spec} object
@@ -20,7 +20,7 @@ returned by calling such a function with no arguments.}
 A \code{test_lazy} S3 object.
 }
 \description{
-\code{prepare_test()} attaches a test specification to a \code{def_model} object,
+\code{prepare_test()} attaches a test specification to a \code{def_var} object,
 producing a \code{test_lazy} ready for optional recalibration with \code{\link[=via]{via()}}
 before being executed with \code{\link[=conclude]{conclude()}}.
 }
