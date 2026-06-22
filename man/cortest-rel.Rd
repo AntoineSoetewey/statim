@@ -39,7 +39,13 @@ support \code{\link[=state_null]{state_null()}}.}
 
 \section{Correlation test default class}{
 
-Returns a \link{class_corr_two} object inheriting from \link{class_stat_infer}.
+By default, it returns a \link{class_corr_two} object inheriting from \link{class_stat_infer}.
+All variants that also return \link{class_ttest_two} inherit \code{\link[=auto_tidy]{auto_tidy()}} and \code{\link[=print]{print()}}
+automatically. Otherwise, to process outputs:
+\itemize{
+\item \code{print()}: Write it down through \code{print} from \code{\link[=variant]{variant()}}.
+\item \code{tidy()}: Use \code{\link[=making_tidy]{making_tidy()}} to register a tidy method if needed.
+}
 
 For the \code{base} variant, \code{df}, \code{lower_ci}, and \code{upper_ci} are always
 populated. For \code{spearman} and \code{kendall}, those slots are \code{numeric(0)} and

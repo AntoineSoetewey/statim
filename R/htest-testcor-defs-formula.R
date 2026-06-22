@@ -22,7 +22,13 @@
 #' }
 #'
 #' @section Correlation test default class:
-#' Returns a [class_corr_two] object inheriting from [class_stat_infer].
+#' As detailed by [cortest-rel], it returns a [class_corr_two] object inheriting
+#' from [class_stat_infer] by default. You need to process outputs by:
+#'
+#' -  `print()`: Write it down through `print` from [variant()].
+#' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
+#'
+#' if the variants from this method pipeline doesn't return a [class_corr_two] object.
 #'
 #' @section Hypothesis claims:
 #' Not supported. Use [rel()] with the `base` variant for [state_null()]

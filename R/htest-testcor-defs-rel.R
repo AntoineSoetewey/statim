@@ -165,7 +165,12 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
 #' }
 #'
 #' @section Correlation test default class:
-#' Returns a [class_corr_two] object inheriting from [class_stat_infer].
+#' By default, it returns a [class_corr_two] object inheriting from [class_stat_infer].
+#' All variants that also return [class_ttest_two] inherit [auto_tidy()] and [print()]
+#' automatically. Otherwise, to process outputs:
+#'
+#' -  `print()`: Write it down through `print` from [variant()].
+#' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
 #'
 #' For the `base` variant, `df`, `lower_ci`, and `upper_ci` are always
 #' populated. For `spearman` and `kendall`, those slots are `numeric(0)` and

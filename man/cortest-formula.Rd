@@ -29,7 +29,14 @@ Pearson; silently ignored for Kendall and Spearman.}
 
 \section{Correlation test default class}{
 
-Returns a \link{class_corr_two} object inheriting from \link{class_stat_infer}.
+As detailed by \link{cortest-rel}, it returns a \link{class_corr_two} object inheriting
+from \link{class_stat_infer} by default. You need to process outputs by:
+\itemize{
+\item \code{print()}: Write it down through \code{print} from \code{\link[=variant]{variant()}}.
+\item \code{tidy()}: Use \code{\link[=making_tidy]{making_tidy()}} to register a tidy method if needed.
+}
+
+if the variants from this method pipeline doesn't return a \link{class_corr_two} object.
 }
 
 \section{Hypothesis claims}{
