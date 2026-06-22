@@ -1,10 +1,10 @@
 #' Validate hypothesis parameter references against a model's declared variables
 #'
-#' An S7 generic dispatched on the model ID class. Called automatically inside
+#' An S7 generic dispatched on the variable mapper `<var_id>` class. Called automatically inside
 #' [state_null()] after the compatible-param guard. Implement a method for any
-#' new [model_id] subclass you define.
+#' new [var_id] subclass you define.
 #'
-#' @param model_id A <[model_id]> object (usually carried by [define_model()]).
+#' @param var_id A <[var_id]> object (usually carried by [define_model()]).
 #' @param processed The processed list from `lazy@processed`, as returned by
 #'   [model_processor()].
 #' @param claims A `null_claim` object.
@@ -13,12 +13,12 @@
 #' @return `invisible(NULL)`, or aborts with a consolidated error.
 #'
 #' @section Implementing a new method:
-#' By default, unknown model ID subclasses pass through without validation.
-#' To add validation for a new [model_id] subclass, implement a method and
+#' By default, unknown variable mapper `<var_id>` subclasses pass through without validation.
+#' To add validation for a new [var_id] subclass, implement a method and
 #' delegate to `check_param_nodes()`:
 #'
 #' ``` r
-#' S7::method(validate_claim_vars, <model_id>) = function(model_id, processed, claims) {
+#' S7::method(validate_claim_vars, <var_id>) = function(var_id, processed, claims) {
 #'     check_param_nodes(
 #'         claims,
 #'         x_vars = names(processed$x_data),
@@ -27,21 +27,21 @@
 #' }
 #' ```
 #'
-#' @seealso [state_null()], [MU()], [RHO()], [PI()], [param_obj()], [model_id()]
+#' @seealso [state_null()], [MU()], [RHO()], [PI()], [param_obj()], [var_id()]
 #'
 #' @name claim-vars-validators
 #' @export
 validate_claim_vars = S7::new_generic(
     "validate_claim_vars",
-    "model_id",
-    fun = function(model_id, processed, claims, ...) S7::S7_dispatch()
+    "var_id",
+    fun = function(var_id, processed, claims, ...) S7::S7_dispatch()
 )
 
-S7::method(validate_claim_vars, model_id) = function(model_id, processed, claims, ...) {
+S7::method(validate_claim_vars, var_id) = function(var_id, processed, claims, ...) {
     invisible(NULL)
 }
 
-S7::method(validate_claim_vars, x_by) = function(model_id, processed, claims, ...) {
+S7::method(validate_claim_vars, x_by) = function(var_id, processed, claims, ...) {
     check_param_nodes(
         claims,
         x_vars = names(processed$x_data),
@@ -49,7 +49,7 @@ S7::method(validate_claim_vars, x_by) = function(model_id, processed, claims, ..
     )
 }
 
-S7::method(validate_claim_vars, rel) = function(model_id, processed, claims, ...) {
+S7::method(validate_claim_vars, rel) = function(var_id, processed, claims, ...) {
     check_param_nodes(
         claims,
         x_vars = c(names(processed$x_data), names(processed$resp_data)),
@@ -57,7 +57,7 @@ S7::method(validate_claim_vars, rel) = function(model_id, processed, claims, ...
     )
 }
 
-S7::method(validate_claim_vars, pairwise) = function(model_id, processed, claims, ...) {
+S7::method(validate_claim_vars, pairwise) = function(var_id, processed, claims, ...) {
     check_param_nodes(
         claims,
         x_vars = processed$var_names,
@@ -65,11 +65,11 @@ S7::method(validate_claim_vars, pairwise) = function(model_id, processed, claims
     )
 }
 
-S7::method(validate_claim_vars, prop) = function(model_id, processed, claims, ...) {
+S7::method(validate_claim_vars, prop) = function(var_id, processed, claims, ...) {
     invisible(NULL)
 }
 
-S7::method(validate_claim_vars, S7::class_formula) = function(model_id, processed, claims) {
+S7::method(validate_claim_vars, S7::class_formula) = function(var_id, processed, claims) {
     check_param_nodes(
         claims,
         x_vars = processed$vars,
