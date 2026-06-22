@@ -16,13 +16,13 @@ STAT_CONSTRUCTOR(cls, defs, .name, spec_class)
 \item{spec_class}{Base class of the type of statistical inference. Must be an S7.}
 }
 \value{
-A function with signature \verb{function(.model, .data, ...)}.
+A function with signature \verb{function(.var_id, .data, ...)}.
 }
 \description{
 This function is a developer-interface function, a constructor for
 user-facing test functions like \code{\link[=HTEST_FN]{HTEST_FN()}}. It returns a function with
 a consistent signature that routes to the correct implementation based
-on the model ID and method variant.
+on the variable mapper \verb{<var_id>} and method variant.
 }
 \seealso{
 \code{\link[=test_define]{test_define()}}, \code{\link[=prepare_test]{prepare_test()}}, \code{\link[=via]{via()}}, \code{\link[=conclude]{conclude()}}

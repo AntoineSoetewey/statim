@@ -20,7 +20,7 @@ or \code{\link[=variant]{variant()}}. Its structure depends on the implementatio
 documentation of the stat function (e.g. \code{?TTEST}) for what to expect.}
 \item{\verb{@cld_meta}}{A list of pipeline metadata:
 \describe{
-\item{\verb{$model_id}}{The model ID object passed to \code{\link[=define_model]{define_model()}}.}
+\item{\verb{$var_id}}{The Variable Mapper object passed to \code{\link[=define_model]{define_model()}}.}
 \item{\verb{$processed}}{The processed model output from \code{\link[=model_processor]{model_processor()}}.
 The same object received as \code{.proc} inside the \code{fn}.}
 \item{\verb{$stat_name}}{The human-readable test or model name.}

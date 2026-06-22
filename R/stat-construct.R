@@ -3,14 +3,14 @@
 #' This function is a developer-interface function, a constructor for
 #' user-facing test functions like [HTEST_FN()]. It returns a function with
 #' a consistent signature that routes to the correct implementation based
-#' on the model ID and method variant.
+#' on the variable mapper `<var_id>` and method variant.
 #'
 #' @param cls A string naming the test class, e.g. `"ttest"`.
 #' @param defs A list of `test_define` objects declaring the implementations.
 #' @param .name A string used as the test title in output.
 #' @param spec_class Base class of the type of statistical inference. Must be an S7.
 #'
-#' @return A function with signature `function(.model, .data, ...)`.
+#' @return A function with signature `function(.var_id, .data, ...)`.
 #'
 #' @seealso [test_define()], [prepare_test()], [via()], [conclude()]
 #'
@@ -21,14 +21,14 @@ STAT_CONSTRUCTOR = function(cls, defs, .name, spec_class) {
     force(.name)
     force(spec_class)
 
-    fn = function(.model = NULL, .data = NULL, ...) {
+    fn = function(.var_id = NULL, .data = NULL, ...) {
         # dots = list(...)
         build_stat(
             cls = cls,
             # args = dots,
             args = list(...),
             defs = defs,
-            model_id = .model,
+            var_id = .var_id,
             .data = .data,
             .name = .name,
             spec_class = spec_class
@@ -38,19 +38,19 @@ STAT_CONSTRUCTOR = function(cls, defs, .name, spec_class) {
     fn
 }
 
-build_stat = function(defs, args, cls, model_id, .data, .name, spec_class) {
-    if (!is.null(model_id)) {
-        run_stat(defs, args, cls, model_id, .data, .name)
+build_stat = function(defs, args, cls, var_id, .data, .name, spec_class) {
+    if (!is.null(var_id)) {
+        run_stat(defs, args, cls, var_id, .data, .name)
     } else {
         lookup = build_lookup(defs)
         defer_stat(lookup, args, cls, defs, .name, spec_class)
     }
 }
 
-run_stat = function(defs, args, cls, model_id, .data, .name) {
+run_stat = function(defs, args, cls, var_id, .data, .name) {
     lookup = build_lookup(defs)
-    def = find_def(lookup, model_type = get_model_type(model_id))
-    processed = model_processor(model_id, data = .data)
+    def = find_def(lookup, model_type = get_model_type(var_id))
+    processed = model_processor(var_id, data = .data)
 
     out_raw = inject_and_run(
         impl = def@impl$base,
@@ -60,7 +60,7 @@ run_stat = function(defs, args, cls, model_id, .data, .name) {
 
     stat_infer_spec(
         out_raw,
-        impl_cls = impl_cls_from_model(cls, model_id),
+        impl_cls = impl_cls_from_model(cls, var_id),
         stat_cls = cls,
         print_fn = def@impl$base@print,
         name = .name
@@ -77,8 +77,8 @@ defer_stat = function(lookup, args, cls, defs, .name, spec_class) {
     )
 }
 
-impl_cls_from_model = function(cls, model_id) {
-    model_nm = if (inherits(model_id, "formula")) "formula" else S7::S7_class(model_id)@name
+impl_cls_from_model = function(cls, var_id) {
+    model_nm = if (inherits(var_id, "formula")) "formula" else S7::S7_class(var_id)@name
     paste0(cls, "_", model_nm)
 }
 
@@ -113,9 +113,9 @@ stat_infer_spec = S7::new_class(
     )
 )
 
-get_model_type = function(model_id) {
-    cls = S7::S7_class(model_id)
-    if (!is.null(cls)) cls@name else class(model_id)[[1]]
+get_model_type = function(var_id) {
+    cls = S7::S7_class(var_id)
+    if (!is.null(cls)) cls@name else class(var_id)[[1]]
 }
 
 S7::method(print, stat_infer_spec) = function(x, ...) {
