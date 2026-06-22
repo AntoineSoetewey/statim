@@ -1,14 +1,13 @@
 #' State a null hypothesis in the pipeline
 #'
 #' `state_null()` captures a hypothesis expression and attaches it to a
-#' `test_lazy` object. Accepts either a single expression or a `more_h0()`
-#' block for multiple named hypotheses.
+#' `test_lazy` object.
 #'
 #' @param .x A `test_lazy` object from [prepare_test()].
 #' @param ... Currently unused.
 #'
-#' @slot expr A hypothesis expression, or a `more_h0()` block. It is passed
-#'     after `prepare_test(...)` to supply the hypothesis expression, e.g.
+#' @slot expr A hypothesis expression. It is passed after `prepare_test(...)` to supply
+#'     the hypothesis expression, e.g.
 #'     `... |> prepare_test(TTEST) |> state_null(expr = MU(x) == 0)`
 #'
 #' @return The modified `test_lazy` object.
@@ -36,7 +35,7 @@ S7::method(state_null, test_lazy) = function(.x, expr, ...) {
     # }
     lazy = attach_claim_to_lazy(.x, claim)
     stated_null(
-        model_id = lazy@model_id,
+        var_id = lazy@var_id,
         processed = lazy@processed,
         test_spec = lazy@test_spec,
         recalibrate_spec = lazy@recalibrate_spec,
@@ -52,7 +51,7 @@ stated_null = S7::new_class(
 
 S7::method(print, stated_null) = function(x, ...) {
     cat("\n")
-    print(x@model_id)
+    print(x@var_id)
 
     cat("\n")
     cat(cli::rule(left = "Test Specification", line = "-"), "\n\n")
@@ -164,10 +163,10 @@ attach_claim_to_lazy = function(lazy, claim) {
         ))
     }
 
-    model_type = if (inherits(lazy@model_id, "formula")) {
+    model_type = if (inherits(lazy@var_id, "formula")) {
         "formula"
     } else {
-        S7::S7_class(lazy@model_id)@name
+        S7::S7_class(lazy@var_id)@name
     }
 
     def = find_def(lazy@test_spec@lookup, model_type = model_type)
@@ -207,7 +206,7 @@ attach_claim_to_lazy = function(lazy, claim) {
         }
     }
 
-    validate_claim_vars(lazy@model_id, lazy@processed, claim)
+    validate_claim_vars(lazy@var_id, lazy@processed, claim)
 
     lazy@claims = claim
     lazy
