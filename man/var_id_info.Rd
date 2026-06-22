@@ -16,7 +16,7 @@ When \code{NULL}, count-based fields in \code{other_info} and \code{vars} are om
 \item{...}{Currently unused.}
 }
 \value{
-A \code{class_model_inform} S7 object with fields:
+A \code{class_var_inform} S7 object with fields:
 \describe{
 \item{\code{var_id}}{The original Variable Mapper object.}
 \item{\code{model_type}}{Derived from the class name of \code{var_id}.}

@@ -10,7 +10,7 @@
 #'   When `NULL`, count-based fields in `other_info` and `vars` are omitted.
 #' @param ... Currently unused.
 #'
-#' @return A `class_model_inform` S7 object with fields:
+#' @return A `class_var_inform` S7 object with fields:
 #' \describe{
 #'   \item{`var_id`}{The original Variable Mapper object.}
 #'   \item{`model_type`}{Derived from the class name of `var_id`.}
@@ -39,7 +39,7 @@ var_id_info = S7::new_generic(
 
 #' Output class for Variable Mapper metadata
 #'
-#' `class_model_inform` is the S7 output class returned by [var_id_info()].
+#' `class_var_inform` is the S7 output class returned by [var_id_info()].
 #' `model_type` is derived automatically from the stored `var_id` object.
 #' All other properties default to empty / unknown values, which are filled in
 #' by registered [var_id_info()] methods for known subclasses.
@@ -48,7 +48,7 @@ var_id_info = S7::new_generic(
 #' @usage NULL
 #'
 #' @export
-class_model_inform = S7::new_class(
+class_var_inform = S7::new_class(
     name = "model_inform",
     properties = list(
         var_id = S7::new_property(
@@ -79,7 +79,7 @@ S7::method(var_id_info, var_id) = function(.var_id, processed = NULL, ...) {
     prop_names = names(S7::S7_class(.var_id)@properties)
     args = if (length(prop_names)) paste(prop_names, collapse = ", ") else "<?>"
 
-    class_model_inform(
+    class_var_inform(
         var_id = .var_id,
         args = args
     )
@@ -102,7 +102,7 @@ S7::method(var_id_info, x_by) = function(.var_id, processed = NULL, ...) {
         )
     }
 
-    class_model_inform(
+    class_var_inform(
         var_id = .var_id,
         args = paste0(x_lbl, " | ", g_lbl),
         other_info = other_info,
@@ -128,7 +128,7 @@ S7::method(var_id_info, rel) = function(.var_id, processed = NULL, ...) {
         )
     }
 
-    class_model_inform(
+    class_var_inform(
         var_id = .var_id,
         args = paste0(x_lbl, " ; ", r_lbl),
         other_info = other_info,
@@ -148,7 +148,7 @@ S7::method(var_id_info, pairwise) = function(.var_id, processed = NULL, ...) {
         vars = vars_preview(as.list(processed$data))
     }
 
-    class_model_inform(
+    class_var_inform(
         var_id = .var_id,
         args = paste(lbls, collapse = ", "),
         other_info = other_info,
@@ -158,7 +158,7 @@ S7::method(var_id_info, pairwise) = function(.var_id, processed = NULL, ...) {
 }
 
 S7::method(var_id_info, prop) = function(.var_id, processed = NULL, ...) {
-    class_model_inform(
+    class_var_inform(
         var_id = .var_id,
         args = paste0(.var_id@x, " / ", .var_id@n),
         other_info = list(x = .var_id@x, n = .var_id@n),
@@ -188,7 +188,7 @@ S7::method(var_id_info, S7::class_formula) = function(.var_id, processed = NULL,
         vars = vars_preview(as.list(processed$data[, avail, drop = FALSE]))
     }
 
-    class_model_inform(
+    class_var_inform(
         var_id = .var_id,
         args = deparse(.var_id),
         other_info = other_info,
