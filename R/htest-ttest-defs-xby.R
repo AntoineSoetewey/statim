@@ -28,6 +28,7 @@
 #' [class_ttest_two] inherit [auto_tidy()] and [print()] automatically. Otherwise,
 #' to process outputs:
 #'
+#' -  `print()`: Write it down through `print` from [variant()].
 #' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
 #'
 #' @section Hypothesis claims:

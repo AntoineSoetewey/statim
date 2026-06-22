@@ -36,6 +36,7 @@ By default, returns a \link{class_ttest_two} object. All variants that also retu
 \link{class_ttest_two} inherit \code{\link[=auto_tidy]{auto_tidy()}} and \code{\link[=print]{print()}} automatically. Otherwise,
 to process outputs:
 \itemize{
+\item \code{print()}: Write it down through \code{print} from \code{\link[=variant]{variant()}}.
 \item \code{tidy()}: Use \code{\link[=making_tidy]{making_tidy()}} to register a tidy method if needed.
 }
 }

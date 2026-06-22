@@ -31,10 +31,16 @@ No variants are currently registered for the \code{pairwise} path. Use
 \code{\link[=add_variant]{add_variant()}} to register custom variants at the user or package level.
 }
 
-\section{Result class}{
+\section{Pairwise t-test class}{
 
-Returns a \link{class_ttest_pairwise} object inheriting from \link{class_stat_infer}.
-Results are printed as a pairwise matrix via \code{\link[tabstats:pairwise_matrix]{tabstats::pairwise_matrix()}}.
+By default, it returns a \link{class_ttest_pairwise} object inheriting from \link{class_stat_infer}.
+Objects from it are printed as a pairwise matrix via \code{\link[tabstats:pairwise_matrix]{tabstats::pairwise_matrix()}}. All variants that
+also return \link{class_ttest_two} inherit \code{\link[=auto_tidy]{auto_tidy()}} and \code{\link[=print]{print()}} automatically. Otherwise,
+to process outputs:
+\itemize{
+\item \code{print()}: Write it down through \code{print} from \code{\link[=variant]{variant()}}.
+\item \code{tidy()}: Use \code{\link[=making_tidy]{making_tidy()}} to register a tidy method if needed.
+}
 }
 
 \section{One-sample mode}{

@@ -28,8 +28,9 @@
 #' @section Formula-based t-test class:
 #' Returns a tibble with columns `type`, `group`, and `ttest` (a list-column
 #' of [stats::t.test()] objects). This path does not currently return a
-#' [class_stat_infer] subclass. To process outputs:
+#' [class_stat_infer] subclass. Otherwise, to process outputs:
 #'
+#' -  `print()`: Write it down through `print` from [variant()].
 #' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
 #'
 #' @examples

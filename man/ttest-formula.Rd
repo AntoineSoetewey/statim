@@ -37,8 +37,9 @@ No variants are currently registered for the formula path. Use
 
 Returns a tibble with columns \code{type}, \code{group}, and \code{ttest} (a list-column
 of \code{\link[stats:t.test]{stats::t.test()}} objects). This path does not currently return a
-\link{class_stat_infer} subclass. To process outputs:
+\link{class_stat_infer} subclass. Otherwise, to process outputs:
 \itemize{
+\item \code{print()}: Write it down through \code{print} from \code{\link[=variant]{variant()}}.
 \item \code{tidy()}: Use \code{\link[=making_tidy]{making_tidy()}} to register a tidy method if needed.
 }
 }

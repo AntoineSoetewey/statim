@@ -24,9 +24,14 @@
 #' No variants are currently registered for the `pairwise` path. Use
 #' [add_variant()] to register custom variants at the user or package level.
 #'
-#' @section Result class:
-#' Returns a [class_ttest_pairwise] object inheriting from [class_stat_infer].
-#' Results are printed as a pairwise matrix via [tabstats::pairwise_matrix()].
+#' @section Pairwise t-test class:
+#' By default, it returns a [class_ttest_pairwise] object inheriting from [class_stat_infer].
+#' Objects from it are printed as a pairwise matrix via [tabstats::pairwise_matrix()]. All variants that
+#' also return [class_ttest_two] inherit [auto_tidy()] and [print()] automatically. Otherwise,
+#' to process outputs:
+#'
+#' -  `print()`: Write it down through `print` from [variant()].
+#' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
 #'
 #' @section One-sample mode:
 #' When [pairwise()] has equal referred columns, made by `direction = "<eq, lteq, gteq>"`
