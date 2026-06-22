@@ -1,19 +1,19 @@
 #' Linear regression
 #'
 #' Fits an ordinary least squares linear regression model.
-#' Accepts [rel()] or a formula as the model ID.
+#' Accepts [rel()] or a formula as the variable mapper `<var_id>`.
 #'
 #' The result is an [class_lm_object], which satisfies the [anova()]
 #' protocol and prints coefficients and model fit universally across
 #' all engines and variants.
 #'
-#' @param .model A model ID from [define_model()], or `NULL` to return a
+#' @param .var_id A variable mapper `<var_id>` from [define_model()], or `NULL` to return a
 #'   `model_spec` for use in [prepare_model()].
-#' @param .data A data frame. Used when `.model` is supplied directly.
+#' @param .data A data frame. Used when `.var_id` is supplied directly.
 #' @param ... Currently unused.
 #'
 #' @return A `cld_exec` object containing a [class_lm_object], or a `model_spec`
-#'   when `.model = NULL`.
+#'   when `.var_id = NULL`.
 #'
 #' @examples
 #' # via rel()

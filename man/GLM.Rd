@@ -4,19 +4,19 @@
 \alias{GLM}
 \title{Generalized linear model}
 \usage{
-GLM(.model = NULL, .data = NULL, ...)
+GLM(.var_id = NULL, .data = NULL, ...)
 }
 \arguments{
-\item{.model}{A model ID from \code{\link[=define_model]{define_model()}}, or \code{NULL} to return a
+\item{.var_id}{A variable mapper \verb{<var_id>} from \code{\link[=define_model]{define_model()}}, or \code{NULL} to return a
 \code{model_spec} for use in \code{\link[=prepare_model]{prepare_model()}}.}
 
-\item{.data}{A data frame. Used when \code{.model} is supplied directly.}
+\item{.data}{A data frame. Used when \code{.var_id} is supplied directly.}
 
 \item{...}{Additional arguments passed to \code{\link[stats:glm]{stats::glm()}}.}
 }
 \value{
 A \code{cld_exec} object in a \code{class_glm_object}, or a \code{model_spec}
-when \code{.model = NULL}.
+when \code{.var_id = NULL}.
 }
 \description{
 A modified GLM for \code{{statim}} pipeline passed through \code{\link[stats:glm]{stats::glm()}}.

@@ -4,23 +4,23 @@
 \alias{LINEAR_REG}
 \title{Linear regression}
 \usage{
-LINEAR_REG(.model = NULL, .data = NULL, ...)
+LINEAR_REG(.var_id = NULL, .data = NULL, ...)
 }
 \arguments{
-\item{.model}{A model ID from \code{\link[=define_model]{define_model()}}, or \code{NULL} to return a
+\item{.var_id}{A variable mapper \verb{<var_id>} from \code{\link[=define_model]{define_model()}}, or \code{NULL} to return a
 \code{model_spec} for use in \code{\link[=prepare_model]{prepare_model()}}.}
 
-\item{.data}{A data frame. Used when \code{.model} is supplied directly.}
+\item{.data}{A data frame. Used when \code{.var_id} is supplied directly.}
 
 \item{...}{Currently unused.}
 }
 \value{
 A \code{cld_exec} object containing a \link{class_lm_object}, or a \code{model_spec}
-when \code{.model = NULL}.
+when \code{.var_id = NULL}.
 }
 \description{
 Fits an ordinary least squares linear regression model.
-Accepts \code{\link[=rel]{rel()}} or a formula as the model ID.
+Accepts \code{\link[=rel]{rel()}} or a formula as the variable mapper \verb{<var_id>}.
 }
 \details{
 The result is an \link{class_lm_object}, which satisfies the \code{\link[=anova]{anova()}}
