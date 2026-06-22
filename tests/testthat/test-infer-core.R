@@ -175,7 +175,7 @@ test_that("cld_exec@cld_meta contains required fields", {
 
     expect_named(
         result@cld_meta,
-        c("model_id", "processed", "stat_name", "method", "data_name"),
+        c("var_id", "processed", "stat_name", "method", "data_name"),
         ignore.order = TRUE
     )
     expect_equal(result@cld_meta$method, "default")

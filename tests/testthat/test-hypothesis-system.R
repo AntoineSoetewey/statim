@@ -387,8 +387,8 @@ test_that("validate_claim_vars prop: passes through without validation", {
     )
 })
 
-test_that("validate_claim_vars unknown model_id: passes through silently", {
-    my_id = S7::new_class("my_id", parent = model_id)()
+test_that("validate_claim_vars unknown var_id: passes through silently", {
+    my_id = S7::new_class("my_id", parent = var_id)()
     processed = list()
     claim = parse_null_claim(rlang::quo(MU(x) == 0))
     expect_no_error(validate_claim_vars(my_id, processed, claim))
