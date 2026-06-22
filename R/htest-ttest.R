@@ -21,14 +21,9 @@
 #' Each model ID routes to a separate implementation. See the linked pages
 #' for full argument lists, variants, and result class details:
 #'
-#' - `x_by()`: two-sample or paired t-test. See [ttest-xby].
-#' - `pairwise()`: pairwise t-tests across variables. See [ttest-pairwise].
-#' - `<formula>`: one-sample and/or two-sample t-test. See [ttest-formula].
-#'
-#' @inheritSection ttest-xby Arguments
-#' @inheritSection ttest-xby Variants
-#' @inheritSection ttest-xby Two-sample t-test default class
-#' @inheritSection ttest-xby Hypothesis claims
+#' - `x_by()`: two-sample or paired t-test. See details from [ttest-xby].
+#' - `pairwise()`: pairwise t-tests across variables. See details from [ttest-pairwise].
+#' - `<formula>`: one-sample and/or two-sample t-test. See details from [ttest-formula].
 #'
 #' @examples
 #' # eager
@@ -237,19 +232,36 @@ class_ttest_pairwise = S7::new_class(
         df = S7::class_numeric,
         t_stat = S7::class_numeric,
         p_value = S7::class_numeric,
-        method_name = S7::new_property(
-            class = S7::class_character,
-            default = "",
+        lower_ci = S7::class_numeric,
+        upper_ci = S7::class_numeric,
+        ci_level = S7::new_property(
+            class = S7::class_numeric,
+            default = 0.95,
             validator = function(value) {
                 if (length(value) != 1L)
-                    paste0("`method_name` must be length 1, not ", length(value), ".")
+                    return(paste0("`ci_level` must be length 1, not ", length(value), "."))
+                if (value <= 0 || value >= 1)
+                    "`ci_level` must be between 0 and 1 (exclusive)."
             }
+        ),
+        method_name = S7::new_property(
+            class = S7::class_character,
+            default = character(0)
+            # default = "",
+            # validator = function(value) {
+            #     if (length(value) != 1L)
+            #         paste0("`method_name` must be length 1, not ", length(value), ".")
+            # }
         )
     )
 )
 
 S7::method(print, class_ttest_pairwise) = function(x, ...) {
     is_one_sample = all(x@var1 == x@var2)
+    fmt_ci = function(lo, hi) {
+        fmt = function(v) ifelse(is.infinite(v), ifelse(v > 0, "Inf", "-Inf"), formatC(v, digits = 3, format = "f"))
+        paste0("[", fmt(lo), "  ", fmt(hi), "]")
+    }
 
     if (is_one_sample) {
         vars = x@var1
@@ -258,12 +270,14 @@ S7::method(print, class_ttest_pairwise) = function(x, ...) {
         diff_vec = rep("", nrow(grid))
         t_vec = rep("", nrow(grid))
         pval_vec = rep("", nrow(grid))
+        ci_vec = rep("", nrow(grid))
 
         for (k in seq_along(vars)) {
             idx = which(grid$var1 == vars[[k]] & grid$var2 == vars[[k]])
             diff_vec[[idx]] = formatC(x@est[[k]], digits = 3, format = "f")
             t_vec[[idx]] = formatC(x@t_stat[[k]], digits = 3, format = "f")
             pval_vec[[idx]] = formatC(x@p_value[[k]], digits = 3, format = "f")
+            ci_vec[[idx]] = fmt_ci(x@lower_ci[[k]], x@upper_ci[[k]])
         }
 
         spec = tabstats::new_pairwise_data(
@@ -271,7 +285,8 @@ S7::method(print, class_ttest_pairwise) = function(x, ...) {
             var2 = grid$var2,
             diff = diff_vec,
             t_stat = t_vec,
-            pval = pval_vec
+            pval = pval_vec,
+            ci = ci_vec
         )
     } else {
         spec = tabstats::new_pairwise_data(
@@ -279,13 +294,18 @@ S7::method(print, class_ttest_pairwise) = function(x, ...) {
             var2 = x@var2,
             diff = formatC(x@est, digits = 3, format = "f"),
             t_stat = formatC(x@t_stat, digits = 3, format = "f"),
-            pval = formatC(x@p_value, digits = 3, format = "f")
+            pval = formatC(x@p_value, digits = 3, format = "f"),
+            ci = fmt_ci(x@lower_ci, x@upper_ci)
         )
     }
 
+    unique_methods = unique(x@method_name)
+    title = if (length(unique_methods) == 1L) unique_methods else "Pairwise t-Tests"
+
     tabstats::pairwise_matrix(
         spec,
-        title = if (nzchar(x@method_name)) x@method_name else "Pairwise t-Tests",
+        title = title,
+        # title = if (nzchar(x@method_name)) x@method_name else "Pairwise t-Tests",
         layout_view = TRUE,
         diag_1 = FALSE,
         style = tabstats::cm_style(
