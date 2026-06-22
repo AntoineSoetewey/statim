@@ -38,13 +38,13 @@ reference:
   - title: High Level API
     desc: Main functions for interactive use
 
-  - subtitle: Model definition and data preparation
+  - subtitle: Statistical Inference Layout definer and data preparation
     desc: Verbs that describe the model you want to analyze
     contents:
-    - model-define-base
+    - layout-define-base
     - write_models
 
-  - subtitle: Model IDs
+  - subtitle: Variable Mapper IDs
     desc: Mappers similar to formula in R to shape the model you want to describe. Formula also allowed.
     contents:
     - x_by
