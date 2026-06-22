@@ -25,11 +25,12 @@
 #' No variants are currently registered for the formula path. Use
 #' [add_variant()] to register custom variants at the user or package level.
 #'
-#' @section Result class:
+#' @section Formula-based t-test class:
 #' Returns a tibble with columns `type`, `group`, and `ttest` (a list-column
-#' of [stats::t.test()] results). This path does not currently return a
-#' [class_stat_infer] subclass — use [making_tidy()] to register a tidy
-#' method if needed.
+#' of [stats::t.test()] objects). This path does not currently return a
+#' [class_stat_infer] subclass. To process outputs:
+#'
+#' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
 #'
 #' @examples
 #' sleep |>

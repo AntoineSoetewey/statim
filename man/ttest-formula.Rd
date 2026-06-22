@@ -33,12 +33,14 @@ No variants are currently registered for the formula path. Use
 \code{\link[=add_variant]{add_variant()}} to register custom variants at the user or package level.
 }
 
-\section{Result class}{
+\section{Formula-based t-test class}{
 
 Returns a tibble with columns \code{type}, \code{group}, and \code{ttest} (a list-column
-of \code{\link[stats:t.test]{stats::t.test()}} results). This path does not currently return a
-\link{class_stat_infer} subclass — use \code{\link[=making_tidy]{making_tidy()}} to register a tidy
-method if needed.
+of \code{\link[stats:t.test]{stats::t.test()}} objects). This path does not currently return a
+\link{class_stat_infer} subclass. To process outputs:
+\itemize{
+\item \code{tidy()}: Use \code{\link[=making_tidy]{making_tidy()}} to register a tidy method if needed.
+}
 }
 
 \examples{
