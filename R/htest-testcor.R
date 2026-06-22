@@ -18,13 +18,8 @@
 #' Each model ID routes to a separate implementation. See the linked pages
 #' for full argument lists, variants, and correlation test class details:
 #'
-#' - `rel()`: one-to-one correlation test. See [cortest-rel].
-#' - `<formula>`: one-to-many correlation test. See [cortest-formula].
-#'
-#' @inheritSection cortest-rel Arguments
-#' @inheritSection cortest-rel Variants
-#' @inheritSection cortest-rel Correlation test default class
-#' @inheritSection cortest-rel Hypothesis claims
+#' - `rel()`: one-to-one correlation test. See details from [cortest-rel].
+#' - `<formula>`: one-to-many correlation test. See details from [cortest-formula].
 #'
 #' @examples
 #' # eager
@@ -33,6 +28,11 @@
 #' # grammatical syntax
 #' cars |>
 #'     define_model(rel(speed, dist)) |>
+#'     prepare_test(CORTEST) |>
+#'     conclude()
+#'
+#' cars |>
+#'     define_model(speed ~ dist) |>
 #'     prepare_test(CORTEST) |>
 #'     conclude()
 #'

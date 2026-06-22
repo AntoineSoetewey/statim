@@ -30,57 +30,8 @@ supply \code{CORTEST} as a function i.e. \code{prepare_test(.test = CORTEST)} ca
 Each model ID routes to a separate implementation. See the linked pages
 for full argument lists, variants, and correlation test class details:
 \itemize{
-\item \code{rel()}: one-to-one correlation test. See \link{cortest-rel}.
-\item \verb{<formula>}: one-to-many correlation test. See \link{cortest-formula}.
-}
-}
-
-\section{Arguments}{
-
-The following arguments are passed via \code{...} in \code{\link[=CORTEST]{CORTEST()}}:
-
-\describe{
-\item{\code{.alt}}{String. One of \code{"two.sided"}, \code{"greater"}, or \code{"less"}.
-Default \code{"two.sided"}.}
-\item{\code{.ci}}{Numeric. Confidence level. Default \code{0.95}. Not applicable
-to Spearman and Kendall variants.}
-\item{\code{.rho}}{Numeric. Hypothesized population correlation coefficient
-under H\eqn{_0}. Default \code{0}. Only applicable to the \code{base} (Pearson)
-variant. When \code{0}, delegates to \code{\link[stats:cor.test]{stats::cor.test()}}. When non-zero,
-uses a Fisher-z test against the specified null value.}
-}
-}
-
-\section{Variants}{
-
-\describe{
-\item{\code{"spearman"}}{Spearman's \eqn{\rho}. Uses \code{\link[stats:cor.test]{stats::cor.test()}} with
-\code{method = "spearman"}. No confidence interval is returned. Does not
-support \code{\link[=state_null]{state_null()}}.}
-\item{\code{"kendall"}}{Kendall's \eqn{\tau}. Uses \code{\link[stats:cor.test]{stats::cor.test()}} with
-\code{method = "kendall"}. No confidence interval is returned. Does not
-support \code{\link[=state_null]{state_null()}}.}
-}
-}
-
-\section{Correlation test default class}{
-
-Returns a \link{class_corr_two} object inheriting from \link{class_stat_infer}.
-
-For the \code{base} variant, \code{df}, \code{lower_ci}, and \code{upper_ci} are always
-populated. For \code{spearman} and \code{kendall}, those slots are \code{numeric(0)} and
-are omitted from the printed output.
-}
-
-\section{Hypothesis claims}{
-
-Supports \code{\link[=RHO]{RHO()}} via \code{\link[=state_null]{state_null()}}. Only available on the \code{base}
-(Pearson) variant. The claim is parsed as follows:
-\itemize{
-\item The operator maps to \code{.alt}: \code{==} and \code{!=} become \code{"two.sided"},
-\code{>=} and \code{>} become \code{"less"}, \code{<=} and \code{<} become \code{"greater"}.
-\item The scalar maps to \code{.rho}: \code{RHO(x, y) == 0.9}, not \code{0.9 == RHO(x, y)},
-is handled correctly via \code{\link[=claim_scalar]{claim_scalar()}}.
+\item \code{rel()}: one-to-one correlation test. See details from \link{cortest-rel}.
+\item \verb{<formula>}: one-to-many correlation test. See details from \link{cortest-formula}.
 }
 }
 
@@ -91,6 +42,11 @@ CORTEST(rel(speed, dist), cars)
 # grammatical syntax
 cars |>
     define_model(rel(speed, dist)) |>
+    prepare_test(CORTEST) |>
+    conclude()
+
+cars |>
+    define_model(speed ~ dist) |>
     prepare_test(CORTEST) |>
     conclude()
 
