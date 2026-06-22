@@ -24,8 +24,11 @@
 #' }
 #'
 #' @section Two-sample t-test default class:
-#' Returns a [class_ttest_two] object. All variants that also return
-#' [class_ttest_two] inherit [auto_tidy()] and [print()] automatically.
+#' By default, returns a [class_ttest_two] object. All variants that also return
+#' [class_ttest_two] inherit [auto_tidy()] and [print()] automatically. Otherwise,
+#' to process outputs:
+#'
+#' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
 #'
 #' @section Hypothesis claims:
 #' Supports [MU()] via [state_null()]. The `contrast` variant performs Welch-Satterthwaite linear contrast test
