@@ -102,7 +102,7 @@ All you need to know is that the most usual usage of `{statim}` comes with three
 # Data can be piped in or passed as argument to `define_model()`
 ... |>                                   # Possible extensions  
     define_model(
-        <model_id>(var1, var2, ...), 
+        <var_id>(var1, var2, ...), 
         data, ...
     ) |>                                 # 1. Model definition
     # ... |>                             # Possible extensions  
@@ -116,7 +116,7 @@ All you need to know is that the most usual usage of `{statim}` comes with three
 
 Explanation of the code above: 
 
-1. *Model processor and definition*, where defining the shape of model *to be analyzed* happens at the beginning during statistical inference. Typically, this step where supplying either a data frame or a `<model_id>` objects into `define_model()` occurs, and then some functions to be appended in the future updates. 
+1. *Model processor and definition*, where defining the shape of model *to be analyzed* happens at the beginning during statistical inference. Typically, this step where supplying either a data frame or a `<var_id>` objects into `define_model()` occurs, and then some functions to be appended in the future updates. 
 
 2. *Parameterization*, where the estimation process of the statistical inference pipeline is defined lazily. Our usual statistical inference application can be either a model-based inference (e.g. linear regression through `prepare_model()`) or H-test inference (e.g. t-test through `prepare_test()`). With that said, the execution is lazy-loaded, and only executed if needed. (The `(*)` mark means they are interchangeable. )
 
@@ -132,7 +132,7 @@ The package is designed around three ideas:
 
 1.  **Composability**: the simplest way to write `{statim}` has two forms: the eager form and the grammar/piped syntax form. The eager form skips the verbs and cannot be recalibrated, only skips to the output. On the other hand, the grammar/piped syntax form relies on verbs and lazy loading, which comes with the recalibration of the estimation method with a single `via()` call, and the execution of the lazy-loaded pipeline with `conclude()`.
 
-2.  **A shared grammar**: Only applied on the main `{statim}` semantics: piped/grammar syntax. `define_model()` =\> `prepare_*()` =\> `conclude()` is the same shape for every inferential procedure. The `<model_id>` objects (`x_by`, `rel`, `pairwise`, ...) describe the statistical structure of the problem; the verbs stay constant.
+2.  **A shared grammar**: Only applied on the main `{statim}` semantics: piped/grammar syntax. `define_model()` =\> `prepare_*()` =\> `conclude()` is the same shape for every inferential procedure. The `<var_id>` objects (`x_by`, `rel`, `pairwise`, ...) describe the statistical structure of the problem; the verbs stay constant.
 
     > Eager forms (`TTEST()`, `CORTEST()`, ...) provide a shortcut when the full pipeline (in a form of piped syntax that reads like a sentence) is not needed.
 

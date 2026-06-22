@@ -112,7 +112,7 @@ semantics:
 # Data can be piped in or passed as argument to `define_model()`
 ... |>                                   # Possible extensions  
     define_model(
-        <model_id>(var1, var2, ...), 
+        <var_id>(var1, var2, ...), 
         data, ...
     ) |>                                 # 1. Model definition
     # ... |>                             # Possible extensions  
@@ -129,8 +129,8 @@ Explanation of the code above:
 1.  *Model processor and definition*, where defining the shape of model
     *to be analyzed* happens at the beginning during statistical
     inference. Typically, this step where supplying either a data frame
-    or a `<model_id>` objects into `define_model()` occurs, and then
-    some functions to be appended in the future updates.
+    or a `<var_id>` objects into `define_model()` occurs, and then some
+    functions to be appended in the future updates.
 
 2.  *Parameterization*, where the estimation process of the statistical
     inference pipeline is defined lazily. Our usual statistical
@@ -170,7 +170,7 @@ The package is designed around three ideas:
 2.  **A shared grammar**: Only applied on the main `{statim}` semantics:
     piped/grammar syntax. `define_model()` =\> `prepare_*()` =\>
     `conclude()` is the same shape for every inferential procedure. The
-    `<model_id>` objects (`x_by`, `rel`, `pairwise`, …) describe the
+    `<var_id>` objects (`x_by`, `rel`, `pairwise`, …) describe the
     statistical structure of the problem; the verbs stay constant.
 
     > Eager forms (`TTEST()`, `CORTEST()`, …) provide a shortcut when
