@@ -117,10 +117,10 @@ reference:
   - subtitle: Model ID helpers
     desc: Classes and internal functions
     contents:
-    - model_id
+    - var_id
     - model-processor
-    - model_id_info
-    - class_model_inform
+    - var_id_info
+    - class_var_inform
 
   - subtitle: Implementation containers
     desc: Declare how a test runs
@@ -203,7 +203,7 @@ articles:
   - title: Pointers of statim you need to know
     navbar: Pointers of statim you need to know
     contents:
-    - pointers/model_id
+    - pointers/var_id
     - pointers/stat_define
     - pointers/hypothesis-expressions
     - pointers/recalibration-method
