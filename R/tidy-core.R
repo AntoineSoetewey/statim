@@ -140,9 +140,9 @@ making_tidy_register = function(lhs, rhs) {
 
     key = tidy_registry_key(paste0(stat_cls, "_", model_type_name(model_type)))
     existing = register_tidy[[key]]
-    if (is.null(existing)) {
-        register_tidy[[key]] = rhs
-    } else {
+        if (is.null(existing)) {
+            register_tidy[[key]] = rhs
+        } else {
         merged_default = rhs@default %||% existing@default
         merged_variants = utils::modifyList(existing@variants, rhs@variants)
         register_tidy[[key]] = do.call(method_tidy, c(list(merged_default), merged_variants))
@@ -183,9 +183,9 @@ method_tidy = S7::new_class(
                 "All variant entries must be functions. Non-function: {.arg {names(variants)[bad]}}."
             )
         }
-        if (!is.null(names(variants)) && any(!nzchar(names(variants)))) {
-            cli::cli_abort("All variant entries in {.fn method_tidy} must be named.")
-        }
+        # if (!is.null(names(variants)) && any(!nzchar(names(variants)))) {
+        #     cli::cli_abort("All variant entries in {.fn method_tidy} must be named.")
+        # }
         S7::new_object(S7::S7_object(), default = default, variants = variants)
     }
 )
