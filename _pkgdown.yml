@@ -6,10 +6,10 @@ template:
   bootswatch: flatly
   bslib:
     base_font: {google: "Viaoda Libre"}
-    heading_font: {google: "Viaoda Libre"}
+    heading_font: {google: "Grechen Fuemen"}
     code_font: {google: "Fira Mono"}
-    primary: "#0054AD"
-    link-color: "#0054AD"
+    primary: "#0A2947"
+    link-color: "#AA1C41"
   math-rendering: katex
 
 home:
