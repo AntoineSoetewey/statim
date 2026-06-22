@@ -4,10 +4,10 @@
 \alias{CORTEST}
 \title{Correlation Test}
 \usage{
-CORTEST(.model = NULL, .data = NULL, ...)
+CORTEST(.var_id = NULL, .data = NULL, ...)
 }
 \arguments{
-\item{.model}{A model ID for \code{CORTEST()}, e.g. \code{\link[=rel]{rel()}}.
+\item{.var_id}{A variable mapper \verb{<var_id>} for \code{CORTEST()}, e.g. \code{\link[=rel]{rel()}}.
 When supplied, the test executes immediately.}
 
 \item{.data}{A data frame. Only used on the standalone path.}
@@ -17,7 +17,7 @@ See the \strong{Arguments} section of each implementation page.}
 }
 \value{
 A \code{cld_exec} object (in \code{\link[=conclude]{conclude()}}), or a \code{test_spec} object
-when \code{.model = NULL}. The default correlation test class for most paths is
+when \code{.var_id = NULL}. The default correlation test class for most paths is
 \link{class_corr_two}.
 }
 \description{
@@ -25,9 +25,9 @@ when \code{.model = NULL}. The default correlation test class for most paths is
 relationships. If \code{CORTEST} is supplied within the lazy-loaded pipeline,
 supply \code{CORTEST} as a function i.e. \code{prepare_test(.test = CORTEST)} call.
 }
-\section{Supported model IDs}{
+\section{Supported variable mapper \verb{<var_id>}s}{
 
-Each model ID routes to a separate implementation. See the linked pages
+Each variable mapper \verb{<var_id>} routes to a separate implementation. See the linked pages
 for full argument lists, variants, and correlation test class details:
 \itemize{
 \item \code{rel()}: one-to-one correlation test. See details from \link{cortest-rel}.

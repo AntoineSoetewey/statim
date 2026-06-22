@@ -7,7 +7,7 @@
 The \code{rel} implementation performs a correlation test between exactly one
 independent variable and one response variable.
 
-Use \code{\link[=rel]{rel()}} as the model ID to select this implementation.
+Use \code{\link[=rel]{rel()}} as the variable mapper \verb{<var_id>} to select this implementation.
 }
 \section{Arguments}{
 

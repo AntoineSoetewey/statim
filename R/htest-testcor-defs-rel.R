@@ -138,7 +138,7 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
 #' The `rel` implementation performs a correlation test between exactly one
 #' independent variable and one response variable.
 #'
-#' Use [rel()] as the model ID to select this implementation.
+#' Use [rel()] as the variable mapper `<var_id>` to select this implementation.
 #'
 #' @section Arguments:
 #' The following arguments are passed via `...` in [CORTEST()]:
