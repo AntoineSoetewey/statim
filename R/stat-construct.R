@@ -42,13 +42,13 @@ build_stat = function(defs, args, cls, var_id, .data, .name, spec_class) {
     if (!is.null(var_id)) {
         run_stat(defs, args, cls, var_id, .data, .name)
     } else {
-        lookup = build_lookup(defs)
+        lookup = build_lookup(defs, cls)
         defer_stat(lookup, args, cls, defs, .name, spec_class)
     }
 }
 
 run_stat = function(defs, args, cls, var_id, .data, .name) {
-    lookup = build_lookup(defs)
+    lookup = build_lookup(defs, cls)
     def = find_def(lookup, model_type = get_model_type(var_id))
     processed = model_processor(var_id, data = .data)
 
@@ -73,7 +73,8 @@ defer_stat = function(lookup, args, cls, defs, .name, spec_class) {
         args = args,
         cls = cls,
         name = .name,
-        lookup = lookup
+        lookup = lookup,
+        registry_version = stat_define_registry$.version
     )
 }
 
@@ -88,12 +89,31 @@ model_type_name = function(model_type) {
     cli::cli_abort("Cannot extract a name from {.arg model_type}.")
 }
 
-build_lookup = function(defs) {
+build_lookup = function(defs, cls) {
     keys = vapply(defs, function(d) model_type_name(d@model_type), character(1))
     defs_rev = rev(defs)
     keys_rev = rev(keys)
-    lookup = rlang::set_names(defs_rev, keys_rev)
-    lookup[!duplicated(names(lookup))]
+    base_lookup = rlang::set_names(defs_rev, keys_rev)
+    base_lookup = base_lookup[!duplicated(names(base_lookup))]
+
+    reg_key = stat_define_registry_key(cls)
+    env = stat_define_registry[[reg_key]]
+    if (is.null(env)) return(base_lookup)
+
+    extra = as.list(env)
+    extra_defs = lapply(extra, function(e) e$def)
+
+    # Paranoia check — baked-in conflict should never reach here
+    # since add_stat_define already blocks it, but belt-and-suspenders
+    conflicts = intersect(names(base_lookup), names(extra_defs))
+    if (length(conflicts) > 0L) {
+        cli::cli_abort(c(
+            "Registry conflict detected for model type{?s}: {.val {conflicts}}.",
+            "i" = "This should have been caught by {.fn add_stat_define}. Please file a bug."
+        ))
+    }
+
+    c(base_lookup, extra_defs)
 }
 
 find_def = function(lookup, model_type) {
@@ -136,7 +156,8 @@ test_spec = S7::new_class(
         args = S7::new_property(class = S7::class_list),
         cls = S7::new_property(class = S7::class_character),
         name = S7::new_property(class = S7::class_character),
-        lookup = S7::new_property(class = S7::class_list)
+        lookup = S7::new_property(class = S7::class_list),
+        registry_version = S7::new_property(class = S7::class_integer, default = 0L)
     )
 )
 
@@ -148,6 +169,7 @@ model_spec = S7::new_class(
         args = S7::new_property(class = S7::class_list),
         cls = S7::new_property(class = S7::class_character),
         name = S7::new_property(class = S7::class_character),
-        lookup = S7::new_property(class = S7::class_list)
+        lookup = S7::new_property(class = S7::class_list),
+        registry_version = S7::new_property(class = S7::class_integer, default = 0L)
     )
 )

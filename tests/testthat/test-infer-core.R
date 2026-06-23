@@ -1,25 +1,25 @@
 test_that("build_lookup() keys defs by model_type name", {
-    lookup = build_lookup(list(ttest_def_two))
+    lookup = build_lookup(list(ttest_def_two), cls = "ttest")
 
     expect_named(lookup, "x_by")
     expect_s7_class(lookup[["x_by"]], stat_define)
 })
 
 test_that("build_lookup() last-write-wins on duplicate model_type", {
-    lookup = build_lookup(list(ttest_def_two, ttest_def_two))
+    lookup = build_lookup(list(ttest_def_two, ttest_def_two), cls = "ttest")
 
     expect_length(lookup, 1)
 })
 
 test_that("find_def() returns the matched def", {
-    lookup = build_lookup(list(ttest_def_two))
+    lookup = build_lookup(list(ttest_def_two), cls = "ttest")
     def = find_def(lookup, "x_by")
 
     expect_s7_class(def, stat_define)
 })
 
 test_that("find_def() errors on unknown model type", {
-    lookup = build_lookup(list(ttest_def_two))
+    lookup = build_lookup(list(ttest_def_two), cls = "ttest")
 
     expect_error(
         find_def(lookup, "nonexistent"),

@@ -89,10 +89,17 @@ S7::method(conclude, test_lazy) = function(.x, ...) {
     } else {
         S7::S7_class(.x@var_id)@name
     }
-    def = find_def(.x@test_spec@lookup, model_type = model_type)
-
-    method_name = .x@recalibrate_spec$method_name
     cls = .x@test_spec@cls
+    lookup = if (identical(.x@test_spec@registry_version, stat_define_registry$.version)) {
+        .x@test_spec@lookup
+    } else {
+        build_lookup(.x@test_spec@defs, cls)
+    }
+    def = find_def(lookup, model_type = model_type)
+
+    # method_name = .x@recalibrate_spec$method_name
+    # cls = .x@test_spec@cls
+    method_name = .x@recalibrate_spec$method_name
     key = variant_registry_key(cls, model_type)
     impl = def@impl$variants[[method_name %||% ""]] %||%
         variant_registry[[key]][[method_name %||% ""]]$impl %||%
@@ -149,10 +156,17 @@ S7::method(conclude, model_lazy) = function(.x, ...) {
     } else {
         S7::S7_class(.x@var_id)@name
     }
-    def = find_def(.x@model_spec@lookup, model_type = model_type)
-
-    method_name = .x@recalibrate_spec$method_name
     cls = .x@model_spec@cls
+    lookup = if (identical(.x@model_spec@registry_version, stat_define_registry$.version)) {
+        .x@model_spec@lookup
+    } else {
+        build_lookup(.x@model_spec@defs, cls)
+    }
+    def = find_def(lookup, model_type = model_type)
+
+    # method_name = .x@recalibrate_spec$method_name
+    # cls = .x@model_spec@cls
+    method_name = .x@recalibrate_spec$method_name
     key = variant_registry_key(cls, model_type)
     impl = def@impl$variants[[method_name %||% ""]] %||%
         variant_registry[[key]][[method_name %||% ""]]$impl %||%
