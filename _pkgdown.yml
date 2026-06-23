@@ -148,6 +148,12 @@ reference:
     - HTEST_FN
     - MODEL_FN
 
+  - subtitle: stat_define add-ons management
+    desc: Add or remove estimation method on existing test functions
+    contents:
+    - add-stat-define
+    - purge_stat_defines
+
   - subtitle: Session-scoped variant management
     desc: Add or replace variants on existing test functions
     contents:
