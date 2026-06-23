@@ -49,6 +49,7 @@ Collate:
     'ops.R'
     'utils.R'
     'add-option.R'
+    'add-stat-define.R'
     'zzz.R'
     'define-var-ids.R'
     'define-var-ids-process.R'
