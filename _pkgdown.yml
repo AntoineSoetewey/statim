@@ -5,8 +5,8 @@ template:
   light-switch: true
   bootswatch: flatly
   bslib:
-    base_font: {google: "Viaoda Libre"}
-    heading_font: {google: "Grechen Fuemen"}
+    base_font: {google: "Source Serif 4"}
+    heading_font: {google: "Fraunces"}
     code_font: {google: "Fira Mono"}
     primary: "#0A2947"
     link-color: "#AA1C41"
