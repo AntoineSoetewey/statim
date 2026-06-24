@@ -12,3 +12,5 @@ renv.lock
 docs
 docs/
 inst/doc
+/doc/
+/Meta/
