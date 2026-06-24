@@ -158,14 +158,3 @@ LifeCycleSavings |>
     conclude() |>
     display(2)
 ```
-
-## Summary of the pipeline
-
-| Step | Function | What it does |
-|---|---|---|
-| Define | `define_model(formula)` | Binds the formula and data into a `def_model` |
-| Multiple definitions | `write_models(name = formula, ...)` | Builds a named `expanded_model` |
-| Prepare | `prepare_model(LINEAR_REG)` | Attaches the regression spec lazily |
-| Fit | `conclude()` | Executes; returns `cld_exec` or `multi_exec` |
-| ANOVA | `anova(...)` | Compares nested models or runs Type I ANOVA |
-| Coefficients | `tidy()` | Extracts the coefficient tibble |
