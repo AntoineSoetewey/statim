@@ -24,6 +24,16 @@ library(statim)
 
 This article traces the internal flow from `define_model()` through to the retrieval functions (`conclude()`, `tidy()`, `display()`), describing what each stage produces and why.
 
+| Stage | Function | Produces | Executes? |
+|---|---|---|---|
+| [Stage 1: lazy spec](#stage-1-building-a-lazy-specification) | `define_model()` | `def_model` | No |
+| [Stage 1: lazy spec](#stage-1-building-a-lazy-specification) | `prepare_test()` | `test_lazy` | No |
+| [Stage 1: lazy spec](#stage-1-building-a-lazy-specification) | `prepare_model()` | `model_lazy` | No |
+| [Stage 1: lazy spec](#stage-1-building-a-lazy-specification) | `via()` | modified lazy object | No |
+| [Stage 2: execution](#stage-2-execution-at-conclude) | `conclude()` | `cld_exec` | **Yes** |
+| [Stage 3: retrieval](#stage-3-retrieval) | `tidy()` | tibble | (reads `cld_exec@data`) |
+| [Stage 3: retrieval](#stage-3-retrieval) | `print()` | side effect | (reads `cld_exec@data`) |
+
 ## Stage 1: building a lazy specification
 
 ### `define_model()` produces a `def_model`
@@ -217,15 +227,3 @@ class_stat_infer
 ```
 
 A variant that reuses its def's existing result class inherits both `auto_tidy()` and `print()` automatically. A variant that needs a genuinely different output shape can opt out by returning a plain structure and supplying a `print` function directly to `variant()`.
-
-## Summary
-
-| Stage | Function | Produces | Executes? |
-|---|---|---|---|
-| Define | `define_model()` | `def_model` | No |
-| Prepare | `prepare_test()` | `test_lazy` | No |
-| Prepare | `prepare_model()` | `model_lazy` | No |
-| Recalibrate | `via()` | modified lazy object | No |
-| Execute | `conclude()` | `cld_exec` | **Yes** |
-| Tidy | `tidy()` | tibble | (reads `cld_exec@data`) |
-| Print | `print()` | side effect | (reads `cld_exec@data`) |
