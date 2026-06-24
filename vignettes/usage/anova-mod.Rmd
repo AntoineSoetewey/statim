@@ -87,10 +87,10 @@ Comparing a sequence of nested models tells you whether each additional predicto
 ```{r}
 LifeCycleSavings |>
     write_models(
-        null   = sr ~ 1,
-        main   = sr ~ pop15,
+        null = sr ~ 1,
+        main = sr ~ pop15,
         extend = sr ~ pop15 + pop75,
-        full   = sr ~ pop15 + pop75 + dpi + ddpi
+        full = sr ~ pop15 + pop75 + dpi + ddpi
     ) |>
     prepare_model(LINEAR_REG) |>
     anova()
@@ -105,8 +105,8 @@ The `test` argument accepts `"F"` (default for Gaussian models), `"LRT"`, or `"C
 When the models come from separate pipeline branches, pass them directly to `anova()`:
 
 ```{r}
-mod1 = LifeCycleSavings |> define_model(sr ~ 1)         |> prepare_model(LINEAR_REG)
-mod2 = LifeCycleSavings |> define_model(sr ~ pop15)     |> prepare_model(LINEAR_REG)
+mod1 = LifeCycleSavings |> define_model(sr ~ 1) |> prepare_model(LINEAR_REG)
+mod2 = LifeCycleSavings |> define_model(sr ~ pop15) |> prepare_model(LINEAR_REG)
 mod3 = LifeCycleSavings |> define_model(sr ~ pop15 + pop75) |> prepare_model(LINEAR_REG)
 
 anova(mod1, mod2, mod3)
@@ -117,7 +117,7 @@ anova(mod1, mod2, mod3)
 Or, after calling `conclude()` on each model:
 
 ```{r}
-exec1 = LifeCycleSavings |> define_model(sr ~ 1)     |> prepare_model(LINEAR_REG) |> conclude()
+exec1 = LifeCycleSavings |> define_model(sr ~ 1) |> prepare_model(LINEAR_REG) |> conclude()
 exec2 = LifeCycleSavings |> define_model(sr ~ pop15) |> prepare_model(LINEAR_REG) |> conclude()
 
 anova(exec1, exec2, test = "LRT")

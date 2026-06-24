@@ -34,7 +34,7 @@ Either way, it calls `model_processor()` on the model ID and the data, then stor
 
 ```r
 def_model(
-    model_id  = <the model ID or formula>,
+    model_id = <the model ID or formula>,
     processed = <list returned by model_processor()>
 )
 ```
@@ -119,13 +119,13 @@ The return value of `fn` is wrapped in a `cld_exec` S7 object:
 
 ```r
 cld_exec(
-    data     = <raw return value of fn>,
+    data = <raw return value of fn>,
     impl_cls = <string identifying the stat and model shape>,
     cld_meta = list(
-        model_id  = ...,
+        model_id = ...,
         processed = ...,
         stat_name = ...,
-        method    = <variant name, or "default">,
+        method = <variant name, or "default">,
         data_name = ...
     )
 )
