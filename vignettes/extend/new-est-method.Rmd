@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
+fansi::set_knit_hooks(knitr::knit_hooks)
 library(statim)
 ```
 
@@ -31,12 +32,7 @@ There are two genuinely different things "adding a new estimation method" can me
 
 1.  When you want to add another variant to a model shape that's already supported. Let's say adding a variant to a model shape `TTEST()` already supports — a trimmed-mean test for `x_by()`, say. This is the public, documented surface: `add_variant()`, no access to internals required. The rest of this vignette covers it.
 
-2.  Add another but independent support for a model shape that doesn't exist yet. This
-needs a new `stat_define` registered from outside the package via `add_stat_define()`.
-Unlike `add_variant()`, which extends a model shape that already exists, `add_stat_define()`
-teaches a stat function to handle a model shape it has never seen before. The mechanism,
-conflict handling, and session/package scoping are covered in the
-[Registering a new model type](#registering-a-new-model-type) section below.
+2.  Add another but independent support for a model shape that doesn't exist yet. This needs a new `stat_define` registered from outside the package via `add_stat_define()`. Unlike `add_variant()`, which extends a model shape that already exists, `add_stat_define()` teaches a stat function to handle a model shape it has never seen before. The mechanism, conflict handling, and session/package scoping are covered in the [Registering a new model type](#registering-a-new-model-type) section below.
 
 ## The shared contract: what every `fn` must honor
 
@@ -61,8 +57,13 @@ add_variant(LINEAR_REG, S7::class_formula, "weighted") %<-% variant(
     fn = function(.proc, weights = NULL) {
         fit = do.call(
             stats::lm,
-            list(formula = .proc$formula, data = .proc$data, weights = weights)
+            list(
+                formula = .proc$formula, 
+                data = .proc$data, 
+                weights = weights
+            )
         )
+        
         coef_tbl = summary(fit)$coefficients
         rss = sum(fit$residuals^2)
         df_res = fit$df.residual
