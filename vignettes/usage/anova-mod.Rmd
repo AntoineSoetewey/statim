@@ -55,13 +55,13 @@ The returned `cld_anova` prints the full Type I table. The final row is always R
 
 ### Tidy the coefficients
 
-`tidy()` on the preceding `cld_exec` extracts the coefficient table from the fitted model:
+`tidy()` takes the `cld_exec` returned by `conclude()` and extracts a tibble of primary results. For a `LINEAR_REG` model, that tibble is the coefficient table: one row per term, with columns `term`, `estimate`, `std_error`, `statistic`, and `p_value`.
 
 ```{r}
 result |> tidy()
 ```
 
-The same table is visible in the printed output of `result` under the Coefficients section.
+This is the programmatic form of the Coefficients section that `print()` displays. Using `tidy()` is useful when you need the estimates downstream, for example to filter significant terms, pass them to another function, or bind rows across multiple models.
 
 ### From a `model_lazy` directly
 
