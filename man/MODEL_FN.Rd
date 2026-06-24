@@ -14,12 +14,12 @@ MODEL_FN(cls, defs, .name)
 \item{.name}{A string used as the model title in output.}
 }
 \value{
-A function with signature \verb{function(.model, .data, ...)}.
+A function with signature \verb{function(.var_id, .data, ...)}.
 }
 \description{
 \code{MODEL_FN()} is a developer-interface constructor for user-facing model
 functions like \code{LINEAR_REG()}. It returns a function that routes to the
-correct implementation based on the model ID and method variant.
+correct implementation based on the variable mapper \verb{<var_id>} and method variant.
 }
 \seealso{
 \code{\link[=HTEST_FN]{HTEST_FN()}}, \code{\link[=stat_define]{stat_define()}}, \code{\link[=prepare_model]{prepare_model()}}, \code{\link[=via]{via()}}, \code{\link[=conclude]{conclude()}}

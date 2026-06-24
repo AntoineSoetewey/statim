@@ -4,27 +4,22 @@
 #' relationships. If `CORTEST` is supplied within the lazy-loaded pipeline,
 #' supply `CORTEST` as a function i.e. `prepare_test(.test = CORTEST)` call.
 #'
-#' @param .model A model ID for `CORTEST()`, e.g. [rel()].
+#' @param .var_id A variable mapper `<var_id>` for `CORTEST()`, e.g. [rel()].
 #'   When supplied, the test executes immediately.
 #' @param .data A data frame. Only used on the standalone path.
 #' @param ... Additional arguments passed to the implementation.
 #'   See the **Arguments** section of each implementation page.
 #'
 #' @return A `cld_exec` object (in [conclude()]), or a `test_spec` object
-#'   when `.model = NULL`. The default correlation test class for most paths is
+#'   when `.var_id = NULL`. The default correlation test class for most paths is
 #'   [class_corr_two].
 #'
-#' @section Supported model IDs:
-#' Each model ID routes to a separate implementation. See the linked pages
+#' @section Supported variable mapper `<var_id>`s:
+#' Each variable mapper `<var_id>` routes to a separate implementation. See the linked pages
 #' for full argument lists, variants, and correlation test class details:
 #'
-#' - `rel()`: one-to-one correlation test. See [cortest-rel].
-#' - `<formula>`: one-to-many correlation test. See [cortest-formula].
-#'
-#' @inheritSection cortest-rel Arguments
-#' @inheritSection cortest-rel Variants
-#' @inheritSection cortest-rel Correlation test default class
-#' @inheritSection cortest-rel Hypothesis claims
+#' - `rel()`: one-to-one correlation test. See details from [cortest-rel].
+#' - `<formula>`: one-to-many correlation test. See details from [cortest-formula].
 #'
 #' @examples
 #' # eager
@@ -33,6 +28,11 @@
 #' # grammatical syntax
 #' cars |>
 #'     define_model(rel(speed, dist)) |>
+#'     prepare_test(CORTEST) |>
+#'     conclude()
+#'
+#' cars |>
+#'     define_model(speed ~ dist) |>
 #'     prepare_test(CORTEST) |>
 #'     conclude()
 #'
@@ -71,7 +71,7 @@ CORTEST = HTEST_FN(
 #' Structured result container for two-sample t-tests
 #'
 #' @description
-#' An S7 class produced by [CORTEST] using [rel()] and `<formula>` as the model ID.
+#' An S7 class produced by [CORTEST] using [rel()] and `<formula>` as the variable mapper `<var_id>`.
 #' Not constructed manually, use the "grammar interface" instead.
 #'
 #' Inherits from [class_stat_infer], so [auto_tidy()] dispatches on it

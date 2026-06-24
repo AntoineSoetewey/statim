@@ -2,13 +2,13 @@
 #'
 #' `MODEL_FN()` is a developer-interface constructor for user-facing model
 #' functions like `LINEAR_REG()`. It returns a function that routes to the
-#' correct implementation based on the model ID and method variant.
+#' correct implementation based on the variable mapper `<var_id>` and method variant.
 #'
 #' @param cls A string naming the model class, e.g. `"linear_reg"`.
 #' @param defs A list of [stat_define()] objects.
 #' @param .name A string used as the model title in output.
 #'
-#' @return A function with signature `function(.model, .data, ...)`.
+#' @return A function with signature `function(.var_id, .data, ...)`.
 #'
 #' @seealso [HTEST_FN()], [stat_define()], [prepare_model()], [via()], [conclude()]
 #'

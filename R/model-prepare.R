@@ -1,8 +1,8 @@
 model_lazy = S7::new_class(
     "model_lazy",
     properties = list(
-        model_id = S7::new_property(
-            class = S7::new_union(model_id, S7::class_formula)
+        var_id = S7::new_property(
+            class = S7::new_union(var_id, S7::class_formula)
         ),
         processed = S7::new_property(class = S7::class_list),
         model_spec = S7::new_property(class = model_spec),
@@ -13,11 +13,11 @@ model_lazy = S7::new_class(
 
 #' Lazily prepare a model inference
 #'
-#' `prepare_model()` attaches a model specification to a `def_model` object,
+#' `prepare_model()` attaches a model specification to a `def_var` object,
 #' producing a `model_lazy` ready for optional recalibration with [via()]
 #' before being executed with [conclude()].
 #'
-#' @param .x An S7 object extension yielded by, e.g. `def_model` object from [define_model()],
+#' @param .x An S7 object extension yielded by, e.g. `def_var` object from [define_model()],
 #'   or an `expanded_model` object from [write_models()].
 #' @param .model_fn A model function such as `LINEAR_REG()`.
 #' @param ... Additional arguments passed to methods.
@@ -36,11 +36,11 @@ model_lazy = S7::new_class(
 #' @export
 prepare_model = S7::new_generic("prepare_model", dispatch_args = c(".x", ".model_fn"))
 
-S7::method(prepare_model, list(def_model, S7::class_function)) = function(.x, .model_fn, ...) {
+S7::method(prepare_model, list(def_var, S7::class_function)) = function(.x, .model_fn, ...) {
     spec = as_model_spec(.model_fn)
     dots = list(...)
     model_lazy(
-        model_id = .x@model_id,
+        var_id = .x@var_id,
         processed = .x@processed,
         model_spec = spec,
         recalibrate_spec = if (length(dots) > 0L) list(args = dots) else NULL
@@ -49,7 +49,7 @@ S7::method(prepare_model, list(def_model, S7::class_function)) = function(.x, .m
 
 S7::method(print, model_lazy) = function(x, ...) {
     cat("\n")
-    print(x@model_id)
+    print(x@var_id)
 
     cat("\n")
     cat(cli::rule(left = "Model Specification", line = "-"), "\n\n")
@@ -96,7 +96,7 @@ as_model_spec = function(.model_fn) {
         cli::cli_abort("{.arg .model_fn} must be a function.")
     }
 
-    spec = .model_fn(.model = NULL)
+    spec = .model_fn(.var_id = NULL)
 
     if (S7::S7_inherits(spec, test_spec)) {
         cli::cli_abort(c(

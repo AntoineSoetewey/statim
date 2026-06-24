@@ -14,7 +14,7 @@
 #'       documentation of the stat function (e.g. `?TTEST`) for what to expect.}
 #'     \item{`@cld_meta`}{A list of pipeline metadata:
 #'       \describe{
-#'         \item{`$model_id`}{The model ID object passed to [define_model()].}
+#'         \item{`$var_id`}{The Variable Mapper object passed to [define_model()].}
 #'         \item{`$processed`}{The processed model output from [model_processor()].
 #'           The same object received as `.proc` inside the `fn`.}
 #'         \item{`$stat_name`}{The human-readable test or model name.}
@@ -84,15 +84,22 @@
 conclude = S7::new_generic("conclude", ".x")
 
 S7::method(conclude, test_lazy) = function(.x, ...) {
-    model_type = if (inherits(.x@model_id, "formula")) {
+    model_type = if (inherits(.x@var_id, "formula")) {
         "formula"
     } else {
-        S7::S7_class(.x@model_id)@name
+        S7::S7_class(.x@var_id)@name
     }
-    def = find_def(.x@test_spec@lookup, model_type = model_type)
-
-    method_name = .x@recalibrate_spec$method_name
     cls = .x@test_spec@cls
+    lookup = if (identical(.x@test_spec@registry_version, stat_define_registry$.version)) {
+        .x@test_spec@lookup
+    } else {
+        build_lookup(.x@test_spec@defs, cls)
+    }
+    def = find_def(lookup, model_type = model_type)
+
+    # method_name = .x@recalibrate_spec$method_name
+    # cls = .x@test_spec@cls
+    method_name = .x@recalibrate_spec$method_name
     key = variant_registry_key(cls, model_type)
     impl = def@impl$variants[[method_name %||% ""]] %||%
         variant_registry[[key]][[method_name %||% ""]]$impl %||%
@@ -107,28 +114,21 @@ S7::method(conclude, test_lazy) = function(.x, ...) {
         .x@recalibrate_spec$args %||% list()
     )
 
-    if (!is.null(def@claim_translator) && !is.null(.x@claims)) {
-        translator = def@claim_translator
-        variant_nm = method_name %||% "default"
-
-        fn = if (inherits(translator, "claim_translate")) {
-            translator[[variant_nm]] %||% cli::cli_abort(c(
-                "No claim translator defined for variant {.val {variant_nm}}.",
-                "i" = "Remove {.fn state_null} or use a supported variant."
-            ))
-        } else {
-            translator
-        }
-
-        translated = fn(.x@claims, .x@processed)
+    if (!is.null(impl@claim_parser) && !is.null(.x@claims)) {
+        translated = impl@claim_parser(.x@claims, .x@processed)
 
         if (!inherits(translated, "claim_args")) {
             cli::cli_abort(
-                "claim_translator must return a {.fn claim_args} object."
+                "claim_parser must return a {.fn claim_args} object."
             )
         }
 
         all_args = utils::modifyList(all_args, unclass(translated))
+    } else if (is.null(impl@claim_parser) && !is.null(.x@claims)) {
+        cli::cli_abort(c(
+            "No claim parser defined for variant {.val {method_name %||% \"default\"}}.",
+            "i" = "Remove {.fn state_null} or use a supported variant."
+        ))
     }
 
     out_raw = inject_and_run(
@@ -144,22 +144,29 @@ S7::method(conclude, test_lazy) = function(.x, ...) {
         stat_cls = .x@test_spec@cls,
         stat_name = .x@test_spec@name,
         method_name = method_name,
-        model_id = .x@model_id,
+        var_id = .x@var_id,
         processed = .x@processed,
         data_name = .x@data_name %||% ""
     )
 }
 
 S7::method(conclude, model_lazy) = function(.x, ...) {
-    model_type = if (inherits(.x@model_id, "formula")) {
+    model_type = if (inherits(.x@var_id, "formula")) {
         "formula"
     } else {
-        S7::S7_class(.x@model_id)@name
+        S7::S7_class(.x@var_id)@name
     }
-    def = find_def(.x@model_spec@lookup, model_type = model_type)
-
-    method_name = .x@recalibrate_spec$method_name
     cls = .x@model_spec@cls
+    lookup = if (identical(.x@model_spec@registry_version, stat_define_registry$.version)) {
+        .x@model_spec@lookup
+    } else {
+        build_lookup(.x@model_spec@defs, cls)
+    }
+    def = find_def(lookup, model_type = model_type)
+
+    # method_name = .x@recalibrate_spec$method_name
+    # cls = .x@model_spec@cls
+    method_name = .x@recalibrate_spec$method_name
     key = variant_registry_key(cls, model_type)
     impl = def@impl$variants[[method_name %||% ""]] %||%
         variant_registry[[key]][[method_name %||% ""]]$impl %||%
@@ -174,29 +181,22 @@ S7::method(conclude, model_lazy) = function(.x, ...) {
         .x@recalibrate_spec$args %||% list()
     )
 
-    if (!is.null(def@claim_translator) && !is.null(.x@claims)) {
-        translator = def@claim_translator
-        variant_nm = method_name %||% "default"
-
-        fn = if (inherits(translator, "claim_translate")) {
-            translator[[variant_nm]] %||% cli::cli_abort(c(
-                "No claim translator defined for variant {.val {variant_nm}}.",
-                "i" = "Remove {.fn state_null} or use a supported variant."
-            ))
-        } else {
-            translator
-        }
-
-        translated = fn(.x@claims, .x@processed)
-
-        if (!inherits(translated, "claim_args")) {
-            cli::cli_abort(
-                "claim_translator must return a {.fn claim_args} object."
-            )
-        }
-
-        all_args = utils::modifyList(all_args, unclass(translated))
-    }
+    # if (!is.null(impl@claim_parser) && !is.null(.x@claims)) {
+    #     translated = impl@claim_parser(.x@claims, .x@processed)
+    #
+    #     if (!inherits(translated, "claim_args")) {
+    #         cli::cli_abort(
+    #             "claim_parser must return a {.fn claim_args} object."
+    #         )
+    #     }
+    #
+    #     all_args = utils::modifyList(all_args, unclass(translated))
+    # } else if (is.null(impl@claim_parser) && !is.null(.x@claims)) {
+    #     cli::cli_abort(c(
+    #         "No claim parser defined for variant {.val {method_name %||% \"default\"}}.",
+    #         "i" = "Remove {.fn state_null} or use a supported variant."
+    #     ))
+    # }
 
     out_raw = inject_and_run(
         impl = impl,
@@ -211,7 +211,7 @@ S7::method(conclude, model_lazy) = function(.x, ...) {
         stat_cls = .x@model_spec@cls,
         stat_name = .x@model_spec@name,
         method_name = method_name,
-        model_id = .x@model_id,
+        var_id = .x@var_id,
         processed = .x@processed,
         data_name = .x@data_name %||% ""
     )
@@ -233,16 +233,16 @@ resolve_impl = function(method_name, def, model_type, cls, global_variants) {
 
 wrap_exec = function(
         out_raw, def, impl, stat_cls, stat_name,
-        method_name, model_id, processed, data_name
+        method_name, var_id, processed, data_name
 ) {
     cld_exec(
         data = out_raw,
-        impl_cls = impl_cls_from_model(stat_cls, model_id),
+        impl_cls = impl_cls_from_model(stat_cls, var_id),
         stat_cls = stat_cls,
         print_fn = impl@print,
         name = stat_name,
         cld_meta = list(
-            model_id = model_id,
+            var_id = var_id,
             processed = processed,
             stat_name = stat_name,
             method = method_name %||% "default",
@@ -262,11 +262,11 @@ cld_exec = S7::new_class(
 
 S7::method(print, cld_exec) = function(x, ...) {
     meta = x@cld_meta
-    info = model_id_info(meta$model_id, meta$processed)
+    info = var_id_info(meta$var_id, meta$processed)
 
     cat("\n")
     cat(cli::rule(left = "Model", line = "="), "\n\n")
-    cat("Model ID :", info@model_type, "\n")
+    cat("Variable Mapper :", info@model_type, "\n")
     cat("Args :", info@args, "\n")
     if (length(info@other_info) > 0L) {
         for (nm in names(info@other_info)) {

@@ -14,7 +14,7 @@
 #'
 #' @param obj A test or model function built with [HTEST_FN()] or [MODEL_FN()]
 #'   (e.g. `TTEST`). Used to scope the registry key.
-#' @param model_type An S7 model ID class (e.g. `x_by`, `S7::class_formula`).
+#' @param model_type An S7 `<var_id>` class (e.g. `x_by`, `S7::class_formula`).
 #' @param name A string naming the variant to add.
 #' @param origin One of `"user"` (default, session-scoped) or `"package"`
 #'   (load-scoped, intended for `.onLoad()`).
@@ -67,11 +67,11 @@ add_variant_register = function(lhs, rhs) {
     stat_cls = attr(obj, "cls") %||% cli::cli_abort(
         "{.arg obj} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
     )
-    is_model_id_class = inherits(model_type, "S7_class") && identical(model_type@parent, model_id)
+    is_var_id_class = inherits(model_type, "S7_class") && identical(model_type@parent, var_id)
     is_formula_class = identical(model_type, S7::class_formula)
-    if (!is_model_id_class && !is_formula_class) {
+    if (!is_var_id_class && !is_formula_class) {
         cli::cli_abort(
-            "{.arg model_type} must be a class inheriting from {.cls model_id}, or {.code S7::class_formula}."
+            "{.arg model_type} must be a class inheriting from {.cls var_id}, or {.code S7::class_formula}."
         )
     }
     if (identical(name, "default")) {
@@ -94,9 +94,9 @@ remove_variant = function(obj, model_type, name) {
     stat_cls = attr(obj, "cls") %||% cli::cli_abort(
         "{.arg obj} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
     )
-    is_model_id_class = inherits(model_type, "S7_class") && identical(model_type@parent, model_id)
+    is_var_id_class = inherits(model_type, "S7_class") && identical(model_type@parent, var_id)
     is_formula_class = identical(model_type, S7::class_formula)
-    if (!is_model_id_class && !is_formula_class) {
+    if (!is_var_id_class && !is_formula_class) {
         cli::cli_abort(
             "{.arg model_type} must be an S7 class (e.g. {.cls x_by}, {.code S7::class_formula})."
         )

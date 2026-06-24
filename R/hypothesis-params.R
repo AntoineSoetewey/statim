@@ -1,7 +1,7 @@
 #' Base class for population parameters
 #'
 #' `param_obj` is the abstract base S7 class for all population parameter
-#' objects, analogous to [model_id()]. Concrete subclasses (`MU`, `PI`,`RHO`)
+#' objects, analogous to [var_id()]. Concrete subclasses (`MU`, `PI`,`RHO`)
 #' inherit from it. The base class is a pure marker — each
 #' subclass declares its own properties.
 #'

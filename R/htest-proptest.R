@@ -1,17 +1,16 @@
-
 #' Proportion Test
 #'
 #' `P_TEST()` performs a one-sample proportion test using either an exact
 #' binomial test or a normal approximation. If `P_TEST` is supplied within the lazy-loaded pipeline,
 #' supply `P_TEST` as a function within i.e. `prepare_test(.test = P_TEST)` call.
 #'
-#' @param .model A registered model ID, e.g. [prop()]. When supplied, the test executes
+#' @param .var_id A registered variable mapper `<var_id>`, e.g. [prop()]. When supplied, the test executes
 #'   immediately.
 #' @param .data Unused. Accepted for pipeline consistency.
 #' @param ... Additional arguments passed to the implementation. See the
 #'   **Arguments** and **Variants** sections below.
 #'
-#' @return A `cld_exec` object, or a `test_spec` when `.model = NULL`.
+#' @return A `cld_exec` object, or a `test_spec` when `.var_id = NULL`.
 #'   The object stored in `cld_exec@data` is a [class_p_test] object.
 #'
 #' @section Arguments:

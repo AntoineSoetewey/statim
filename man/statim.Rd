@@ -6,7 +6,7 @@
 \alias{statim}
 \title{statim: A Declarative Interface for Statistical Inference}
 \description{
-A declarative interface for statistical inference built on the S7 object system. Models are described using expressive model identifiers, null hypotheses are stated as mathematical expressions over population parameters, and estimation is deferred until explicitly requested. Supports hypothesis testing and model-based inference with an extensible variant system for registering custom estimation methods.
+A declarative interface for statistical inference built on the S7 object system. The layouts of the statistical inference are described using expressive variable mappers, null hypotheses are stated as mathematical expressions over population parameters, and estimation is deferred until explicitly requested. Supports estimation method involving hypothesis testing and model-based inference with an extensible variant system for registering custom estimation methods.
 }
 \seealso{
 Useful links:

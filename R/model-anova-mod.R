@@ -117,7 +117,7 @@ S7::method(print, anova_lazy) = function(x, ...) {
     for (i in seq_along(x@models)) {
         m = x@models[[i]]
         lbl = x@labels[[i]]
-        formula_str = model_id_info(m@model_id)@args
+        formula_str = var_id_info(m@var_id)@args
         cat(sprintf("  %s : %s\n", lbl, formula_str))
     }
 
@@ -447,10 +447,10 @@ compute_anova_stats_single = function(obj) {
 #' @keywords internal
 #' @noRd
 run_model_lazy_raw = function(m) {
-    model_type = if (inherits(m@model_id, "formula")) {
+    model_type = if (inherits(m@var_id, "formula")) {
         "formula"
     } else {
-        S7::S7_class(m@model_id)@name
+        S7::S7_class(m@var_id)@name
     }
     def = find_def(m@model_spec@lookup, model_type = model_type)
     all_args = utils::modifyList(

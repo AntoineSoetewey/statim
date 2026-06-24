@@ -4,20 +4,20 @@
 \alias{TTEST}
 \title{T-Test}
 \usage{
-TTEST(.model = NULL, .data = NULL, ...)
+TTEST(.var_id = NULL, .data = NULL, ...)
 }
 \arguments{
-\item{.model}{A model ID from \code{x_by()}, \code{pairwise()}, or a formula.
+\item{.var_id}{A variable mapper \verb{<var_id>} from \code{x_by()}, \code{pairwise()}, or a formula.
 When supplied, the test executes immediately.}
 
 \item{.data}{A data frame. Only used on the standalone path.}
 
 \item{...}{Additional arguments passed to the implementation. See the
-\strong{Arguments by model ID} section for the full list per path.}
+\strong{Arguments by variable mapper} section for the full list per path.}
 }
 \value{
 A \code{cld_exec} object (in \code{\link[=conclude]{conclude()}}), a \code{stat_infer_spec} object, or a
-\code{test_spec} when \code{.model = NULL}. Depending on the implementation you wrote, it returns
+\code{test_spec} when \code{.var_id = NULL}. Depending on the implementation you wrote, it returns
 any class. However, by default, some implementations use base \code{{statim}} S7 classes.
 For instance:
 \itemize{
@@ -30,61 +30,15 @@ For instance:
 formula-based comparisons. If \code{TTEST} is supplied within the lazy-loaded pipeline,
 supply \code{TTEST} as a function within i.e. \code{prepare_test(.test = TTEST)} call.
 }
-\section{Supported model IDs}{
+\section{Supported variable mapper \verb{<var_id>}s}{
 
-Each model ID routes to a separate implementation. See the linked pages
+Each variable mapper \verb{<var_id>} routes to a separate implementation. See the linked pages
 for full argument lists, variants, and result class details:
 \itemize{
-\item \code{x_by()}: two-sample or paired t-test. See \link{ttest-xby}.
-\item \code{pairwise()}: pairwise t-tests across variables. See \link{ttest-pairwise}.
-\item \verb{<formula>}: one-sample and/or two-sample t-test. See \link{ttest-formula}.
+\item \code{x_by()}: two-sample or paired t-test. See details from \link{ttest-xby}.
+\item \code{pairwise()}: pairwise t-tests across variables. See details from \link{ttest-pairwise}.
+\item \verb{<formula>}: one-sample and/or two-sample t-test. See details from \link{ttest-formula}.
 }
-}
-
-\section{Arguments}{
-
-The following arguments are passed via \code{...} in \code{\link[=TTEST]{TTEST()}} or \code{\link[=via]{via()}}:
-
-\describe{
-\item{\code{.paired}}{Logical. Whether to perform a paired t-test. Default \code{FALSE}.}
-\item{\code{.mu}}{Numeric. Hypothesized mean difference. Default \code{0}.}
-\item{\code{.alt}}{Direction: \code{"two.sided"}, \code{"greater"}, or \code{"less"}. Default \code{"two.sided"}.}
-\item{\code{.ci}}{Confidence level. Default \code{0.95}.}
-\item{\code{.first_group}}{Only if uses \code{\link[=state_null]{state_null()}}. Considers first term as the first order. Default is \code{NULL}.}
-}
-}
-
-\section{Variants}{
-
-\describe{
-\item{\code{"boot"}}{Bootstrap CI. Accepts \code{n} (reps) and \code{seed}.}
-\item{\code{"permute"}}{Permutation test. Accepts \code{n} and \code{seed}.}
-\item{\code{"contrast"}}{Welch-Satterthwaite linear contrast test. Accepts \code{.w}, \code{.mu}, \code{.ci}, \code{.op}.}
-\item{\code{"multi"}}{Accepts multiple selected \code{group} variables}
-}
-}
-
-\section{Two-sample t-test default class}{
-
-Returns a \link{class_ttest_two} object. All variants that also return
-\link{class_ttest_two} inherit \code{\link[=auto_tidy]{auto_tidy()}} and \code{\link[=print]{print()}} automatically.
-}
-
-\section{Hypothesis claims}{
-
-Supports \code{\link[=MU]{MU()}} via \code{\link[=state_null]{state_null()}}. The \code{contrast} variant performs Welch-Satterthwaite linear contrast test
-and additionally accepts contrast coefficients via \code{.w}.
-
-Claim order is respected: writing \code{MU(x, g == "a") - MU(x, g == "b")} versus
-\code{MU(x, g == "b") - MU(x, g == "a")} flips the sign of \code{estimate} and
-\code{t_stat}, since the group with coefficient \code{+1} in the parsed claim becomes
-\code{x} in \code{stats::t.test()}. This is implemented via an internal \code{.first_group}
-argument resolved from the claim — it is not meant to be set directly by
-users. If you call \code{via("base", .first_group = ...)} or use \code{update()} to
-override it manually, note that it accepts a single group label (one of
-the two levels of the grouping variable) and silently falls back to the
-data's natural level order (\code{unique()} on the grouping variable) if \code{NULL},
-unset, or not found among the levels.
 }
 
 \section{References}{

@@ -10,7 +10,7 @@ write_models(.data, ...)
 \item{.data}{A data frame.}
 
 \item{...}{Named model expressions. Each must evaluate to a formula or
-a \code{model_id} object. Names are used as row labels in \code{\link[=anova]{anova()}} output
+a \code{var_id} object. Names are used as row labels in \code{\link[=anova]{anova()}} output
 and as the \code{model} column in \code{\link[=tidy]{tidy()}}.}
 }
 \value{
@@ -19,8 +19,8 @@ An \code{expanded_model} object.
 \description{
 \code{write_models()} evaluates named model expressions sequentially against
 \code{.data}, so each name is available to subsequent expressions via
-\code{\link[stats:update]{stats::update()}}. Accepts any valid model ID: formulas, \code{\link[=rel]{rel()}},
-\code{\link[=x_by]{x_by()}}, or any registered \code{model_id} type.
+\code{\link[stats:update]{stats::update()}}. Accepts any valid variable mapper \verb{<var_id>}: \verb{<formulas>}, \code{\link[=rel]{rel()}},
+\code{\link[=x_by]{x_by()}}, or any registered \code{var_id} type.
 }
 \details{
 Sits between a data frame and \code{\link[=prepare_model]{prepare_model()}} or \code{\link[=prepare_test]{prepare_test()}}

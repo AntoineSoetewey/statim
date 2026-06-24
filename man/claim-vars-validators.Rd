@@ -8,7 +8,7 @@
 \alias{check_x_and_given}
 \title{Validate hypothesis parameter references against a model's declared variables}
 \usage{
-validate_claim_vars(model_id, processed, claims, ...)
+validate_claim_vars(var_id, processed, claims, ...)
 
 check_param_nodes(claims, x_vars, by_vars)
 
@@ -17,12 +17,12 @@ validate_one_param_node(node, ...)
 check_x_and_given(x_quo, given_quo, x_vars, by_vars, cls_name)
 }
 \arguments{
-\item{model_id}{A <\link{model_id}> object (usually carried by \code{\link[=define_model]{define_model()}}).}
+\item{var_id}{A <\link{var_id}> object (usually carried by \code{\link[=define_model]{define_model()}}).}
 
 \item{processed}{The processed list from \code{lazy@processed}, as returned by
 \code{\link[=model_processor]{model_processor()}}.}
 
-\item{claims}{A single \code{null_claim} or a \code{null_claims} object.}
+\item{claims}{A \code{null_claim} object.}
 
 \item{...}{Currently unused.}
 
@@ -44,9 +44,9 @@ to skip x-variable validation.}
 \code{invisible(NULL)}, or aborts with a consolidated error.
 }
 \description{
-An S7 generic dispatched on the model ID class. Called automatically inside
+An S7 generic dispatched on the variable mapper \verb{<var_id>} class. Called automatically inside
 \code{\link[=state_null]{state_null()}} after the compatible-param guard. Implement a method for any
-new \link{model_id} subclass you define.
+new \link{var_id} subclass you define.
 }
 \details{
 \code{check_param_nodes()} is the shared walker used by all built-in
@@ -69,11 +69,11 @@ the \code{MU(x, given)} slot convention. It checks an \code{x} quosure against
 }
 \section{Implementing a new method}{
 
-By default, unknown model ID subclasses pass through without validation.
-To add validation for a new \link{model_id} subclass, implement a method and
+By default, unknown variable mapper \verb{<var_id>} subclasses pass through without validation.
+To add validation for a new \link{var_id} subclass, implement a method and
 delegate to \code{check_param_nodes()}:
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{S7::method(validate_claim_vars, <model_id>) = function(model_id, processed, claims) \{
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{S7::method(validate_claim_vars, <var_id>) = function(var_id, processed, claims) \{
     check_param_nodes(
         claims,
         x_vars = names(processed$x_data),
@@ -112,5 +112,5 @@ For a subclass with two variable slots (like \code{\link[=RHO]{RHO()}}):
 }
 
 \seealso{
-\code{\link[=state_null]{state_null()}}, \code{\link[=MU]{MU()}}, \code{\link[=RHO]{RHO()}}, \code{\link[=PI]{PI()}}, \code{\link[=param_obj]{param_obj()}}, \code{\link[=model_id]{model_id()}}
+\code{\link[=state_null]{state_null()}}, \code{\link[=MU]{MU()}}, \code{\link[=RHO]{RHO()}}, \code{\link[=PI]{PI()}}, \code{\link[=param_obj]{param_obj()}}, \code{\link[=var_id]{var_id()}}
 }

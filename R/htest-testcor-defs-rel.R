@@ -138,7 +138,7 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
 #' The `rel` implementation performs a correlation test between exactly one
 #' independent variable and one response variable.
 #'
-#' Use [rel()] as the model ID to select this implementation.
+#' Use [rel()] as the variable mapper `<var_id>` to select this implementation.
 #'
 #' @section Arguments:
 #' The following arguments are passed via `...` in [CORTEST()]:
@@ -165,7 +165,12 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
 #' }
 #'
 #' @section Correlation test default class:
-#' Returns a [class_corr_two] object inheriting from [class_stat_infer].
+#' By default, it returns a [class_corr_two] object inheriting from [class_stat_infer].
+#' All variants that also return [class_ttest_two] inherit [auto_tidy()] and [print()]
+#' automatically. Otherwise, to process outputs:
+#'
+#' -  `print()`: Write it down through `print` from [variant()].
+#' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
 #'
 #' For the `base` variant, `df`, `lower_ci`, and `upper_ci` are always
 #' populated. For `spearman` and `kendall`, those slots are `numeric(0)` and
@@ -303,7 +308,30 @@ cor_test_rel = test_define(
                         ci = .ci
                     )
                 }
-            }
+            },
+            claim_parser = map_claim(
+                .alt = function(claim, processed) {
+                    switch(
+                        claim@op,
+                        "==" = , "!=" = "two.sided",
+                        ">=" = , ">" = "less",
+                        "<=" = , "<" = "greater"
+                    )
+                },
+                .rho = function(claim, processed) {
+                    resolved = claim_scalar(claim, solve_coef = TRUE)
+
+                    if (resolved$coefs[[1]] != 1) {
+                        cli::cli_abort(c(
+                            "Correlation test only supports a single {.fn RHO} parameter.",
+                            "i" = "Found coefficient: {.val {resolved$coefs[[1]]}}.",
+                            "i" = "{.fn RHO} cannot be scaled or combined with other parameters."
+                        ))
+                    }
+
+                    resolved$scalar
+                }
+            )
         ),
         spearman = variant(
             fn = main_cortest_rel("spearman")
@@ -367,30 +395,5 @@ cor_test_rel = test_define(
             }
         )
     ),
-    compatible_params = list(RHO),
-    claim_translator = claim_translate(
-        default = map_claim(
-            .alt = function(claim, processed) {
-                switch(
-                    claim@op,
-                    "==" = , "!=" = "two.sided",
-                    ">=" = , ">" = "less",
-                    "<=" = , "<" = "greater"
-                )
-            },
-            .rho = function(claim, processed) {
-                resolved = claim_scalar(claim, solve_coef = TRUE)
-
-                if (resolved$coefs[[1]] != 1) {
-                    cli::cli_abort(c(
-                        "Correlation test only supports a single {.fn RHO} parameter.",
-                        "i" = "Found coefficient: {.val {resolved$coefs[[1]]}}.",
-                        "i" = "{.fn RHO} cannot be scaled or combined with other parameters."
-                    ))
-                }
-
-                resolved$scalar
-            }
-        )
-    )
+    compatible_params = list(RHO)
 )

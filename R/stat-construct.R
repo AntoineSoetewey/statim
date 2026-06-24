@@ -3,14 +3,14 @@
 #' This function is a developer-interface function, a constructor for
 #' user-facing test functions like [HTEST_FN()]. It returns a function with
 #' a consistent signature that routes to the correct implementation based
-#' on the model ID and method variant.
+#' on the variable mapper `<var_id>` and method variant.
 #'
 #' @param cls A string naming the test class, e.g. `"ttest"`.
 #' @param defs A list of `test_define` objects declaring the implementations.
 #' @param .name A string used as the test title in output.
 #' @param spec_class Base class of the type of statistical inference. Must be an S7.
 #'
-#' @return A function with signature `function(.model, .data, ...)`.
+#' @return A function with signature `function(.var_id, .data, ...)`.
 #'
 #' @seealso [test_define()], [prepare_test()], [via()], [conclude()]
 #'
@@ -21,14 +21,14 @@ STAT_CONSTRUCTOR = function(cls, defs, .name, spec_class) {
     force(.name)
     force(spec_class)
 
-    fn = function(.model = NULL, .data = NULL, ...) {
+    fn = function(.var_id = NULL, .data = NULL, ...) {
         # dots = list(...)
         build_stat(
             cls = cls,
             # args = dots,
             args = list(...),
             defs = defs,
-            model_id = .model,
+            var_id = .var_id,
             .data = .data,
             .name = .name,
             spec_class = spec_class
@@ -38,19 +38,19 @@ STAT_CONSTRUCTOR = function(cls, defs, .name, spec_class) {
     fn
 }
 
-build_stat = function(defs, args, cls, model_id, .data, .name, spec_class) {
-    if (!is.null(model_id)) {
-        run_stat(defs, args, cls, model_id, .data, .name)
+build_stat = function(defs, args, cls, var_id, .data, .name, spec_class) {
+    if (!is.null(var_id)) {
+        run_stat(defs, args, cls, var_id, .data, .name)
     } else {
-        lookup = build_lookup(defs)
+        lookup = build_lookup(defs, cls)
         defer_stat(lookup, args, cls, defs, .name, spec_class)
     }
 }
 
-run_stat = function(defs, args, cls, model_id, .data, .name) {
-    lookup = build_lookup(defs)
-    def = find_def(lookup, model_type = get_model_type(model_id))
-    processed = model_processor(model_id, data = .data)
+run_stat = function(defs, args, cls, var_id, .data, .name) {
+    lookup = build_lookup(defs, cls)
+    def = find_def(lookup, model_type = get_model_type(var_id))
+    processed = model_processor(var_id, data = .data)
 
     out_raw = inject_and_run(
         impl = def@impl$base,
@@ -60,7 +60,7 @@ run_stat = function(defs, args, cls, model_id, .data, .name) {
 
     stat_infer_spec(
         out_raw,
-        impl_cls = impl_cls_from_model(cls, model_id),
+        impl_cls = impl_cls_from_model(cls, var_id),
         stat_cls = cls,
         print_fn = def@impl$base@print,
         name = .name
@@ -73,12 +73,13 @@ defer_stat = function(lookup, args, cls, defs, .name, spec_class) {
         args = args,
         cls = cls,
         name = .name,
-        lookup = lookup
+        lookup = lookup,
+        registry_version = stat_define_registry$.version
     )
 }
 
-impl_cls_from_model = function(cls, model_id) {
-    model_nm = if (inherits(model_id, "formula")) "formula" else S7::S7_class(model_id)@name
+impl_cls_from_model = function(cls, var_id) {
+    model_nm = if (inherits(var_id, "formula")) "formula" else S7::S7_class(var_id)@name
     paste0(cls, "_", model_nm)
 }
 
@@ -88,12 +89,31 @@ model_type_name = function(model_type) {
     cli::cli_abort("Cannot extract a name from {.arg model_type}.")
 }
 
-build_lookup = function(defs) {
+build_lookup = function(defs, cls) {
     keys = vapply(defs, function(d) model_type_name(d@model_type), character(1))
     defs_rev = rev(defs)
     keys_rev = rev(keys)
-    lookup = rlang::set_names(defs_rev, keys_rev)
-    lookup[!duplicated(names(lookup))]
+    base_lookup = rlang::set_names(defs_rev, keys_rev)
+    base_lookup = base_lookup[!duplicated(names(base_lookup))]
+
+    reg_key = stat_define_registry_key(cls)
+    env = stat_define_registry[[reg_key]]
+    if (is.null(env)) return(base_lookup)
+
+    extra = as.list(env)
+    extra_defs = lapply(extra, function(e) e$def)
+
+    # Paranoia check — baked-in conflict should never reach here
+    # since add_stat_define already blocks it, but belt-and-suspenders
+    conflicts = intersect(names(base_lookup), names(extra_defs))
+    if (length(conflicts) > 0L) {
+        cli::cli_abort(c(
+            "Registry conflict detected for model type{?s}: {.val {conflicts}}.",
+            "i" = "This should have been caught by {.fn add_stat_define}. Please file a bug."
+        ))
+    }
+
+    c(base_lookup, extra_defs)
 }
 
 find_def = function(lookup, model_type) {
@@ -113,9 +133,9 @@ stat_infer_spec = S7::new_class(
     )
 )
 
-get_model_type = function(model_id) {
-    cls = S7::S7_class(model_id)
-    if (!is.null(cls)) cls@name else class(model_id)[[1]]
+get_model_type = function(var_id) {
+    cls = S7::S7_class(var_id)
+    if (!is.null(cls)) cls@name else class(var_id)[[1]]
 }
 
 S7::method(print, stat_infer_spec) = function(x, ...) {
@@ -136,7 +156,8 @@ test_spec = S7::new_class(
         args = S7::new_property(class = S7::class_list),
         cls = S7::new_property(class = S7::class_character),
         name = S7::new_property(class = S7::class_character),
-        lookup = S7::new_property(class = S7::class_list)
+        lookup = S7::new_property(class = S7::class_list),
+        registry_version = S7::new_property(class = S7::class_integer, default = 0L)
     )
 )
 
@@ -148,6 +169,7 @@ model_spec = S7::new_class(
         args = S7::new_property(class = S7::class_list),
         cls = S7::new_property(class = S7::class_character),
         name = S7::new_property(class = S7::class_character),
-        lookup = S7::new_property(class = S7::class_list)
+        lookup = S7::new_property(class = S7::class_list),
+        registry_version = S7::new_property(class = S7::class_integer, default = 0L)
     )
 )

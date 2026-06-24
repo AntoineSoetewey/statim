@@ -6,12 +6,12 @@ test_that("prepare_test() returns a test_lazy", {
     expect_s7_class(tl, test_lazy)
 })
 
-test_that("prepare_test() stores model_id, processed, test_spec", {
+test_that("prepare_test() stores var_id, processed, test_spec", {
     tl = sleep |>
         define_model(x_by(extra, group)) |>
         prepare_test(TTEST)
 
-    expect_s7_class(tl@model_id, x_by)
+    expect_s7_class(tl@var_id, x_by)
     expect_s7_class(tl@test_spec, test_spec)
     expect_named(tl@processed, c("x_data", "group_data"))
 })

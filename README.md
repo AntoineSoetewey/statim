@@ -1,7 +1,5 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-# statim <img src="man/figures/logo.png" align="right" height="139" />
+# statim <img src="man/figures/logo.png" align="right" height="139"/>
 
 <!-- badges: start -->
 
@@ -14,7 +12,7 @@ coverage](https://codecov.io/gh/s7-stats/statim/graph/badge.svg)](https://app.co
 
 **A Declarative Interface for Statistical Inference**
 
-## Package Overview
+## Package Overview: Simple Fun Fact
 
 What does `{statim}` mean?
 
@@ -22,6 +20,7 @@ What does `{statim}` mean?
 a double meaning:
 
 - *stat*: as in statistics, the domain this package lives in
+
 - *im* (*statim*): as in “immediate”, signalling that inference should
   be expressible as a direct declaration, not somewhat a sequence of
   mechanical steps
@@ -31,14 +30,9 @@ perform, then `{statim}` immediately delivers *how*.
 
 ## Why statim?
 
-R has a rich statistical ecosystem. Most of the packages in the wild
-were written at top of S3 and S4, and it is yet for the S7 to be
-prominent into statistics ecosystem — `{statim}` is glad to take the
-step (there are reasons why [S7 supersedes both S3 and
-S4](https://tidyverse.org/blog/2024/11/s7-0-2-0/)). Statistical
-inference in general is served by an assortment of disconnected
-functions: the functions you’re looking for may exist but they are
-scattered across different packages.
+R has a rich statistical ecosystem. Statistical inference in general is
+served by an assortment of disconnected functions: the functions you’re
+looking for may exist but they are scattered across different packages.
 
 R gained a grammar for graphics (`{ggplot2}`), and one for data
 manipulation (`{dplyr}`). And then there’s `{statim}`, an attempt to
@@ -51,11 +45,11 @@ What makes `{statim}` *composable* for statistical workflows is the
 *verbs* and the *accessibility* of the methods you’re looking for. For
 example, you want to write a t-test pipeline, and you want to use the
 classical one and then the permutation method. `{statim}` lets you do
-that with `via()`, and while you can use t-test from `default`
-(classical), you can access its permutation method through
-`... |> via(permute)` (or whatever the keyword is) with one line of code
-only. You won’t need you to do a lot of work (which sometimes require
-rewriting your code), just a single addition to the syntax.
+that with `via("<method_name>")`, and while you can use t-test from
+`default` (classical), you can access its permutation method through
+`... |> via("permute")` with one line of code only. You won’t need you
+to do a lot of work (which sometimes require rewriting your code), just
+a single addition to the syntax.
 
 ``` r
 # Classical t-test
@@ -68,7 +62,8 @@ sleep |>
 sleep |> 
     define_model(x_by(extra, group)) |> 
     prepare_test(TTEST) |> 
-    via("permute", n = 1000L) |>         # Here, one line added, nothing else changes
+    # Here, one line added, nothing else changes
+    via("permute", n = 1000L) |>         
     conclude()
 ```
 
@@ -79,9 +74,9 @@ For a quick result, the eager form skips the piped syntax entirely:
 TTEST(x_by(extra, group), sleep)
 ```
 
-But it’s not as expressive and assertive as the piped syntax form as
-shown above, and you can’t process the output after executing this ([see
-for more details](#core-semantics)).
+The trade-off: eager forms cannot be recalibrated / switch off into
+different methods with `via()` and do not support post-execution output
+manipulation ([see for more details](#core-semantics)).
 
 ## Installation
 
@@ -103,39 +98,52 @@ pak::pak("s7-stats/statim")
 
 ## General Usage
 
-By the way, loading a library comes with [a lot of
-preferences](https://joshuamarie.com/posts/06-load-pkg/). Let us start
-by loading `{statim}` first:
+Let us start by loading `{statim}` first:
 
 ``` r
 library(statim)
 ```
 
 All you need to know is that the most usual usage of `{statim}` comes
-with three steps.
+with three steps. Here’s the general anatomy of the main `{statim}`
+semantics:
 
 ``` r
-sleep |>                                # 1
-    define_model(extra %by% group) |>   # 1              
-    prepare_test(TTEST) |>              # 2            
-    conclude() |>                       # 3           
-    tidy()                              # 3          
+# Data can be piped in or passed as argument to `define_model()`
+... |>                                   # Possible extensions  
+    define_model(
+        <var_id>(var1, var2, ...), 
+        data, ...
+    ) |>                                 # 1. Model definition
+    # ... |>                             # Possible extensions  
+    prepare_*(<STAT_FN>) |>              # 2. Prepare method (lazy)
+    via(...) |>                          # Optional: method variant  (*)
+    state_null(<expr>) |>                # Optional: null hypothesis (*)
+    # ... |>                             # Possible extensions  
+    conclude() |>                        # 3. Execute
+    <output_handler>()                   # e.g. tidy(), display()    
 ```
 
-Brief explanation of the code above:
+Explanation of the code above:
 
 1.  *Model processor and definition*, where defining the shape of model
     *to be analyzed* happens at the beginning during statistical
     inference. Typically, this step where supplying either a data frame
-    or a `<model_id>` objects into `define_model()` occurs, and then
-    some functions to be appended in the future updates.
+    or a `<var_id>` objects into `define_model()` occurs, and then some
+    functions to be appended in the future updates.
 
 2.  *Parameterization*, where the estimation process of the statistical
     inference pipeline is defined lazily. Our usual statistical
     inference application can be either a model-based inference
     (e.g. linear regression through `prepare_model()`) or H-test
     inference (e.g. t-test through `prepare_test()`). With that said,
-    the execution is lazy-loaded, and only executed if needed.
+    the execution is lazy-loaded, and only executed if needed. (The
+    `(*)` mark means they are interchangeable. )
+
+    > `state_null()` is one of the reasons why `{statim}` — it’s
+    > astronomical way of writing null hypothesis expressed
+    > mathematically. Learn more about it on
+    > `vignette("hypothesis-expressions", package = "statim")`.
 
 3.  *Execution and retrieval*, where the first 2 steps is (re-)executed
     and then retrieve the output. The most common function is
@@ -143,29 +151,31 @@ Brief explanation of the code above:
     e.g. through `tidy()`. This is functional if there are available
     methods are registered, automatically or from a manual step.
 
-For more information, see through `vignette("statim")`, and learn more
-about how `{statim}` works.
+The `...` before the pipe above means the possible future extensions for
+this package. For more information, see through `vignette("statim")`,
+and learn more about how `{statim}` works.
 
 ## Core Semantics
 
 The package is designed around three ideas:
 
-1.  **A shared grammar**: every inferential procedure follows the same
-    shape — `define_model()`, `prepare_test()`, `conclude()`, regardless
-    of which test or model ID is used. The model ID objects
-    (e.g. `x_by`, `rel`, `pairwise`) defines the shape of the
-    statistical inference throughout `{statim}` pipeline, while the
-    grammar stays the same. Eager forms (`TTEST()`, `CORTEST()`, …)
-    provide a shortcut when the full pipeline (in a form of piped syntax
-    that reads like a sentence) is not needed.
-
-2.  **Composability**: the simplest way to write `{statim}` has two
+1.  **Composability**: the simplest way to write `{statim}` has two
     forms: the eager form and the grammar/piped syntax form. The eager
     form skips the verbs and cannot be recalibrated, only skips to the
     output. On the other hand, the grammar/piped syntax form relies on
     verbs and lazy loading, which comes with the recalibration of the
     estimation method with a single `via()` call, and the execution of
     the lazy-loaded pipeline with `conclude()`.
+
+2.  **A shared grammar**: Only applied on the main `{statim}` semantics:
+    piped/grammar syntax. `define_model()` =\> `prepare_*()` =\>
+    `conclude()` is the same shape for every inferential procedure. The
+    `<var_id>` objects (`x_by`, `rel`, `pairwise`, …) describe the
+    statistical structure of the problem; the verbs stay constant.
+
+    > Eager forms (`TTEST()`, `CORTEST()`, …) provide a shortcut when
+    > the full pipeline (in a form of piped syntax that reads like a
+    > sentence) is not needed.
 
 3.  **Extensible by design**: the `{statim}` pipeline is extensible. For
     instance, if you want to write new estimation method, an

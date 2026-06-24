@@ -6,13 +6,13 @@
 #'
 #' @param fn A function whose first argument must be `.proc`, the processed
 #'   model output from [model_processor()]. The keys available on `.proc`
-#'   depend on the model ID used:
+#'   depend on the variable mapper `<var_id>` used:
 #'   - `x_by`: `$x_data`, `$group_data`
 #'   - `rel`: `$x_data`, `$resp_data`
 #'   - `pairwise`: `$var_names`, `$pairs`, `$data`
 #'   - `formula`: `$data`, `$vars`, `$formula`
 #'
-#'   Try run this to explore the structure: `names(model_processor(<model_id>, <data>))`.
+#'   Try run this to explore the structure: `names(model_processor(<var_id>, <data>))`.
 #'
 #'   \cr
 #'
@@ -36,20 +36,24 @@
 #' @param print A function with signature `function(x, ...)` for formatting
 #'   the result. `x` is a `cld_exec` object — read your result from `x@data`.
 #'   `NULL` falls back to `print(x@data)`.
+#' @param claim_parser A [map_claim()] object that maps a `null_claim` to
+#'   named arguments injected into `fn` alongside `.proc`. `NULL` (the
+#'   default) if this implementation does not support [state_null()].
 #'
 #' @return A `baseline` S7 object.
 #'
 #' @seealso [variant()], [agendas()], [stat_define()], [model_processor()],
-#'   [class_stat_infer], [auto_tidy()]
+#'   [map_claim()], [class_stat_infer], [auto_tidy()]
 #'
 #' @export
 baseline = S7::new_class(
     "baseline",
     properties = list(
         fn = S7::new_property(class = S7::class_function),
-        print = S7::new_property(default = NULL)
+        print = S7::new_property(default = NULL),
+        claim_parser = S7::new_property(default = NULL)
     ),
-    constructor = function(fn, print = NULL) {
+    constructor = function(fn, print = NULL, claim_parser = NULL) {
         if (!is.function(fn)) {
             cli::cli_abort("{.arg fn} must be a function.")
         }
@@ -64,10 +68,14 @@ baseline = S7::new_class(
         if (!is.null(print) && !is.function(print)) {
             cli::cli_abort("{.arg print} must be a function or {.val NULL}.")
         }
+        if (!is.null(claim_parser) && !inherits(claim_parser, "map_claim")) {
+            cli::cli_abort("{.arg claim_parser} must be a {.fn map_claim} object or {.val NULL}.")
+        }
         S7::new_object(
             S7::S7_object(),
             fn = fn,
-            print = print
+            print = print,
+            claim_parser = claim_parser
         )
     }
 )
@@ -79,13 +87,13 @@ baseline = S7::new_class(
 #'
 #' @param fn A function whose first argument must be `.proc`, the processed
 #'   model output from [model_processor()]. The keys available on `.proc`
-#'   depend on the model ID used:
+#'   depend on the variable mapper `<var_id>` used:
 #'   - `x_by`: `$x_data`, `$group_data`
 #'   - `rel`: `$x_data`, `$resp_data`
 #'   - `pairwise`: `$var_names`, `$pairs`, `$data`
 #'   - `formula`: `$data`, `$vars`, `$formula`
 #'
-#'   Try run this to explore the structure: `names(model_processor(<model_id>, <data>))`.
+#'   Try run this to explore the structure: `names(model_processor(<var_id>, <data>))`.
 #'
 #'   \cr
 #'
@@ -121,20 +129,24 @@ baseline = S7::new_class(
 #'
 #' @param print A function with signature `function(x, ...)`. `x` is a
 #'   `cld_exec` object. `NULL` falls back to `print(x@data)`.
+#' @param claim_parser A [map_claim()] object that maps a `null_claim` to
+#'   named arguments injected into `fn` alongside `.proc`. `NULL` (the
+#'   default) if this variant does not support [state_null()].
 #'
 #' @return A `variant` S7 object.
 #'
 #' @seealso [baseline()], [agendas()], [via()], [model_processor()],
-#'   [class_stat_infer], [auto_tidy()]
+#'   [map_claim()], [class_stat_infer], [auto_tidy()]
 #'
 #' @export
 variant = S7::new_class(
     "variant",
     properties = list(
         fn = S7::new_property(class = S7::class_function),
-        print = S7::new_property(default = NULL)
+        print = S7::new_property(default = NULL),
+        claim_parser = S7::new_property(default = NULL)
     ),
-    constructor = function(fn, print = NULL) {
+    constructor = function(fn, print = NULL, claim_parser = NULL) {
         if (!is.function(fn)) {
             cli::cli_abort("{.arg fn} must be a function.")
         }
@@ -149,10 +161,14 @@ variant = S7::new_class(
         if (!is.null(print) && !is.function(print)) {
             cli::cli_abort("{.arg print} must be a function or {.val NULL}.")
         }
+        if (!is.null(claim_parser) && !inherits(claim_parser, "map_claim")) {
+            cli::cli_abort("{.arg claim_parser} must be a {.fn map_claim} object or {.val NULL}.")
+        }
         S7::new_object(
             S7::S7_object(),
             fn = fn,
-            print = print
+            print = print,
+            claim_parser = claim_parser
         )
     }
 )

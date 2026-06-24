@@ -16,20 +16,21 @@ parse_null_claim = function(quo) {
 
     op = validate_top_level_op(expr)
 
+    # (For future use)
     # %=% chains are left-associative in R:
     # MU(a) %=% MU(b) %=% MU(c) parses as ((MU(a) %=% MU(b)) %=% MU(c))
     # We flatten all operands recursively into a list and store in lhs.
     # rhs is NULL for %=% claims.
-    if (op == "%=%") {
-        nodes = flatten_peq(expr, env)
-        return(null_claim(
-            lhs = nodes,
-            rhs = NULL,
-            op = "%=%",
-            alt_op = "%!=%",
-            expr = expr
-        ))
-    }
+    # if (op == "%=%") {
+    #     nodes = flatten_peq(expr, env)
+    #     return(null_claim(
+    #         lhs = nodes,
+    #         rhs = NULL,
+    #         op = "%=%",
+    #         alt_op = "%!=%",
+    #         expr = expr
+    #     ))
+    # }
 
     lhs = parse_param_node(expr[[2]], env, side = "LHS")
     rhs = parse_param_node(expr[[3]], env, side = "RHS")
@@ -55,25 +56,25 @@ parse_null_claim = function(quo) {
     )
 }
 
-#' Recursively flatten a left-associative %=% chain into a list of nodes.
-#'
-#' ((MU(a) %=% MU(b)) %=% MU(c)) → list(MU(a), MU(b), MU(c))
-#'
-#' @keywords internal
-#' @noRd
-flatten_peq = function(expr, env) {
-    if (rlang::is_call(expr, "%=%")) {
-        lhs_nodes = flatten_peq(expr[[2]], env)
-        rhs_expr = expr[[3]]
-        if (rlang::is_call(rhs_expr, "(")) rhs_expr = rhs_expr[[2]]
-        rhs_node = parse_param_node(rhs_expr, env, side = "RHS")
-        c(lhs_nodes, list(rhs_node))
-    } else if (rlang::is_call(expr, "(")) {
-        list(parse_param_node(expr[[2]], env, side = "LHS"))
-    } else {
-        list(parse_param_node(expr, env, side = "LHS"))
-    }
-}
+# #' Recursively flatten a left-associative %=% chain into a list of nodes.
+# #'
+# #' ((MU(a) %=% MU(b)) %=% MU(c)) → list(MU(a), MU(b), MU(c))
+# #'
+# #' @keywords internal
+# #' @noRd
+# flatten_peq = function(expr, env) {
+#     if (rlang::is_call(expr, "%=%")) {
+#         lhs_nodes = flatten_peq(expr[[2]], env)
+#         rhs_expr = expr[[3]]
+#         if (rlang::is_call(rhs_expr, "(")) rhs_expr = rhs_expr[[2]]
+#         rhs_node = parse_param_node(rhs_expr, env, side = "RHS")
+#         c(lhs_nodes, list(rhs_node))
+#     } else if (rlang::is_call(expr, "(")) {
+#         list(parse_param_node(expr[[2]], env, side = "LHS"))
+#     } else {
+#         list(parse_param_node(expr, env, side = "LHS"))
+#     }
+# }
 
 validate_top_level_op = function(expr) {
     if (!rlang::is_call(expr)) {

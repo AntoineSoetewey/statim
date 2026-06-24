@@ -1,5 +1,5 @@
 #' Resolve and call the right fn from a baseline or variant,
-#' injecting the processed model output and user-supplied args.
+#' injecting the processed output and user-supplied args.
 #'
 #' `.proc` is always injected as the first argument. Every other formal
 #' is resolved from `args`, falling back to the declared default in `fn`.

@@ -4,10 +4,10 @@
 \alias{P_TEST}
 \title{Proportion Test}
 \usage{
-P_TEST(.model = NULL, .data = NULL, ...)
+P_TEST(.var_id = NULL, .data = NULL, ...)
 }
 \arguments{
-\item{.model}{A registered model ID, e.g. \code{\link[=prop]{prop()}}. When supplied, the test executes
+\item{.var_id}{A registered variable mapper \verb{<var_id>}, e.g. \code{\link[=prop]{prop()}}. When supplied, the test executes
 immediately.}
 
 \item{.data}{Unused. Accepted for pipeline consistency.}
@@ -16,7 +16,7 @@ immediately.}
 \strong{Arguments} and \strong{Variants} sections below.}
 }
 \value{
-A \code{cld_exec} object, or a \code{test_spec} when \code{.model = NULL}.
+A \code{cld_exec} object, or a \code{test_spec} when \code{.var_id = NULL}.
 The object stored in \code{cld_exec@data} is a \link{class_p_test} object.
 }
 \description{

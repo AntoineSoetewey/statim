@@ -7,13 +7,13 @@
 #' (e.g. [stats::binomial()], [stats::poisson()]). Defaults to
 #' [stats::gaussian()] when omitted.
 #'
-#' @param .model A model ID from [define_model()], or `NULL` to return a
+#' @param .var_id A variable mapper `<var_id>` from [define_model()], or `NULL` to return a
 #'   `model_spec` for use in [prepare_model()].
-#' @param .data A data frame. Used when `.model` is supplied directly.
+#' @param .data A data frame. Used when `.var_id` is supplied directly.
 #' @param ... Additional arguments passed to [stats::glm()].
 #'
 #' @return A `cld_exec` object in a `class_glm_object`, or a `model_spec`
-#'   when `.model = NULL`.
+#'   when `.var_id = NULL`.
 #'
 #' @examples
 #' # logistic regression
@@ -47,7 +47,7 @@
 #' @export
 GLM = MODEL_FN(
     cls = "glm",
-    defs = list(glm_def_formula),
+    defs = list(glm_def_rel, glm_def_formula),
     .name = "Generalized Linear Model"
 )
 

@@ -529,7 +529,7 @@ test_that("write_models() supports update() chaining across named expressions", 
     expect_length(em@models, 3L)
     expect_equal(em@labels, c("f1", "f2", "f3"))
 
-    f3_formula = em@models[[3L]]@model_id
+    f3_formula = em@models[[3L]]@var_id
     expect_equal(deparse(f3_formula), "sr ~ pop15 + pop75")
 })
 

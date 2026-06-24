@@ -270,7 +270,7 @@ test_that("pairs_generator() with simplify = FALSE returns a data frame", {
 
 # ---- Core `define_model()` processor ----
 # Internally, `define_model()` always relies on
-# `model_processor()` given the data and the `model_id`
+# `model_processor()` given the data and the `var_id`
 
 test_that("model_processor() for x_by returns x_data and group_data", {
     result = model_processor(x_by(extra, group), sleep)
@@ -311,7 +311,7 @@ test_that("model_processor() for formula resolves variables from environment whe
 })
 
 # ---- vars_preview + format_quo_label ----
-# This is only used to display info from `model_id` objects
+# This is only used to display info from `var_id` objects
 
 test_that("vars_preview() returns a list with name and preview fields", {
     cols = list(x = 1:10, g = letters[1:10])

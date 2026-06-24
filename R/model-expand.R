@@ -28,15 +28,15 @@ multi_exec = S7::new_class(
 #'
 #' `write_models()` evaluates named model expressions sequentially against
 #' `.data`, so each name is available to subsequent expressions via
-#' [stats::update()]. Accepts any valid model ID: formulas, [rel()],
-#' [x_by()], or any registered `model_id` type.
+#' [stats::update()]. Accepts any valid variable mapper `<var_id>`: `<formulas>`, [rel()],
+#' [x_by()], or any registered `var_id` type.
 #'
 #' Sits between a data frame and [prepare_model()] or [prepare_test()]
 #' in the pipeline.
 #'
 #' @param .data A data frame.
 #' @param ... Named model expressions. Each must evaluate to a formula or
-#'   a `model_id` object. Names are used as row labels in [anova()] output
+#'   a `var_id` object. Names are used as row labels in [anova()] output
 #'   and as the `model` column in [tidy()].
 #'
 #' @return An `expanded_model` object.
@@ -111,8 +111,8 @@ S7::method(write_models, S7::class_data.frame) = function(.data, ...) {
     for (i in seq_along(quos)) {
         val = rlang::eval_tidy(quos[[i]], data = env)
         env[[nms[[i]]]] = val
-        models[[i]] = def_model(
-            model_id = val,
+        models[[i]] = def_var(
+            var_id = val,
             processed = model_processor(val, .data)
         )
     }
@@ -126,7 +126,7 @@ S7::method(print, expanded_model) = function(x, ...) {
     for (i in seq_along(x@models)) {
         m = x@models[[i]]
         lbl = x@labels[[i]]
-        cat(sprintf("  %s : %s\n", lbl, model_id_info(m@model_id)@args))
+        cat(sprintf("  %s : %s\n", lbl, var_id_info(m@var_id)@args))
     }
     cat("\n")
     invisible(x)
@@ -173,7 +173,7 @@ S7::method(prepare_model, list(expanded_model, S7::class_function)) = function(.
     spec = as_model_spec(.model_fn)
     models = lapply(.x@models, function(dm) {
         model_lazy(
-            model_id = dm@model_id,
+            var_id = dm@var_id,
             processed = dm@processed,
             model_spec = spec
         )
@@ -185,7 +185,7 @@ S7::method(prepare_test, list(expanded_model, S7::class_function)) = function(.x
     spec = as_test_spec(.test)
     models = lapply(.x@models, function(dm) {
         test_lazy(
-            model_id = dm@model_id,
+            var_id = dm@var_id,
             processed = dm@processed,
             test_spec = spec
         )
@@ -199,7 +199,7 @@ S7::method(print, multi_lazy) = function(x, ...) {
     for (i in seq_along(x@models)) {
         m = x@models[[i]]
         lbl = x@labels[[i]]
-        cat(sprintf("  %s : %s\n", lbl, model_id_info(m@model_id)@args))
+        cat(sprintf("  %s : %s\n", lbl, var_id_info(m@var_id)@args))
     }
     cat("\n")
     invisible(x)

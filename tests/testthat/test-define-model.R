@@ -1,16 +1,16 @@
 test_that("define_model() dispatches on model-ID first style", {
     dm = define_model(x_by(extra, group), sleep)
 
-    expect_s7_class(dm, def_model)
-    expect_s7_class(dm@model_id, x_by)
+    expect_s7_class(dm, def_var)
+    expect_s7_class(dm@var_id, x_by)
     expect_named(dm@processed, c("x_data", "group_data"))
 })
 
 test_that("define_model() dispatches on data-frame first style", {
     dm = sleep |> define_model(x_by(extra, group))
 
-    expect_s7_class(dm, def_model)
-    expect_s7_class(dm@model_id, x_by)
+    expect_s7_class(dm, def_var)
+    expect_s7_class(dm@var_id, x_by)
     expect_named(dm@processed, c("x_data", "group_data"))
 })
 
@@ -24,7 +24,7 @@ test_that("define_model() data-frame first and model-ID first produce identical 
 test_that("define_model() with rel() populates x_data and resp_data", {
     dm = define_model(rel(speed, dist), cars)
 
-    expect_s7_class(dm@model_id, rel)
+    expect_s7_class(dm@var_id, rel)
     expect_named(dm@processed, c("x_data", "resp_data"))
     expect_equal(dm@processed$x_data$speed, cars$speed)
     expect_equal(dm@processed$resp_data$dist, cars$dist)
@@ -33,7 +33,7 @@ test_that("define_model() with rel() populates x_data and resp_data", {
 test_that("define_model() with pairwise() populates var_names, pairs, data", {
     dm = define_model(pairwise(speed, dist), cars)
 
-    expect_s7_class(dm@model_id, pairwise)
+    expect_s7_class(dm@var_id, pairwise)
     expect_named(dm@processed, c("var_names", "pairs", "data"))
     expect_all_true(dm@processed$var_names == c("speed", "dist"))
     # expect_equal(dm@processed$var_names, c("speed", "dist"))
@@ -42,18 +42,18 @@ test_that("define_model() with pairwise() populates var_names, pairs, data", {
 test_that("define_model() with formula dispatches correctly", {
     dm = define_model(extra ~ group, sleep)
 
-    expect_s7_class(dm, def_model)
-    expect_true(inherits(dm@model_id, "formula"))
+    expect_s7_class(dm, def_var)
+    expect_true(inherits(dm@var_id, "formula"))
     expect_named(dm@processed, c("data", "vars", "formula"))
 })
 
 # ---- x_by ----
 
-test_that("x_by() produces an x_by/model_id object", {
+test_that("x_by() produces an x_by/var_id object", {
     m = x_by(extra, group)
 
     expect_s7_class(m, x_by)
-    expect_s7_class(m, model_id)
+    expect_s7_class(m, var_id)
 })
 
 test_that("x_by() stores quosures in @x and @group", {
@@ -102,11 +102,11 @@ test_that("%by% is an alias for x_by()", {
 
 # ---- rel ----
 
-test_that("rel() produces a rel/model_id object", {
+test_that("rel() produces a rel/var_id object", {
     m = rel(speed, dist)
 
     expect_s7_class(m, rel)
-    expect_s7_class(m, model_id)
+    expect_s7_class(m, var_id)
 })
 
 test_that("rel() with tidyselect helper requires data — errors without it", {
@@ -127,11 +127,11 @@ test_that("rel() resolves columns from data frame", {
 
 # ---- pairwise ----
 
-test_that("pairwise() produces a pairwise/model_id object", {
+test_that("pairwise() produces a pairwise/var_id object", {
     m = pairwise(a, b, c)
 
     expect_s7_class(m, pairwise)
-    expect_s7_class(m, model_id)
+    expect_s7_class(m, var_id)
 })
 
 test_that("pairwise() default direction is 'lt'", {
@@ -174,10 +174,10 @@ test_that("pairwise() with direction = 'eq' returns only self-pairs", {
     expect_true(all(vapply(dm@processed$pairs, \(p) p[[1]] == p[[2]], logical(1))))
 })
 
-# ---- model_id_info ----
+# ---- var_id_info ----
 
-test_that("model_id_info() for x_by without processed omits vars and counts", {
-    info = model_id_info(x_by(extra, group))
+test_that("var_id_info() for x_by without processed omits vars and counts", {
+    info = var_id_info(x_by(extra, group))
 
     expect_equal(info@model_type, "x_by")
     expect_match(info@args, "extra")
@@ -186,59 +186,59 @@ test_that("model_id_info() for x_by without processed omits vars and counts", {
     expect_length(info@other_info, 0)
 })
 
-test_that("model_id_info() for x_by with processed includes vars and counts", {
+test_that("var_id_info() for x_by with processed includes vars and counts", {
     dm = define_model(x_by(extra, group), sleep)
-    info = model_id_info(dm@model_id, dm@processed)
+    info = var_id_info(dm@var_id, dm@processed)
 
     expect_equal(info@other_info$x_vars, 1)
     expect_equal(info@other_info$by_vars, 1)
     expect_length(info@vars, 2)
 })
 
-test_that("model_id_info() for rel without processed omits vars", {
-    info = model_id_info(rel(speed, dist))
+test_that("var_id_info() for rel without processed omits vars", {
+    info = var_id_info(rel(speed, dist))
 
     expect_equal(info@model_type, "rel")
     expect_length(info@vars, 0)
 })
 
-test_that("model_id_info() for rel with processed includes vars and counts", {
+test_that("var_id_info() for rel with processed includes vars and counts", {
     dm = define_model(rel(speed, dist), cars)
-    info = model_id_info(dm@model_id, dm@processed)
+    info = var_id_info(dm@var_id, dm@processed)
 
     expect_equal(info@other_info$x_vars, 1)
     expect_equal(info@other_info$resp_vars, 1)
     expect_length(info@vars, 2)
 })
 
-test_that("model_id_info() for pairwise includes direction in other_info", {
-    info = model_id_info(pairwise(a, b, c))
+test_that("var_id_info() for pairwise includes direction in other_info", {
+    info = var_id_info(pairwise(a, b, c))
 
     expect_equal(info@model_type, "pairwise")
     expect_equal(info@other_info$direction, "lt")
 })
 
-test_that("model_id_info() for pairwise with processed includes n_pairs", {
+test_that("var_id_info() for pairwise with processed includes n_pairs", {
     df = data.frame(a = 1:5, b = 1:5, c = 1:5)
     dm = define_model(pairwise(a, b, c), df)
-    info = model_id_info(dm@model_id, dm@processed)
+    info = var_id_info(dm@var_id, dm@processed)
 
     expect_equal(info@other_info$n_pairs, 3)
     expect_length(info@vars, 3)
 })
 
-test_that("model_id_info() for formula reports left_var and right_var", {
+test_that("var_id_info() for formula reports left_var and right_var", {
     dm = define_model(extra ~ group, sleep)
-    info = model_id_info(dm@model_id, dm@processed)
+    info = var_id_info(dm@var_id, dm@processed)
 
     expect_equal(info@model_type, "formula")
     expect_equal(info@other_info$left_var, 1)
     expect_equal(info@other_info$right_var, 1)
 })
 
-test_that("model_id_info() for unregistered subclass returns property names in args", {
-    my_id = S7::new_class("my_id", parent = model_id, properties = list(foo = S7::class_any))
-    info = model_id_info(my_id(foo = 1))
+test_that("var_id_info() for unregistered subclass returns property names in args", {
+    my_id = S7::new_class("my_id", parent = var_id, properties = list(foo = S7::class_any))
+    info = var_id_info(my_id(foo = 1))
 
     expect_equal(info@model_type, "my_id")
     expect_match(info@args, "foo")
@@ -247,19 +247,19 @@ test_that("model_id_info() for unregistered subclass returns property names in a
     expect_length(info@other_info, 0)
 })
 
-test_that("define_model() with unregistered model_id subclass prints without error", {
-    my_id = S7::new_class("my_id", parent = model_id, properties = list(foo = S7::class_any))
+test_that("define_model() with unregistered var_id subclass prints without error", {
+    my_id = S7::new_class("my_id", parent = var_id, properties = list(foo = S7::class_any))
     dm = define_model(my_id(foo = 1))
 
     expect_invisible(print(dm))
     expect_output(print(dm), "Unregistered")
 })
 
-test_that("model_id_info() for known subclasses sets registered = TRUE", {
-    expect_true(model_id_info(x_by(extra, group))@registered)
-    expect_true(model_id_info(rel(speed, dist))@registered)
-    expect_true(model_id_info(pairwise(a, b, c))@registered)
-    expect_true(model_id_info(prop(45, 100))@registered)
+test_that("var_id_info() for known subclasses sets registered = TRUE", {
+    expect_true(var_id_info(x_by(extra, group))@registered)
+    expect_true(var_id_info(rel(speed, dist))@registered)
+    expect_true(var_id_info(pairwise(a, b, c))@registered)
+    expect_true(var_id_info(prop(45, 100))@registered)
 })
 
 # ---- prop ----
@@ -267,37 +267,37 @@ test_that("model_id_info() for known subclasses sets registered = TRUE", {
 test_that("define_model() with prop() dispatches on model-ID first style", {
     dm = define_model(prop(45, 100))
 
-    expect_s7_class(dm, def_model)
-    expect_s7_class(dm@model_id, prop)
+    expect_s7_class(dm, def_var)
+    expect_s7_class(dm@var_id, prop)
     expect_named(dm@processed, c("x", "n"))
 })
 
-test_that("model_id_info() for prop without processed still includes vars", {
-    info = model_id_info(prop(45, 100))
+test_that("var_id_info() for prop without processed still includes vars", {
+    info = var_id_info(prop(45, 100))
 
     expect_equal(info@model_type, "prop")
     expect_length(info@vars, 2)
 })
 
-test_that("print.def_model() returns invisibly for prop()", {
+test_that("print.def_var() returns invisibly for prop()", {
     dm = define_model(prop(45, 100))
 
     expect_invisible(print(dm))
 })
 
-test_that("print.model_id() returns invisibly for prop()", {
+test_that("print.var_id() returns invisibly for prop()", {
     expect_invisible(print(prop(45, 100)))
 })
 
 # print methods ----------------------------------------------------------------
 
-test_that("print.def_model() returns invisibly", {
+test_that("print.def_var() returns invisibly", {
     dm = define_model(x_by(extra, group), sleep)
 
     expect_invisible(print(dm))
 })
 
-test_that("print.model_id() returns invisibly", {
+test_that("print.var_id() returns invisibly", {
     expect_invisible(print(x_by(extra, group)))
     expect_invisible(print(rel(speed, dist)))
     expect_invisible(print(pairwise(a, b, c)))

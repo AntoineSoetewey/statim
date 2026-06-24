@@ -13,7 +13,7 @@ the left-hand side; the right-hand side determines the test type:
 \item \code{y ~ group + 1}" both tests in a single call.
 }
 
-Use a formula directly as the model ID to select this implementation.
+Use a formula directly as the variable mapper \verb{<var_id>} to select this implementation.
 }
 \section{Arguments}{
 
@@ -33,12 +33,15 @@ No variants are currently registered for the formula path. Use
 \code{\link[=add_variant]{add_variant()}} to register custom variants at the user or package level.
 }
 
-\section{Result class}{
+\section{Formula-based t-test class}{
 
 Returns a tibble with columns \code{type}, \code{group}, and \code{ttest} (a list-column
-of \code{\link[stats:t.test]{stats::t.test()}} results). This path does not currently return a
-\link{class_stat_infer} subclass — use \code{\link[=making_tidy]{making_tidy()}} to register a tidy
-method if needed.
+of \code{\link[stats:t.test]{stats::t.test()}} objects). This path does not currently return a
+\link{class_stat_infer} subclass. Otherwise, to process outputs:
+\itemize{
+\item \code{print()}: Write it down through \code{print} from \code{\link[=variant]{variant()}}.
+\item \code{tidy()}: Use \code{\link[=making_tidy]{making_tidy()}} to register a tidy method if needed.
+}
 }
 
 \examples{

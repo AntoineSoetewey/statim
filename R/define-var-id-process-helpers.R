@@ -1,4 +1,4 @@
-#' Inline multiple expressions in a model ID
+#' Inline multiple expressions in a Variable Mapper
 #'
 #' `inlines()` is the multi-expression analogue of `c()` for inline data.
 #' Where `c(x1, x2)` selects multiple variables or columns by name from a
@@ -18,7 +18,7 @@
 #'   take an auto-name based on their position regardless of whether other
 #'   elements are named.
 #'
-#' @return A named list of quosures. Intended for use inside model ID
+#' @return A named list of quosures. Intended for use inside variable mapper `<var_id>`
 #'   functions such as [x_by()] and [rel()]; not typically called on its own.
 #'
 #' @seealso [I()] for a single inline expression, [x_by()], [rel()],
@@ -168,7 +168,7 @@ resolve_quo = function(quo, data = NULL, role = "x", idx = 1L) {
         ":error" = {
             expr_lbl = rlang::as_label(quo)
             cli::cli_abort(c(
-                "Invalid input in model ID: {.code {expr_lbl}}.",
+                "Invalid input in variable mapper `<var_id>`: {.code {expr_lbl}}.",
                 "i" = "Wrap inline expressions with {.fn I}: {.code I({expr_lbl})}.",
                 "i" = "Use bare names or {.code c()} for column references."
             ))

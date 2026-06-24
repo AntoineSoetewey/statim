@@ -1,8 +1,8 @@
 test_lazy = S7::new_class(
     "test_lazy",
     properties = list(
-        model_id = S7::new_property(
-            class = S7::new_union(model_id, S7::class_formula)
+        var_id = S7::new_property(
+            class = S7::new_union(var_id, S7::class_formula)
         ),
         processed = S7::new_property(class = S7::class_list),
         test_spec = S7::new_property(class = test_spec),
@@ -14,11 +14,11 @@ test_lazy = S7::new_class(
 
 #' Lazily prepare a single test
 #'
-#' `prepare_test()` attaches a test specification to a `def_model` object,
+#' `prepare_test()` attaches a test specification to a `def_var` object,
 #' producing a `test_lazy` ready for optional recalibration with [via()]
 #' before being executed with [conclude()].
 #'
-#' @param .x An S7 object extension yielded by, e.g. `def_model` object from [define_model()],
+#' @param .x An S7 object extension yielded by, e.g. `def_var` object from [define_model()],
 #'   or an `expanded_model` object from [write_models()].
 #' @param .test A test function such as [TTEST], or a `test_spec` object
 #'   returned by calling such a function with no arguments.
@@ -38,11 +38,11 @@ test_lazy = S7::new_class(
 #' @export
 prepare_test = S7::new_generic("prepare_test", dispatch_args = c(".x", ".test"))
 
-S7::method(prepare_test, list(def_model, S7::class_function)) = function(.x, .test, ...) {
+S7::method(prepare_test, list(def_var, S7::class_function)) = function(.x, .test, ...) {
     spec = as_test_spec(.test)
     dots = list(...)
     test_lazy(
-        model_id = .x@model_id,
+        var_id = .x@var_id,
         processed = .x@processed,
         test_spec = spec,
         recalibrate_spec = if (length(dots) > 0L) list(args = dots) else NULL
@@ -51,7 +51,7 @@ S7::method(prepare_test, list(def_model, S7::class_function)) = function(.x, .te
 
 S7::method(print, test_lazy) = function(x, ...) {
     cat("\n")
-    print(x@model_id)
+    print(x@var_id)
 
     cat("\n")
     cat(cli::rule(left = "Test Specification", line = "-"), "\n\n")
@@ -119,7 +119,7 @@ as_test_spec = function(.test) {
         cli::cli_abort("{.arg .test} must be a function.")
     }
 
-    spec = .test(.model = NULL)
+    spec = .test(.var_id = NULL)
 
     if (S7::S7_inherits(spec, model_spec)) {
         cli::cli_abort(c(

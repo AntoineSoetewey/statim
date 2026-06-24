@@ -24,8 +24,12 @@
 #' }
 #'
 #' @section Two-sample t-test default class:
-#' Returns a [class_ttest_two] object. All variants that also return
-#' [class_ttest_two] inherit [auto_tidy()] and [print()] automatically.
+#' By default, returns a [class_ttest_two] object. All variants that also return
+#' [class_ttest_two] inherit [auto_tidy()] and [print()] automatically. Otherwise,
+#' to process outputs:
+#'
+#' -  `print()`: Write it down through `print` from [variant()].
+#' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
 #'
 #' @section Hypothesis claims:
 #' Supports [MU()] via [state_null()]. The `contrast` variant performs Welch-Satterthwaite linear contrast test
@@ -146,7 +150,38 @@ ttest_def_two = test_define(
                     upper_ci = res$conf.int[[2]],
                     ci_level = .ci
                 )
-            }
+            },
+            claim_parser = map_claim(
+                .mu = function(claim, processed) {
+                    resolved = claim_contrast_coefs(claim, filter = "given")
+                    coefs = resolved$coefs
+
+                    valid_two_sample = length(coefs) == 2L && identical(sort(unname(coefs)), c(-1, 1))
+
+                    if (!valid_two_sample) {
+                        cli::cli_abort(c(
+                            "T-test for `x_by()` only supports two-sample mean differences.",
+                            "i" = "Found contrast coefficients: {.val {coefs}}.",
+                            "i" = "Use {.code via(\"contrast\")} for weighted/contrast hypotheses,",
+                            "i" = "or use a formula model for one-sample tests."
+                        ))
+                    }
+
+                    resolved$scalar
+                },
+                .first_group = function(claim, processed) {
+                    resolved = claim_contrast_coefs(claim, filter = "given")
+                    names(resolved$coefs)[resolved$coefs == 1]
+                },
+                .alt = function(claim, processed = NULL) {
+                    switch(
+                        claim@op,
+                        "==" = , "!=" = "two.sided",
+                        ">=" = , ">" = "less",
+                        "<=" = , "<" = "greater"
+                    )
+                }
+            )
         ),
         contrast = variant(
             # ---- contrast t-test ----
@@ -225,7 +260,12 @@ ttest_def_two = test_define(
                     upper_ci = ci[[2]],
                     ci_level = .ci
                 )
-            }
+            },
+            claim_parser = map_claim(
+                .mu = function(claim, processed) claim_contrast_coefs(claim)$scalar,
+                .op = function(claim, processed) claim_contrast_coefs(claim)$op,
+                .w = function(claim, processed) claim_contrast_coefs(claim)$coefs
+            )
         ),
         multi = variant(
             # ---- Multiple grouping variables ----
@@ -391,43 +431,5 @@ ttest_def_two = test_define(
         )
     ),
     # ---- Modify Modelled Hypothesis ----
-    compatible_params = list(MU),
-    claim_translator = claim_translate(
-        default = map_claim(
-            .mu = function(claim, processed) {
-                resolved = claim_contrast_coefs(claim, filter = "given")
-                coefs = resolved$coefs
-
-                valid_two_sample = length(coefs) == 2L && identical(sort(unname(coefs)), c(-1, 1))
-
-                if (!valid_two_sample) {
-                    cli::cli_abort(c(
-                        "T-test for `x_by()` only supports two-sample mean differences.",
-                        "i" = "Found contrast coefficients: {.val {coefs}}.",
-                        "i" = "Use {.code via(\"contrast\")} for weighted/contrast hypotheses,",
-                        "i" = "or use a formula model for one-sample tests."
-                    ))
-                }
-
-                resolved$scalar
-            },
-            .first_group = function(claim, processed) {
-                resolved = claim_contrast_coefs(claim, filter = "given")
-                names(resolved$coefs)[resolved$coefs == 1]
-            },
-            .alt = function(claim, processed = NULL) {
-                switch(
-                    claim@op,
-                    "==" = , "!=" = "two.sided",
-                    ">=" = , ">" = "less",
-                    "<=" = , "<" = "greater"
-                )
-            }
-        ),
-        contrast = map_claim(
-            .mu = function(claim, processed) claim_contrast_coefs(claim)$scalar,
-            .op = function(claim, processed) claim_contrast_coefs(claim)$op,
-            .w = function(claim, processed) claim_contrast_coefs(claim)$coefs
-        )
-    )
+    compatible_params = list(MU)
 )

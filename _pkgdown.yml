@@ -5,11 +5,11 @@ template:
   light-switch: true
   bootswatch: flatly
   bslib:
-    base_font: {google: "Viaoda Libre"}
-    heading_font: {google: "Viaoda Libre"}
+    base_font: {google: "Source Serif 4"}
+    heading_font: {google: "Fraunces"}
     code_font: {google: "Fira Mono"}
-    primary: "#0054AD"
-    link-color: "#0054AD"
+    primary: "#0A2947"
+    link-color: "#AA1C41"
   math-rendering: katex
 
 home:
@@ -38,13 +38,13 @@ reference:
   - title: High Level API
     desc: Main functions for interactive use
 
-  - subtitle: Model definition and data preparation
+  - subtitle: Statistical Inference Layout definer and data preparation
     desc: Verbs that describe the model you want to analyze
     contents:
-    - model-define-base
+    - layout-define-base
     - write_models
 
-  - subtitle: Model IDs
+  - subtitle: Variable Mapper IDs
     desc: Mappers similar to formula in R to shape the model you want to describe. Formula also allowed.
     contents:
     - x_by
@@ -117,10 +117,10 @@ reference:
   - subtitle: Model ID helpers
     desc: Classes and internal functions
     contents:
-    - model_id
+    - var_id
     - model-processor
-    - model_id_info
-    - class_model_inform
+    - var_id_info
+    - class_var_inform
 
   - subtitle: Implementation containers
     desc: Declare how a test runs
@@ -148,6 +148,12 @@ reference:
     - HTEST_FN
     - MODEL_FN
 
+  - subtitle: stat_define add-ons management
+    desc: Add or remove estimation method on existing test functions
+    contents:
+    - add-stat-define
+    - purge_stat_defines
+
   - subtitle: Session-scoped variant management
     desc: Add or replace variants on existing test functions
     contents:
@@ -167,10 +173,11 @@ reference:
     - claim_contrast_coefs
 
   - subtitle: Modelled hypothesis translator and container
-    desc: Core function to contain the implementation to translate modelled hypothesis, placed under `claim_translator` from `stat_define`
+    desc: Core function to contain the implementation to translate modelled hypothesis, placed under `claim_parser` from `baseline()` / `variant()`
     contents:
-    - claim_translate
     - map_claim
+    - baseline
+    - variant
 
   - subtitle: Tidy implementation container
     desc: Add or replace `tidy()` method for following `STAT_CONSTRUCTOR` objects
@@ -202,7 +209,7 @@ articles:
   - title: Pointers of statim you need to know
     navbar: Pointers of statim you need to know
     contents:
-    - pointers/model_id
+    - pointers/var_id
     - pointers/stat_define
     - pointers/hypothesis-expressions
     - pointers/recalibration-method

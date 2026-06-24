@@ -12,10 +12,10 @@ Authors@R: c(
            comment = c(ORCID = "0000-0001-8159-0804"))
     )
 Description: A declarative interface for statistical inference built on the S7 object 
-    system. Models are described using expressive model identifiers, null 
-    hypotheses are stated as mathematical expressions over population parameters, 
-    and estimation is deferred until explicitly requested. Supports hypothesis 
-    testing and model-based inference with an extensible variant system for 
+    system. The layouts of the statistical inference are described using expressive variable mappers, 
+    null hypotheses are stated as mathematical expressions over population parameters, 
+    and estimation is deferred until explicitly requested. Supports estimation method involving
+    hypothesis testing and model-based inference with an extensible variant system for 
     registering custom estimation methods.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -49,12 +49,13 @@ Collate:
     'ops.R'
     'utils.R'
     'add-option.R'
+    'add-stat-define.R'
     'zzz.R'
-    'define-model-ids.R'
-    'define-model-ids-info.R'
-    'define-model-process.R'
+    'define-var-ids.R'
+    'define-var-ids-process.R'
+    'define-var-ids-info.R'
     'define-model.R'
-    'define-model-helpers.R'
+    'define-var-id-process-helpers.R'
     'generate-pairs.R'
     'inject-and-run.R'
     'stat-construct.R'

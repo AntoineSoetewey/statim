@@ -1,8 +1,8 @@
-test_that("prop() produces a prop/model_id object", {
+test_that("prop() produces a prop/var_id object", {
     m = prop(45, 100)
 
     expect_s7_class(m, prop)
-    expect_s7_class(m, model_id)
+    expect_s7_class(m, var_id)
 })
 
 test_that("prop() stores x and n as numerics", {
@@ -53,8 +53,8 @@ test_that("prop() allows x = n (all successes)", {
 test_that("define_model() with prop() produces a def_model object", {
     dm = define_model(prop(45, 100))
 
-    expect_s7_class(dm, def_model)
-    expect_s7_class(dm@model_id, prop)
+    expect_s7_class(dm, def_var)
+    expect_s7_class(dm@var_id, prop)
 })
 
 test_that("define_model() with prop() populates processed with x and n", {
@@ -65,21 +65,21 @@ test_that("define_model() with prop() populates processed with x and n", {
     expect_equal(dm@processed$n, 100)
 })
 
-test_that("model_id_info() for prop returns correct model_type", {
-    info = model_id_info(prop(45, 100))
+test_that("var_id_info() for prop returns correct model_type", {
+    info = var_id_info(prop(45, 100))
 
     expect_equal(info@model_type, "prop")
 })
 
-test_that("model_id_info() for prop includes x and n in other_info", {
-    info = model_id_info(prop(45, 100))
+test_that("var_id_info() for prop includes x and n in other_info", {
+    info = var_id_info(prop(45, 100))
 
     expect_equal(info@other_info$x, 45)
     expect_equal(info@other_info$n, 100)
 })
 
-test_that("model_id_info() for prop always includes vars", {
-    info = model_id_info(prop(45, 100))
+test_that("var_id_info() for prop always includes vars", {
+    info = var_id_info(prop(45, 100))
 
     expect_length(info@vars, 2)
     expect_equal(info@vars[[1]]$name, "x")
@@ -245,4 +245,30 @@ test_that("print.class_p_test() returns invisibly", {
     test_out = P_TEST(prop(45, 100))
 
     expect_invisible(print(test_out@data))
+})
+
+# ---- tidy ----
+test_that("`P_TEST()`'s `tidy()` method is functional", {
+    test_out = define_model(prop(45, 100)) |>
+        prepare_test(P_TEST) |>
+        via("prop", correct = FALSE) |>
+        state_null(PI() == 0.3) |>
+        conclude()
+
+    expect_no_error(test_out |> tidy())
+    expect_no_error({
+        auto_tidy(P_TEST(prop(45, 100))@data)
+    })
+})
+
+test_that("`P_TEST()`'s `tidy()` method expects to be 'tibble' with expected columns", {
+    test_out = define_model(prop(45, 100)) |>
+        prepare_test(P_TEST) |>
+        via("prop", correct = FALSE) |>
+        state_null(PI() == 0.3) |>
+        conclude() |>
+        tidy()
+
+    expect_s3_class(test_out, "tbl_df")
+    expect_true(all(c("successes", "statistic", "p_val") %in% names(test_out)))
 })

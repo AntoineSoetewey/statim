@@ -1,8 +1,8 @@
 #' Model evaluator
 #'
-#' A function for development use to extract the information in model IDs.
+#' A function for development use to extract the information in Variable Mappers.
 #'
-#' @param x The model IDs to be extracted.
+#' @param x The Variable Mappers to be extracted.
 #' @param data Optional. Only passed when a certain data structure (normally it's data frame)
 #'    is required.
 #' @param ... Passed through S7 method compatibility.
@@ -19,7 +19,7 @@ model_processor = S7::new_generic(
     fun = function(x, data = NULL, ...) S7::S7_dispatch()
 )
 
-S7::method(model_processor, model_id) = function(x, data = NULL, ...) {
+S7::method(model_processor, var_id) = function(x, data = NULL, ...) {
     list()
 }
 
@@ -44,7 +44,7 @@ S7::method(model_processor, S7::class_formula) =
 
         list(
             data = data,
-            vars = all.vars(x),
+            vars = vars,
             formula = x
         )
     }

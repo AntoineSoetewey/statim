@@ -17,14 +17,13 @@ The modified \code{test_lazy} object.
 }
 \description{
 \code{state_null()} captures a hypothesis expression and attaches it to a
-\code{test_lazy} object. Accepts either a single expression or a \code{more_h0()}
-block for multiple named hypotheses.
+\code{test_lazy} object.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{expr}}{A hypothesis expression, or a \code{more_h0()} block. It is passed
-after \code{prepare_test(...)} to supply the hypothesis expression, e.g.
+\item{\code{expr}}{A hypothesis expression. It is passed after \code{prepare_test(...)} to supply
+the hypothesis expression, e.g.
 \code{... |> prepare_test(TTEST) |> state_null(expr = MU(x) == 0)}}
 }}
 
