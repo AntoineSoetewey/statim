@@ -218,6 +218,10 @@ class_lm_object = S7::new_class(
         x_mat = S7::new_property(
             class = S7::new_union(S7::class_numeric, S7::class_missing),
             default = NULL
+        ),
+        x_assign = S7::new_property(
+            class = S7::new_union(S7::class_integer, S7::class_missing),
+            default = NULL
         )
     )
 )
@@ -298,6 +302,7 @@ lm_to_lm_object = function(fit) {
     coef_tbl = summary(fit)$coefficients
     rss = sum(fit$residuals^2)
     df_res = fit$df.residual
+    mm = stats::model.matrix(fit)
 
     class_lm_object(
         terms = fit$terms,
@@ -309,6 +314,7 @@ lm_to_lm_object = function(fit) {
         deviance = rss,
         dispersion = rss / df_res,
         family = "gaussian",
-        x_mat = as.numeric(stats::model.matrix(fit))
+        x_mat = as.numeric(mm),
+        x_assign = attr(mm, "assign")
     )
 }

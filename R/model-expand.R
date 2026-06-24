@@ -161,6 +161,25 @@ S7::method(conclude, multi_lazy) = function(.x, ...) {
     )
 }
 
+S7::method(update, multi_lazy) = function(object, ...) {
+    dots = list(...)
+    object@models = lapply(object@models, function(m) {
+        if (!is.null(m@recalibrate_spec)) {
+            m@recalibrate_spec$args = utils::modifyList(
+                m@recalibrate_spec$args,
+                dots
+            )
+        } else {
+            m@model_spec@args = utils::modifyList(
+                m@model_spec@args,
+                dots
+            )
+        }
+        m
+    })
+    object
+}
+
 S7::method(tidy, multi_exec) = function(.x, ...) {
     tidied = lapply(.x@results, function(r) tidy(r, ...))
     tibble::tibble(

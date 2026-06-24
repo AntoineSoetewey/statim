@@ -213,6 +213,7 @@ S7::method(build_anova, S7::class_list) = function(fitted, labels, test) {
 
     family = families[[1L]]
     stats_tbl = compute_anova_stats(fitted, labels = labels, family = family, test = test)
+    effective_test = attr(stats_tbl, "effective_test") %||% test
 
     cld_anova(
         data = stats_tbl,
@@ -223,7 +224,7 @@ S7::method(build_anova, S7::class_list) = function(fitted, labels, test) {
         labels = labels,
         cld_meta = list(
             stat_name = "ANOVA",
-            method = test,
+            method = effective_test,
             data_name = ""
         )
     )
@@ -363,7 +364,6 @@ compute_anova_stats = function(fitted, labels, family, test) {
             "!" = "F-test is only valid for Gaussian models.",
             "i" = "Switching to LRT for family {.val {family}}."
         ))
-
         test = "LRT"
     }
 
@@ -380,7 +380,7 @@ compute_anova_stats = function(fitted, labels, family, test) {
         stat_col = "chisq_value"
     }
 
-    tibble::tibble(
+    tbl = tibble::tibble(
         model = if (length(labels) == length(fitted)) labels else as.character(seq_along(fitted)),
         res_df = res_df,
         deviance = dev,
@@ -389,6 +389,9 @@ compute_anova_stats = function(fitted, labels, family, test) {
         !!stat_col := stat,
         p_value = p_val
     )
+
+    attr(tbl, "effective_test") = test
+    tbl
 }
 
 #' Type I ANOVA
@@ -404,9 +407,7 @@ compute_anova_stats_single = function(obj) {
     }
 
     trms = obj@terms
-    all_labels = attr(trms, "term.labels")
     resp = as.character(attr(trms, "variables")[[attr(trms, "response") + 1L]])
-    term_labels = all_labels[all_labels != resp]
     has_intercept = attr(trms, "intercept") == 1L
 
     y = obj@fitted + obj@residuals
@@ -415,13 +416,22 @@ compute_anova_stats_single = function(obj) {
     ncols = length(obj@beta)
     X = matrix(obj@x_mat, nrow = n, ncol = ncols)
 
+    # Map each model-matrix column to its term index (0 = intercept).
+    # Strip intercept column from X so indices align with non-intercept columns.
+    asgn = obj@x_assign
+    if (has_intercept) {
+        asgn = asgn[asgn > 0L]
+        X = X[, -1L, drop = FALSE]
+    }
+    term_indices = unique(asgn)
+    term_labels = attr(trms, "term.labels")
+
     rss_baseline = if (has_intercept) sum((y - mean(y))^2) else sum(y^2)
 
-    start_col = if (has_intercept) 2L else 1L
-    rss_seq = numeric(length(term_labels))
-    for (k in seq_along(term_labels)) {
-        cols = seq_len(k) + (start_col - 1L)
-        X_sub = if (has_intercept) cbind(1, X[, cols, drop = FALSE]) else X[, cols, drop = FALSE]
+    rss_seq = numeric(length(term_indices))
+    for (k in seq_along(term_indices)) {
+        cols_k = which(asgn %in% seq_len(k))
+        X_sub = if (has_intercept) cbind(1, X[, cols_k, drop = FALSE]) else X[, cols_k, drop = FALSE]
         rss_seq[k] = sum(stats::lm.fit(X_sub, y)$residuals^2)
     }
 
@@ -429,10 +439,9 @@ compute_anova_stats_single = function(obj) {
     ss_terms = -diff(rss_all)
     rss_final = rss_seq[length(rss_seq)]
     ms_res = rss_final / df_res
-    f_val = ss_terms / ms_res
-    p_val = pf(f_val, 1L, df_res, lower.tail = FALSE)
-
-    df_terms = rep(1L, length(term_labels))
+    df_terms = vapply(term_indices, function(i) sum(asgn == i), integer(1))
+    f_val = (ss_terms / df_terms) / ms_res
+    p_val = pf(f_val, df_terms, df_res, lower.tail = FALSE)
 
     tibble::tibble(
         term = c(term_labels, "Residuals"),
