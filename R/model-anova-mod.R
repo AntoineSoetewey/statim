@@ -204,15 +204,38 @@ S7::method(build_anova, S7::class_list) = function(fitted, labels, test) {
         ))
     }
 
-    nobs = vapply(fitted, function(f) length(f@terms), integer(1))
+    # nobs = vapply(fitted, function(f) length(f@terms), integer(1))
+    nobs = vapply(fitted, function(f) {
+        p = length(attr(f@terms, "term.labels")) + attr(f@terms, "intercept")
+        as.integer(f@df_residual) + p
+    }, integer(1))
     if (length(unique(nobs)) > 1L) {
         cli::cli_abort(
             "Models were not all fitted to the same number of observations."
         )
     }
 
+    res_dfs = vapply(fitted, function(f) f@df_residual, numeric(1))
+    non_nested = which(diff(res_dfs) >= 0)
+    if (length(non_nested) > 0L) {
+        cli::cli_warn(c(
+            "!" = "{length(non_nested)} non-nested model pair(s) detected.",
+            "i" = "The incremental F-test is undefined for models with equal complexity.",
+            "i" = "Affected rows will show empty test statistics, as in {.fn stats::anova}.",
+            "i" = "Non-nested positions: {non_nested}."
+        ))
+    }
+
     family = families[[1L]]
-    stats_tbl = compute_anova_stats(fitted, labels = labels, family = family, test = test)
+    stats_tbl = suppressWarnings(
+        compute_anova_stats(fitted, labels = labels, family = family, test = test)
+    )
+
+    stats_tbl[] = lapply(stats_tbl, function(col) {
+        if (is.numeric(col)) col[is.nan(col) | is.infinite(col)] = NA_real_
+        col
+    })
+
     effective_test = attr(stats_tbl, "effective_test") %||% test
 
     cld_anova(
@@ -314,11 +337,19 @@ S7::method(print, cld_anova) = function(x, ...) {
         }
     }
 
+    tbl = x@data
+    tbl[] = lapply(tbl, function(col) {
+        if (is.numeric(col)) {
+            col[is.nan(col) | is.infinite(col)] = NA_real_
+        }
+        col
+    })
+
     cli::cat_line(cli::rule(left = "ANOVA Table", line = "-"), "\n")
     tabstats::table_default(
-        x@data,
+        tbl,
         style_columns = tabstats::td_style(p_value = pval_styler),
-        nrows = nrow(x@data)
+        nrows = nrow(tbl)
     )
     cat("\n\n")
 

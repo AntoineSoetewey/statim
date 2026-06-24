@@ -546,3 +546,76 @@ test_that("write_models() with update() chaining feeds correctly into anova()", 
     expect_true(is_cld_anova(result))
     expect_equal(nrow(result@data), 3L)
 })
+
+pipeline_conclude = function(data, formula) {
+    data |>
+        define_model(formula) |>
+        prepare_model(LINEAR_REG) |>
+        conclude()
+}
+
+pipeline_lazy = function(data, formula) {
+    data |>
+        define_model(formula) |>
+        prepare_model(LINEAR_REG)
+}
+
+is_cld_anova = function(x) S7::S7_inherits(x, cld_anova)
+
+# ---- build_anova(): non-nested model warning ----
+
+test_that("anova() warns when models have equal complexity", {
+    mod1 = pipeline_conclude(mtcars, mpg ~ wt)
+    mod2 = pipeline_conclude(mtcars, mpg ~ hp)
+
+    expect_warning(
+        anova(mod1, mod2),
+        regexp = "non-nested"
+    )
+})
+
+test_that("anova() with non-nested models still returns a cld_anova", {
+    mod1 = pipeline_conclude(mtcars, mpg ~ wt)
+    mod2 = pipeline_conclude(mtcars, mpg ~ hp)
+
+    result = suppressWarnings(anova(mod1, mod2))
+
+    expect_true(is_cld_anova(result))
+})
+
+test_that("anova() non-nested rows have NA test statistics in @data", {
+    mod1 = pipeline_conclude(mtcars, mpg ~ wt)
+    mod2 = pipeline_conclude(mtcars, mpg ~ hp)
+
+    result = suppressWarnings(anova(mod1, mod2))
+
+    expect_true(is.na(result@data$f_value[2L]))
+    expect_true(is.na(result@data$p_value[2L]))
+})
+
+test_that("print() on non-nested cld_anova does not error", {
+    mod1 = pipeline_conclude(mtcars, mpg ~ wt)
+    mod2 = pipeline_conclude(mtcars, mpg ~ hp)
+
+    result = suppressWarnings(anova(mod1, mod2))
+
+    expect_invisible(print(result))
+})
+
+test_that("anova() warns only for non-nested pairs, not nested ones", {
+    mod1 = pipeline_conclude(mtcars, mpg ~ wt)
+    mod2 = pipeline_conclude(mtcars, mpg ~ hp)
+    mod3 = pipeline_conclude(mtcars, mpg ~ wt + hp)
+
+    expect_warning(
+        anova(mod1, mod2, mod3),
+        regexp = "non-nested"
+    )
+})
+
+test_that("anova() nested models produce no non-nested warning", {
+    mod1 = pipeline_conclude(mtcars, mpg ~ wt)
+    mod2 = pipeline_conclude(mtcars, mpg ~ wt + hp)
+
+    expect_no_warning(anova(mod1, mod2))
+})
