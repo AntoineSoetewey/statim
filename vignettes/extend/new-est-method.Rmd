@@ -86,7 +86,7 @@ add_variant(LINEAR_REG, S7::class_formula, "weighted") %<-% variant(
 
 Let's try with a simple example:
 
-```{r, comment="", collapse=FALSE}
+```{r, comment="", collapse=FALSE, warning=FALSE, message=FALSE}
 cars |>
     define_model(dist ~ speed) |>
     prepare_model(LINEAR_REG) |>
@@ -98,8 +98,7 @@ Nothing here differs structurally from extending a test function. The left-hand 
 
 ## Worked example: adding a variant to a test function
 
-The canonical example in `?add_variant` does exactly the same thing for
-`TTEST` and `x_by()`:
+The canonical example in `?add_variant` does exactly the same thing for `TTEST` and `x_by()`:
 
 ```{r, eval = FALSE}
 add_variant(TTEST, x_by, "another_boot") %<-%
@@ -164,11 +163,7 @@ add_stat_define(
 )
 ```
 
-The first two arguments mirror `add_variant()` exactly: the stat function, then
-the model type. `impl` is a full `agendas()` object — `baseline()` plus any
-named `variant()`s you want reachable via `via()`. `compatible_params` declares
-which hypothesis parameter classes (e.g. `PI`, `MU`) are valid in `state_null()`
-for this model type; omit it or pass `list()` to disable the check entirely.
+The first two arguments mirror `add_variant()` exactly: the stat function, then the model type. `impl` is a full `agendas()` object — `baseline()` plus any named `variant()`s you want reachable via `via()`. `compatible_params` declares which hypothesis parameter classes (e.g. `PI`, `MU`) are valid in `state_null()` for this model type; omit it or pass `list()` to disable the check entirely.
 
 ### Conflict handling
 
@@ -181,17 +176,11 @@ whether baked-in or previously registered:
 add_stat_define(P_TEST, prop, impl = agendas(base = baseline(fn = function(.proc) NULL)))
 ```
 
-When a registry conflict exists, the error names the prior registrant — its
-origin and package — so you know exactly who owns the entry before deciding
-whether to `remove_stat_define()` it first.
+When a registry conflict exists, the error names the prior registrant — its origin and package — so you know exactly who owns the entry before deciding whether to `remove_stat_define()` it first.
 
 ### Scoping and teardown
 
-`add_stat_define()` follows the same `origin` contract as `add_variant()`.
-`origin = "user"` (the default) is session-scoped and removable with
-`remove_stat_define()`. `origin = "package"` is for `.onLoad()` in an
-extension package and is removed automatically on unload via
-`purge_stat_defines()`:
+`add_stat_define()` follows the same `origin` contract as `add_variant()`. `origin = "user"` (the default) is session-scoped and removable with remove_stat_define()`. `origin = "package"` is for `.onLoad()` in an extension package and is removed automatically on unload via `purge_stat_defines()`:
 
 ```{r, eval = FALSE}
 # In your package's zzz.R
@@ -209,20 +198,11 @@ extension package and is removed automatically on unload via
 }
 ```
 
-`origin = "package"` called outside a package context — from the global
-environment or a script — is a hard error, not a silent fallback to `"user"`.
-This prevents accidental use of the package-scoped path in interactive sessions
-where teardown never runs.
+`origin = "package"` called outside a package context — from the global environment or a script — is a hard error, not a silent fallback to `"user"`. This prevents accidental use of the package-scoped path in interactive sessions where teardown never runs.
 
 ### What `conclude()` sees
 
-Internally, `conclude()` checks whether the `test_spec`'s stamped registry
-version matches the current `stat_define_registry` version. If it does, the
-cached lookup built at `prepare_test()` time is reused at zero cost. If the
-registry mutated between `prepare_test()` and `conclude()` — because
-`add_stat_define()` was called in between — the lookup is rebuilt fresh.
-This means registration order relative to `prepare_test()` never produces
-a stale route silently; it either hits the cache correctly or rebuilds.
+Internally, `conclude()` checks whether the `test_spec`'s stamped registry version matches the current `stat_define_registry` version. If it does, the cached lookup built at `prepare_test()` time is reused at zero cost. If the registry mutated between `prepare_test()` and `conclude()` — because `add_stat_define()` was called in between — the lookup is rebuilt fresh. This means registration order relative to `prepare_test()` never produces a stale route silently; it either hits the cache correctly or rebuilds.
 
 ## Stress-testing your new method before you ship it
 
