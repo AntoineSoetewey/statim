@@ -163,13 +163,17 @@ LifeCycleSavings |>
 
 For non-Gaussian families, `anova()` performs a likelihood ratio test (LRT) and reports a chi-squared statistic instead of an F-statistic. Pass `test = "LRT"` explicitly; `"F"` is not meaningful for GLMs.
 
-The pipeline is the same as for linear models, with `GLM` in place of `LINEAR_REG` and `update()` to supply the family:
+Supply the family directly to `prepare_model()` — it is forwarded to every model in the pipeline:
 
 ```{r}
-mod1 = mtcars |> define_model(am ~ wt) |> prepare_model(GLM) |> update(family = binomial())
-mod2 = mtcars |> define_model(am ~ wt + hp) |> prepare_model(GLM) |> update(family = binomial())
-
-anova(mod1, mod2, test = "LRT")
+mtcars |>
+    write_models(
+        null = am ~ 1,
+        main = am ~ wt,
+        full = am ~ wt + hp
+    ) |>
+    prepare_model(GLM, family = binomial()) |>
+    anova(test = "LRT")
 ```
 
 The output table has a `chisq_value` column in place of `f_value`. The first row has `NA` test statistics because there is no baseline to compare it against.
