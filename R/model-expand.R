@@ -69,7 +69,7 @@ multi_exec = S7::new_class(
 #'     prepare_model(LINEAR_REG) |>
 #'     anova()
 #'
-#' # conclude() — returns a multi_exec
+#' # conclude() -> returns a multi_exec
 #' LifeCycleSavings |>
 #'     write_models(
 #'         f1 = sr ~ 1,
@@ -79,7 +79,8 @@ multi_exec = S7::new_class(
 #'     prepare_model(LINEAR_REG) |>
 #'     conclude()
 #'
-#' # display() — show up to n models in full
+#' \dontrun{
+#' # display() -> show up to n models in full
 #' LifeCycleSavings |>
 #'     write_models(
 #'         f1 = sr ~ 1,
@@ -91,6 +92,41 @@ multi_exec = S7::new_class(
 #'     prepare_model(LINEAR_REG) |>
 #'     conclude() |>
 #'     display(5)
+#' }
+#'
+#' # via rel()
+#' mtcars |>
+#'     define_model(rel(wt, mpg)) |>
+#'     prepare_model(LINEAR_REG) |>
+#'     anova()
+#' mtcars |>
+#'     write_models(
+#'         m1 = rel(wt, mpg),
+#'         m2 = rel(hp, mpg)
+#'     ) |>
+#'     prepare_model(LINEAR_REG) |>
+#'     anova()
+#'
+#' # mixed var_id types in a single write_models() call
+#' suppressWarnings({
+#'     mtcars |>
+#'         write_models(
+#'             null = mpg ~ 1,
+#'             m1 = rel(wt, mpg),
+#'             m2 = rel(hp, mpg)
+#'         ) |>
+#'         prepare_model(LINEAR_REG) |>
+#'         conclude()
+#' })
+#'
+#' # via prepare_test()
+#' mtcars |>
+#'     write_models(
+#'         by_am = x_by(mpg, am),
+#'         by_vs = x_by(mpg, vs)
+#'     ) |>
+#'     prepare_test(TTEST) |>
+#'     conclude()
 #'
 #' @export
 write_models = S7::new_generic("write_models", ".data")
