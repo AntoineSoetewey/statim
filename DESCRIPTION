@@ -64,6 +64,7 @@ Collate:
     'stat-spec.R'
     'htest-prepare.R'
     'model-prepare.R'
+    'stat-prepare.R'
     'recalibrator-via.R'
     'hypothesis-params.R'
     'hypothesis-parser.R'
