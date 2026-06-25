@@ -4,7 +4,7 @@
 
 box::use(
     statim[
-        define_model, `%by%`, TTEST, prepare_test,
+        define_model, `%by%`, TTEST, prepare,
         state_null, via, conclude
     ],
     infer[specify, hypothesize, calculate, t_test1 = t_test],
@@ -20,7 +20,7 @@ bench::mark(
     statim2 = {
         sleep_large |>
             define_model(extra %by% group) |>
-            prepare_test(TTEST) |>
+            prepare(TTEST) |>
             state_null(
                 MU(extra, group == "2") - 2 * MU(extra, group == "1") == 0
             ) |>
