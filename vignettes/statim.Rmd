@@ -146,19 +146,19 @@ The supported operators are the built-in operators in R itself: `==`, `!=`, `<`,
 
 Here are the current built-in `<param_obj>` objects: 
 
-I.  `MU()`: refers to the population mean $\mu$. It has following usages:
+-  `MU()`: refers to the population mean $\mu$. It has following usages:
 
     1.  `MU(x)` which means the assumed population mean of the variable `x`. 
     
     2.  `MU(x, group == "1")` which means the assumed population mean of the variable `x` given the `group` equal `"1"`. 
 
-II.  `RHO()`: or  $\rho$ which refers to the population correlation between 2 variables — `RHO(x, y) == 0` simply means the true population correlation between `x` and `y` is 0 or $\rho_{x, y} = 0$. 
+-  `RHO()`: or  $\rho$ which refers to the population correlation between 2 variables — `RHO(x, y) == 0` simply means the true population correlation between `x` and `y` is 0 or $\rho_{x, y} = 0$. 
 
-III.  `PI()`: refers to the population proportion $\pi$. Used with `prop()` pipelines. It accepts zero or one argument:
+-  `PI()`: refers to the population proportion $\pi$. Used with `prop()` pipelines. It accepts zero or one argument:
 
-    1.  `PI()` — the population proportion of the modelled count, when the variable name is already encoded in the model ID via `prop()` (see `?P_TEST`). 
+    1.  `PI()` means the population proportion of the modelled count, when the variable name is already encoded in the model ID via `prop()` (see `?P_TEST`). 
 
-    2.  `PI(x)` — the population proportion of a named variable `x`, for future two-sample proportion tests.
+    2.  `PI(x)` means the population proportion of a named variable `x`, for future two-sample proportion tests.
 
 As an example, consider the built-in `sleep` dataset. It records the extra hours of sleep (`extra`) gained by 10 patients under each of two drugs (`group`). A researcher wants to know whether drug 1 produces more additional sleep than drug 2 on average. 
 
