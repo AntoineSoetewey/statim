@@ -116,7 +116,7 @@ semantics:
         data, ...
     ) |>                                 # 1. Model definition
     # ... |>                             # Possible extensions  
-    prepare_*(<STAT_FN>) |>              # 2. Prepare method (lazy)
+    prepare(<STAT_FN>) |>                # 2. Prepare method (lazy)
     via(...) |>                          # Optional: method variant  (*)
     state_null(<expr>) |>                # Optional: null hypothesis (*)
     # ... |>                             # Possible extensions  
@@ -134,11 +134,10 @@ Explanation of the code above:
 
 2.  *Parameterization*, where the estimation process of the statistical
     inference pipeline is defined lazily. Our usual statistical
-    inference application can be either a model-based inference
-    (e.g. linear regression through `prepare_model()`) or H-test
-    inference (e.g. t-test through `prepare_test()`). With that said,
-    the execution is lazy-loaded, and only executed if needed. (The
-    `(*)` mark means they are interchangeable. )
+    inference application can be a model-based inference (e.g. linear
+    regression through `prepare_model()`), H-test inference (e.g. t-test
+    through `prepare_test()`), or both with just `prepare()`. With that
+    said, the execution is lazy-loaded, and only executed if needed.
 
     > `state_null()` is one of the reasons why `{statim}` — it’s
     > astronomical way of writing null hypothesis expressed
@@ -168,7 +167,7 @@ The package is designed around three ideas:
     the lazy-loaded pipeline with `conclude()`.
 
 2.  **A shared grammar**: Only applied on the main `{statim}` semantics:
-    piped/grammar syntax. `define_model()` =\> `prepare_*()` =\>
+    piped/grammar syntax. `define_model()` =\> `prepare()` =\>
     `conclude()` is the same shape for every inferential procedure. The
     `<var_id>` objects (`x_by`, `rel`, `pairwise`, …) describe the
     statistical structure of the problem; the verbs stay constant.
