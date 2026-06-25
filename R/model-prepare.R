@@ -13,16 +13,16 @@ model_lazy = S7::new_class(
 
 #' Lazily prepare a model inference
 #'
-#' `prepare_model()` attaches a model specification to a `def_var` object,
-#' producing a `model_lazy` ready for optional recalibration with [via()]
+#' `prepare_model()` attaches a model specification to a `<def_var>` object,
+#' producing a `<model_lazy>` ready for optional recalibration with [via()]
 #' before being executed with [conclude()].
 #'
-#' @param .x An S7 object extension yielded by, e.g. `def_var` object from [define_model()],
-#'   or an `expanded_model` object from [write_models()].
-#' @param .model_fn A model function such as `LINEAR_REG()`.
+#' @param .x An S7 object extension yielded by, e.g. `<def_var>` object from [define_model()],
+#'   or an `<expanded_model>` object from [write_models()].
+#' @param .model_fn A model function such as [LINEAR_REG()].
 #' @param ... Additional arguments passed to methods.
 #'
-#' @return A `model_lazy` S3 object.
+#' @return A `<model_lazy>` S7 object.
 #'
 #' @seealso [prepare_test()], [define_model()], [via()], [conclude()]
 #'

@@ -14,17 +14,16 @@ test_lazy = S7::new_class(
 
 #' Lazily prepare a single test
 #'
-#' `prepare_test()` attaches a test specification to a `def_var` object,
+#' `prepare_test()` attaches a test specification to a `<def_var>` object,
 #' producing a `test_lazy` ready for optional recalibration with [via()]
 #' before being executed with [conclude()].
 #'
-#' @param .x An S7 object extension yielded by, e.g. `def_var` object from [define_model()],
-#'   or an `expanded_model` object from [write_models()].
-#' @param .test A test function such as [TTEST], or a `test_spec` object
-#'   returned by calling such a function with no arguments.
+#' @param .x An S7 object extension yielded by, e.g. `<def_var>` object from [define_model()],
+#'   or an `<expanded_model>` object from [write_models()].
+#' @param .test A test function such as [TTEST] that carries `<test_spec>` objects when called.
 #' @param ... Additional arguments passed to methods.
 #'
-#' @return A `test_lazy` S3 object.
+#' @return A `<test_lazy>` S7 object.
 #'
 #' @seealso [define_model()], [via()], [conclude()]
 #'

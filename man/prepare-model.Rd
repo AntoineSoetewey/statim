@@ -8,19 +8,19 @@
 prepare_model(.x, .model_fn, ...)
 }
 \arguments{
-\item{.x}{An S7 object extension yielded by, e.g. \code{def_var} object from \code{\link[=define_model]{define_model()}},
-or an \code{expanded_model} object from \code{\link[=write_models]{write_models()}}.}
+\item{.x}{An S7 object extension yielded by, e.g. \verb{<def_var>} object from \code{\link[=define_model]{define_model()}},
+or an \verb{<expanded_model>} object from \code{\link[=write_models]{write_models()}}.}
 
-\item{.model_fn}{A model function such as \code{LINEAR_REG()}.}
+\item{.model_fn}{A model function such as \code{\link[=LINEAR_REG]{LINEAR_REG()}}.}
 
 \item{...}{Additional arguments passed to methods.}
 }
 \value{
-A \code{model_lazy} S3 object.
+A \verb{<model_lazy>} S7 object.
 }
 \description{
-\code{prepare_model()} attaches a model specification to a \code{def_var} object,
-producing a \code{model_lazy} ready for optional recalibration with \code{\link[=via]{via()}}
+\code{prepare_model()} attaches a model specification to a \verb{<def_var>} object,
+producing a \verb{<model_lazy>} ready for optional recalibration with \code{\link[=via]{via()}}
 before being executed with \code{\link[=conclude]{conclude()}}.
 }
 \examples{
