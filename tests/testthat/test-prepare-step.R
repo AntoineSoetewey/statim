@@ -46,6 +46,17 @@ test_that("prepare() errors on non-spec function", {
     )
 })
 
+test_that("prepare() errors when .fn returns a non-spec object", {
+    dm = sleep |> define_model(x_by(extra, group))
+    bad_fn = function(.var_id = NULL) list(x = 1)
+
+    expect_error(
+        dm |> prepare(bad_fn),
+        regexp = "must return a",
+        class = "rlang_error"
+    )
+})
+
 test_that("prepare() works with via() after dispatch", {
     out = sleep |>
         define_model(x_by(extra, group)) |>
