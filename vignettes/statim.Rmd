@@ -81,6 +81,16 @@ Let's try with the two common forms of statistical inference:
     mtcars_dm = define_model(mtcars, mpg ~ .)
     mtcars_lm = mtcars_dm |> prepare_model(LINEAR_REG)
     ```
+
+3.  Generalized `prepare()` function
+
+    ``` r 
+    sleep_dm = define_model(sleep, extra %by% group)
+    mtcars_dm = define_model(mtcars, mpg ~ .)
+    
+    sleep_tt = sleep_dm |> prepare(TTEST) |> update(.ci = 0.9)
+    mtcars_lm = mtcars_dm |> prepare(LINEAR_REG)
+    ```
     
 > Note: `prepare_test()` and `prepare_model()` can supply extra arguments from the default (base) implementation of `<STAT_FN>` functions like `TTEST()` and `LINEAR_REG()`. Using `update()` is totally optional.
 
@@ -104,7 +114,7 @@ tidy(out)
 # t-test example
 sleep |> 
     define_model(extra %by% group) |> 
-    prepare_test(TTEST) |> 
+    prepare(TTEST) |>                  # or `prepare_test()`
     update(.ci = 0.9) |> 
     conclude() |> 
     tidy()
@@ -112,7 +122,7 @@ sleep |>
 # Linear regression example
 mtcars |> 
     define_model(mpg ~ .) |> 
-    prepare_model(LINEAR_REG) |> 
+    prepare(LINEAR_REG) |>             # or `prepare_model()`
     conclude() |> 
     tidy()
 ```
@@ -236,7 +246,7 @@ The null hypothesis is that drug 1 is at least as effective — that is, the mea
 
 $$\mu_{x|\text{group}=1} \geq \mu_{x|\text{group}=2}$$
 
-```{r}
+```{r, collapse=FALSE, comment=""}
 sleep |>
     define_model(extra %by% group) |>
     prepare_test(TTEST) |>
