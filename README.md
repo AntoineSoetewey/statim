@@ -138,6 +138,7 @@ Explanation of the code above:
     regression through `prepare_model()`), H-test inference (e.g. t-test
     through `prepare_test()`), or both with just `prepare()`. With that
     said, the execution is lazy-loaded, and only executed if needed.
+    (The `(*)` mark means they are interchangeable. )
 
     > `state_null()` is one of the reasons why `{statim}` — it’s
     > astronomical way of writing null hypothesis expressed
