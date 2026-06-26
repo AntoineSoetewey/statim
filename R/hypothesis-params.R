@@ -23,10 +23,7 @@ param_obj = S7::new_class("param_obj", abstract = TRUE)
 MU = S7::new_class(
     "MU",
     parent = param_obj,
-    properties = list(
-        x = S7::class_any,
-        given = S7::class_any
-    ),
+    properties = list(x = S7::class_any, given = S7::class_any),
     constructor = function(x, given = NULL) {
         S7::new_object(
             S7::S7_object(),
@@ -52,10 +49,7 @@ MU = S7::new_class(
 PI = S7::new_class(
     "PI",
     parent = param_obj,
-    properties = list(
-        x = S7::class_any,
-        given = S7::class_any
-    ),
+    properties = list(x = S7::class_any, given = S7::class_any),
     constructor = function(x, given = NULL) {
         S7::new_object(
             S7::S7_object(),
@@ -107,10 +101,7 @@ PI = S7::new_class(
 RHO = S7::new_class(
     "RHO",
     parent = param_obj,
-    properties = list(
-        x = S7::class_any,
-        y = S7::class_any
-    ),
+    properties = list(x = S7::class_any, y = S7::class_any),
     constructor = function(x, y) {
         S7::new_object(
             S7::S7_object(),
@@ -138,7 +129,11 @@ S7::method(print, param_obj) = function(x, ...) {
     cat("\n")
     for (nm in present) {
         val = vals[[nm]]
-        lbl = if (rlang::is_quosure(val)) rlang::as_label(val) else as.character(val)
+        lbl = if (rlang::is_quosure(val)) {
+            rlang::as_label(val)
+        } else {
+            as.character(val)
+        }
         cat(sprintf("-  %-*s => %s\n", max_w, nm, lbl))
     }
     cat("\n")
@@ -157,7 +152,11 @@ S7::method(parse_param_call, MU) = function(x, args, env) {
     }
     obj = MU(x = !!rlang::new_quosure(quote(.dummy), emptyenv()))
     S7::prop(obj, "x") = rlang::new_quosure(args[[1]], env)
-    S7::prop(obj, "given") = if (length(args) == 2L) rlang::new_quosure(args[[2]], env) else NULL
+    S7::prop(obj, "given") = if (length(args) == 2L) {
+        rlang::new_quosure(args[[2]], env)
+    } else {
+        NULL
+    }
     obj
 }
 
@@ -169,8 +168,16 @@ S7::method(parse_param_call, PI) = function(x, args, env) {
         ))
     }
     obj = PI()
-    S7::prop(obj, "x") = if (length(args) >= 1L) rlang::new_quosure(args[[1]], env) else NULL
-    S7::prop(obj, "given") = if (length(args) == 2L) rlang::new_quosure(args[[2]], env) else NULL
+    S7::prop(obj, "x") = if (length(args) >= 1L) {
+        rlang::new_quosure(args[[1]], env)
+    } else {
+        NULL
+    }
+    S7::prop(obj, "given") = if (length(args) == 2L) {
+        rlang::new_quosure(args[[2]], env)
+    } else {
+        NULL
+    }
     obj
 }
 
@@ -217,7 +224,11 @@ S7::method(param_id_label, MU) = function(x) {
 
 S7::method(param_id_label, PI) = function(x) {
     if (is.null(x@x)) {
-        if (is.null(x@given)) "PI()" else paste0("PI(, ", rlang::as_label(x@given), ")")
+        if (is.null(x@given)) {
+            "PI()"
+        } else {
+            paste0("PI(, ", rlang::as_label(x@given), ")")
+        }
     } else {
         x_lbl = rlang::as_label(x@x)
         if (is.null(x@given)) {

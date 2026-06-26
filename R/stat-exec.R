@@ -90,7 +90,9 @@ S7::method(conclude, test_lazy) = function(.x, ...) {
         S7::S7_class(.x@var_id)@name
     }
     cls = .x@test_spec@cls
-    lookup = if (identical(.x@test_spec@registry_version, stat_define_registry$.version)) {
+    lookup = if (
+        identical(.x@test_spec@registry_version, stat_define_registry$.version)
+    ) {
         .x@test_spec@lookup
     } else {
         build_lookup(.x@test_spec@defs, cls)
@@ -157,7 +159,9 @@ S7::method(conclude, model_lazy) = function(.x, ...) {
         S7::S7_class(.x@var_id)@name
     }
     cls = .x@model_spec@cls
-    lookup = if (identical(.x@model_spec@registry_version, stat_define_registry$.version)) {
+    lookup = if (
+        identical(.x@model_spec@registry_version, stat_define_registry$.version)
+    ) {
         .x@model_spec@lookup
     } else {
         build_lookup(.x@model_spec@defs, cls)
@@ -218,10 +222,15 @@ S7::method(conclude, model_lazy) = function(.x, ...) {
 }
 
 resolve_impl = function(method_name, def, model_type, cls, global_variants) {
-    if (is.null(method_name)) return(def@impl$base)
+    if (is.null(method_name)) {
+        return(def@impl$base)
+    }
 
     global_entries = global_variants[[cls]] %||% list()
-    global_match = Filter(function(e) identical(e$name, method_name), global_entries)
+    global_match = Filter(
+        function(e) identical(e$name, method_name),
+        global_entries
+    )
 
     def@impl$variants[[method_name]] %||%
         global_match[[1]]$impl %||%
@@ -232,8 +241,15 @@ resolve_impl = function(method_name, def, model_type, cls, global_variants) {
 }
 
 wrap_exec = function(
-        out_raw, def, impl, stat_cls, stat_name,
-        method_name, var_id, processed, data_name
+    out_raw,
+    def,
+    impl,
+    stat_cls,
+    stat_name,
+    method_name,
+    var_id,
+    processed,
+    data_name
 ) {
     cld_exec(
         data = out_raw,

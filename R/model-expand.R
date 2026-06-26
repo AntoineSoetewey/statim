@@ -10,7 +10,10 @@ multi_lazy = S7::new_class(
     "multi_lazy",
     properties = list(
         models = S7::class_list,
-        labels = S7::new_property(class = S7::class_character, default = character(0)),
+        labels = S7::new_property(
+            class = S7::class_character,
+            default = character(0)
+        ),
         args = S7::new_property(class = S7::class_list, default = list())
     )
 )
@@ -19,7 +22,10 @@ multi_exec = S7::new_class(
     "multi_exec",
     properties = list(
         results = S7::new_property(class = S7::class_list),
-        labels = S7::new_property(class = S7::class_character, default = character(0)),
+        labels = S7::new_property(
+            class = S7::class_character,
+            default = character(0)
+        ),
         stat_name = S7::new_property(class = S7::class_character, default = "")
     )
 )
@@ -139,7 +145,9 @@ S7::method(write_models, S7::class_data.frame) = function(.data, ...) {
         cli::cli_abort("All arguments to {.fn write_models} must be named.")
     }
 
-    env = rlang::new_data_mask(rlang::new_environment(parent = rlang::caller_env()))
+    env = rlang::new_data_mask(rlang::new_environment(
+        parent = rlang::caller_env()
+    ))
 
     models = vector("list", length(quos))
     names(models) = nms
@@ -170,7 +178,12 @@ S7::method(print, expanded_model) = function(x, ...) {
 
 S7::method(print, multi_exec) = function(x, ...) {
     n_models = length(x@results)
-    header = sprintf("%d model%s \u00b7 %s", n_models, if (n_models == 1L) "" else "s", x@stat_name)
+    header = sprintf(
+        "%d model%s \u00b7 %s",
+        n_models,
+        if (n_models == 1L) "" else "s",
+        x@stat_name
+    )
 
     cat("\n")
     cat(cli::rule(left = header), "\n\n")
@@ -178,7 +191,9 @@ S7::method(print, multi_exec) = function(x, ...) {
         cat(sprintf("%s : <cld_exec>\n", x@labels[[i]]))
     }
     cat("\n")
-    cli::cat_line(cli::col_silver("Use display() to inspect individual results."))
+    cli::cat_line(cli::col_silver(
+        "Use display() to inspect individual results."
+    ))
     cat("\n")
     invisible(x)
 }
@@ -206,10 +221,7 @@ S7::method(update, multi_lazy) = function(object, ...) {
                 dots
             )
         } else {
-            m@model_spec@args = utils::modifyList(
-                m@model_spec@args,
-                dots
-            )
+            m@model_spec@args = utils::modifyList(m@model_spec@args, dots)
         }
         m
     })
@@ -218,13 +230,14 @@ S7::method(update, multi_lazy) = function(object, ...) {
 
 S7::method(tidy, multi_exec) = function(.x, ...) {
     tidied = lapply(.x@results, function(r) tidy(r, ...))
-    tibble::tibble(
-        model = .x@labels,
-        outs = tidied
-    )
+    tibble::tibble(model = .x@labels, outs = tidied)
 }
 
-S7::method(prepare_model, list(expanded_model, S7::class_function)) = function(.x, .model_fn, ...) {
+S7::method(prepare_model, list(expanded_model, S7::class_function)) = function(
+    .x,
+    .model_fn,
+    ...
+) {
     spec = as_model_spec(.model_fn)
     models = lapply(.x@models, function(dm) {
         model_lazy(
@@ -236,7 +249,11 @@ S7::method(prepare_model, list(expanded_model, S7::class_function)) = function(.
     multi_lazy(models = models, labels = .x@labels, args = list())
 }
 
-S7::method(prepare_test, list(expanded_model, S7::class_function)) = function(.x, .test, ...) {
+S7::method(prepare_test, list(expanded_model, S7::class_function)) = function(
+    .x,
+    .test,
+    ...
+) {
     spec = as_test_spec(.test)
     models = lapply(.x@models, function(dm) {
         test_lazy(
@@ -248,29 +265,34 @@ S7::method(prepare_test, list(expanded_model, S7::class_function)) = function(.x
     multi_lazy(models = models, labels = .x@labels, args = list())
 }
 
-S7::method(prepare, list(expanded_model, S7::class_function)) = function(.x, .fn, ...) {
-    spec = tryCatch(
-        .fn(.var_id = NULL),
-        error = function(e) {
-            cli::cli_abort(
-                "{.arg .fn} must be a function built with {.fn STAT_CONSTRUCTOR}.",
-                parent = e
-            )
-        }
-    )
+S7::method(prepare, list(expanded_model, S7::class_function)) = function(
+    .x,
+    .fn,
+    ...
+) {
+    spec = tryCatch(.fn(.var_id = NULL), error = function(e) {
+        cli::cli_abort(
+            "{.arg .fn} must be a function built with {.fn STAT_CONSTRUCTOR}.",
+            parent = e
+        )
+    })
 
     builder = if (is_test_spec(spec)) {
-        function(dm) test_lazy(
-            var_id = dm@var_id,
-            processed = dm@processed,
-            test_spec = spec
-        )
+        function(dm) {
+            test_lazy(
+                var_id = dm@var_id,
+                processed = dm@processed,
+                test_spec = spec
+            )
+        }
     } else if (is_model_spec(spec)) {
-        function(dm) model_lazy(
-            var_id = dm@var_id,
-            processed = dm@processed,
-            model_spec = spec
-        )
+        function(dm) {
+            model_lazy(
+                var_id = dm@var_id,
+                processed = dm@processed,
+                model_spec = spec
+            )
+        }
     } else {
         cli::cli_abort(
             "{.arg .fn} must return a {.cls test_spec} or {.cls model_spec}."
@@ -281,7 +303,11 @@ S7::method(prepare, list(expanded_model, S7::class_function)) = function(.x, .fn
     multi_lazy(models = models, labels = .x@labels, args = list())
 }
 
-S7::method(via, list(multi_lazy, S7::class_character)) = function(.x, .method, ...) {
+S7::method(via, list(multi_lazy, S7::class_character)) = function(
+    .x,
+    .method,
+    ...
+) {
     .x@models = lapply(.x@models, function(m) via(m, .method, ...))
     .x
 }

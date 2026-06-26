@@ -79,13 +79,21 @@ defer_stat = function(lookup, args, cls, defs, .name, spec_class) {
 }
 
 impl_cls_from_model = function(cls, var_id) {
-    model_nm = if (inherits(var_id, "formula")) "formula" else S7::S7_class(var_id)@name
+    model_nm = if (inherits(var_id, "formula")) {
+        "formula"
+    } else {
+        S7::S7_class(var_id)@name
+    }
     paste0(cls, "_", model_nm)
 }
 
 model_type_name = function(model_type) {
-    if (inherits(model_type, "S7_class")) return(model_type@name)
-    if (inherits(model_type, "S7_S3_class")) return(model_type$class[[1]])
+    if (inherits(model_type, "S7_class")) {
+        return(model_type@name)
+    }
+    if (inherits(model_type, "S7_S3_class")) {
+        return(model_type$class[[1]])
+    }
     cli::cli_abort("Cannot extract a name from {.arg model_type}.")
 }
 
@@ -98,7 +106,9 @@ build_lookup = function(defs, cls) {
 
     reg_key = stat_define_registry_key(cls)
     env = stat_define_registry[[reg_key]]
-    if (is.null(env)) return(base_lookup)
+    if (is.null(env)) {
+        return(base_lookup)
+    }
 
     extra = as.list(env)
     extra_defs = lapply(extra, function(e) e$def)
@@ -117,9 +127,10 @@ build_lookup = function(defs, cls) {
 }
 
 find_def = function(lookup, model_type) {
-    lookup[[model_type]] %||% cli::cli_abort(
-        "No implementation found for model type {.val {model_type}}."
-    )
+    lookup[[model_type]] %||%
+        cli::cli_abort(
+            "No implementation found for model type {.val {model_type}}."
+        )
 }
 
 stat_infer_spec = S7::new_class(
@@ -157,7 +168,10 @@ test_spec = S7::new_class(
         cls = S7::new_property(class = S7::class_character),
         name = S7::new_property(class = S7::class_character),
         lookup = S7::new_property(class = S7::class_list),
-        registry_version = S7::new_property(class = S7::class_integer, default = 0L)
+        registry_version = S7::new_property(
+            class = S7::class_integer,
+            default = 0L
+        )
     )
 )
 
@@ -170,6 +184,9 @@ model_spec = S7::new_class(
         cls = S7::new_property(class = S7::class_character),
         name = S7::new_property(class = S7::class_character),
         lookup = S7::new_property(class = S7::class_list),
-        registry_version = S7::new_property(class = S7::class_integer, default = 0L)
+        registry_version = S7::new_property(
+            class = S7::class_integer,
+            default = 0L
+        )
     )
 )

@@ -17,10 +17,7 @@ inequality = function(a, b, direction = "lteq") {
 }
 
 pairs_generator = function(x, direction = "lteq", simplify = TRUE) {
-    rlang::check_installed(
-        c("tidyr", "dplyr"),
-        reason = "to generate pairs"
-    )
+    rlang::check_installed(c("tidyr", "dplyr"), reason = "to generate pairs")
 
     pairs = tidyr::expand_grid(x = x, y = x) |>
         dplyr::filter(inequality(.data$x, .data$y, direction = {{ direction }}))

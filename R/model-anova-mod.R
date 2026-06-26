@@ -1,7 +1,4 @@
-anova_lazy = S7::new_class(
-    "anova_lazy",
-    parent = multi_lazy
-)
+anova_lazy = S7::new_class("anova_lazy", parent = multi_lazy)
 
 #' ANOVA table for linear model comparisons
 #'
@@ -70,7 +67,11 @@ S7::method(anova, anova_lazy) = function(object, ..., test = "F") {
 S7::method(anova, model_lazy) = function(object, ..., test = "F") {
     rest = list(...)
 
-    not_lazy = !vapply(rest, function(m) S7::S7_inherits(m, model_lazy), logical(1))
+    not_lazy = !vapply(
+        rest,
+        function(m) S7::S7_inherits(m, model_lazy),
+        logical(1)
+    )
     if (any(not_lazy)) {
         cli::cli_abort(c(
             "All arguments to {.fn anova} must be {.cls model_lazy} objects.",
@@ -87,7 +88,11 @@ S7::method(anova, model_lazy) = function(object, ..., test = "F") {
 S7::method(anova, cld_exec) = function(object, ..., test = "F") {
     rest = list(...)
 
-    not_exec = !vapply(rest, function(m) S7::S7_inherits(m, cld_exec), logical(1))
+    not_exec = !vapply(
+        rest,
+        function(m) S7::S7_inherits(m, cld_exec),
+        logical(1)
+    )
     if (any(not_exec)) {
         cli::cli_abort(c(
             "All arguments to {.fn anova} must be {.cls cld_exec} objects.",
@@ -129,13 +134,17 @@ S7::method(print, anova_lazy) = function(x, ...) {
     if (length(all_args) > 0L) {
         args_str = paste(
             names(all_args),
-            vapply(all_args, function(a) {
-                if (is.function(a)) {
-                    paste0(deparse(a[[1]]), "()")
-                } else {
-                    as.character(a)
-                }
-            }, character(1)),
+            vapply(
+                all_args,
+                function(a) {
+                    if (is.function(a)) {
+                        paste0(deparse(a[[1]]), "()")
+                    } else {
+                        as.character(a)
+                    }
+                },
+                character(1)
+            ),
             sep = " = ",
             collapse = ", "
         )
@@ -149,7 +158,11 @@ S7::method(print, anova_lazy) = function(x, ...) {
 build_anova = S7::new_generic("build_anova", "fitted")
 
 S7::method(build_anova, S7::class_list) = function(fitted, labels, test) {
-    not_able = !vapply(fitted, function(f) S7::S7_inherits(f, anova_able), logical(1))
+    not_able = !vapply(
+        fitted,
+        function(f) S7::S7_inherits(f, anova_able),
+        logical(1)
+    )
     if (any(not_able)) {
         cli::cli_abort(c(
             "All models must return an {.cls anova_able} object to participate in {.fn anova}.",
@@ -205,10 +218,15 @@ S7::method(build_anova, S7::class_list) = function(fitted, labels, test) {
     }
 
     # nobs = vapply(fitted, function(f) length(f@terms), integer(1))
-    nobs = vapply(fitted, function(f) {
-        p = length(attr(f@terms, "term.labels")) + attr(f@terms, "intercept")
-        as.integer(f@df_residual) + p
-    }, integer(1))
+    nobs = vapply(
+        fitted,
+        function(f) {
+            p = length(attr(f@terms, "term.labels")) +
+                attr(f@terms, "intercept")
+            as.integer(f@df_residual) + p
+        },
+        integer(1)
+    )
     if (length(unique(nobs)) > 1L) {
         cli::cli_abort(
             "Models were not all fitted to the same number of observations."
@@ -227,12 +245,17 @@ S7::method(build_anova, S7::class_list) = function(fitted, labels, test) {
     }
 
     family = families[[1L]]
-    stats_tbl = suppressWarnings(
-        compute_anova_stats(fitted, labels = labels, family = family, test = test)
-    )
+    stats_tbl = suppressWarnings(compute_anova_stats(
+        fitted,
+        labels = labels,
+        family = family,
+        test = test
+    ))
 
     stats_tbl[] = lapply(stats_tbl, function(col) {
-        if (is.numeric(col)) col[is.nan(col) | is.infinite(col)] = NA_real_
+        if (is.numeric(col)) {
+            col[is.nan(col) | is.infinite(col)] = NA_real_
+        }
         col
     })
 
@@ -285,7 +308,10 @@ anova_able = S7::new_class(
         df_residual = S7::class_numeric,
         deviance = S7::class_numeric,
         dispersion = S7::class_numeric,
-        family = S7::new_property(class = S7::class_character, default = "gaussian")
+        family = S7::new_property(
+            class = S7::class_character,
+            default = "gaussian"
+        )
     )
 )
 
@@ -298,10 +324,7 @@ S7::method(update, anova_lazy) = function(object, ...) {
                 dots
             )
         } else {
-            m@model_spec@args = utils::modifyList(
-                m@model_spec@args,
-                dots
-            )
+            m@model_spec@args = utils::modifyList(m@model_spec@args, dots)
         }
         m
     })
@@ -312,7 +335,10 @@ cld_anova = S7::new_class(
     "cld_anova",
     parent = cld_exec,
     properties = list(
-        labels = S7::new_property(class = S7::class_character, default = character(0))
+        labels = S7::new_property(
+            class = S7::class_character,
+            default = character(0)
+        )
     )
 )
 
@@ -412,7 +438,11 @@ compute_anova_stats = function(fitted, labels, family, test) {
     }
 
     tbl = tibble::tibble(
-        model = if (length(labels) == length(fitted)) labels else as.character(seq_along(fitted)),
+        model = if (length(labels) == length(fitted)) {
+            labels
+        } else {
+            as.character(seq_along(fitted))
+        },
         res_df = res_df,
         deviance = dev,
         df = df_diff,
@@ -462,7 +492,11 @@ compute_anova_stats_single = function(obj) {
     rss_seq = numeric(length(term_indices))
     for (k in seq_along(term_indices)) {
         cols_k = which(asgn %in% seq_len(k))
-        X_sub = if (has_intercept) cbind(1, X[, cols_k, drop = FALSE]) else X[, cols_k, drop = FALSE]
+        X_sub = if (has_intercept) {
+            cbind(1, X[, cols_k, drop = FALSE])
+        } else {
+            X[, cols_k, drop = FALSE]
+        }
         rss_seq[k] = sum(stats::lm.fit(X_sub, y)$residuals^2)
     }
 
@@ -497,5 +531,9 @@ run_model_lazy_raw = function(m) {
         m@model_spec@args,
         m@recalibrate_spec$args %||% list()
     )
-    inject_and_run(impl = def@impl$base, processed = m@processed, args = all_args)
+    inject_and_run(
+        impl = def@impl$base,
+        processed = m@processed,
+        args = all_args
+    )
 }

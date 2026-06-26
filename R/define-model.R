@@ -29,18 +29,16 @@
 #' @export
 define_model = S7::new_generic("define_model", ".x")
 
-S7::method(define_model, S7::new_union(S7::class_formula, var_id)) = function(.x, data = parent.frame(), ...) {
-    def_var(
-        var_id = .x,
-        processed = model_processor(.x, data)
-    )
+S7::method(define_model, S7::new_union(S7::class_formula, var_id)) = function(
+    .x,
+    data = parent.frame(),
+    ...
+) {
+    def_var(var_id = .x, processed = model_processor(.x, data))
 }
 
 S7::method(define_model, S7::class_data.frame) = function(.x, to_analyze, ...) {
-    def_var(
-        var_id = to_analyze,
-        processed = model_processor(to_analyze, .x)
-    )
+    def_var(var_id = to_analyze, processed = model_processor(to_analyze, .x))
 }
 
 def_var = S7::new_class(
@@ -63,7 +61,9 @@ S7::method(print, def_var) = function(x, ...) {
     cat("Args :", info@args, "\n")
 
     if (!info@registered) {
-        cat("Note : Unregistered <var_id> subclass (must define a `var_id_info()` method.)\n")
+        cat(
+            "Note : Unregistered <var_id> subclass (must define a `var_id_info()` method.)\n"
+        )
     } else {
         if (length(info@other_info)) {
             cat("Other info:\n")

@@ -27,11 +27,9 @@
 #'     display(2)
 #'
 #' @export
-display = S7::new_generic(
-    "display",
-    "x",
-    fun = function(x, n = 3L, ...) S7::S7_dispatch()
-)
+display = S7::new_generic("display", "x", fun = function(x, n = 3L, ...) {
+    S7::S7_dispatch()
+})
 
 S7::method(display, multi_exec) = function(x, n = 3L, ...) {
     n = min(n, length(x@results))

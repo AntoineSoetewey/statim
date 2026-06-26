@@ -34,32 +34,43 @@ prepare = S7::new_generic("prepare", c(".x", ".fn"))
 is_test_spec = function(x) S7::S7_inherits(x, test_spec)
 is_model_spec = function(x) S7::S7_inherits(x, model_spec)
 
-S7::method(prepare, list(def_var, S7::class_function)) = function(.x, .fn, ...) {
-    spec = tryCatch(
-        .fn(.var_id = NULL),
-        error = function(e) {
-            cli::cli_abort(
-                "{.arg .fn} must be a function built with {.fn STAT_CONSTRUCTOR}.",
-                parent = e
-            )
-        }
-    )
+S7::method(prepare, list(def_var, S7::class_function)) = function(
+    .x,
+    .fn,
+    ...
+) {
+    spec = tryCatch(.fn(.var_id = NULL), error = function(e) {
+        cli::cli_abort(
+            "{.arg .fn} must be a function built with {.fn STAT_CONSTRUCTOR}.",
+            parent = e
+        )
+    })
 
     if (is_test_spec(spec)) {
         test_lazy(
             var_id = .x@var_id,
             processed = .x@processed,
             test_spec = spec,
-            recalibrate_spec = if (length(list(...)) > 0L) list(args = list(...)) else NULL
+            recalibrate_spec = if (length(list(...)) > 0L) {
+                list(args = list(...))
+            } else {
+                NULL
+            }
         )
     } else if (is_model_spec(spec)) {
         model_lazy(
             var_id = .x@var_id,
             processed = .x@processed,
             model_spec = spec,
-            recalibrate_spec = if (length(list(...)) > 0L) list(args = list(...)) else NULL
+            recalibrate_spec = if (length(list(...)) > 0L) {
+                list(args = list(...))
+            } else {
+                NULL
+            }
         )
     } else {
-        cli::cli_abort("{.arg .fn} must return a {.cls test_spec} or {.cls model_spec}.")
+        cli::cli_abort(
+            "{.arg .fn} must return a {.cls test_spec} or {.cls model_spec}."
+        )
     }
 }

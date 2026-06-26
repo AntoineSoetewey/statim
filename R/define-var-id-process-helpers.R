@@ -101,20 +101,25 @@ resolve_quo = function(quo, data = NULL, role = "x", idx = 1L) {
         ":symbol" = {
             nm = as.character(cl$expr)
             if (is.null(data) || is.environment(data)) {
-                val = tryCatch(
-                    rlang::eval_tidy(quo),
-                    error = function(e) {
-                        rlang::abort(
-                            c(
-                                paste0("Object `", nm, "` not found in the calling environment."),
-                                "i" = "Supply a data frame as `data`:",
-                                "i" = paste0("define_model(x_by(", nm, ", ...), data)")
+                val = tryCatch(rlang::eval_tidy(quo), error = function(e) {
+                    rlang::abort(
+                        c(
+                            paste0(
+                                "Object `",
+                                nm,
+                                "` not found in the calling environment."
                             ),
-                            class = "check_missing_data",
-                            parent = e
-                        )
-                    }
-                )
+                            "i" = "Supply a data frame as `data`:",
+                            "i" = paste0(
+                                "define_model(x_by(",
+                                nm,
+                                ", ...), data)"
+                            )
+                        ),
+                        class = "check_missing_data",
+                        parent = e
+                    )
+                })
                 vctrs::new_data_frame(rlang::set_names(list(val), nm))
             } else {
                 data[, nm, drop = FALSE]
@@ -132,9 +137,17 @@ resolve_quo = function(quo, data = NULL, role = "x", idx = 1L) {
                         error = function(e) {
                             rlang::abort(
                                 c(
-                                    paste0("Object `", nms[[i]], "` not found in the calling environment."),
+                                    paste0(
+                                        "Object `",
+                                        nms[[i]],
+                                        "` not found in the calling environment."
+                                    ),
                                     "i" = "Supply a data frame as `.data`:",
-                                    "i" = paste0("define_model(x_by(c(", paste(nms, collapse = ", "), "), ...), data)")
+                                    "i" = paste0(
+                                        "define_model(x_by(c(",
+                                        paste(nms, collapse = ", "),
+                                        "), ...), data)"
+                                    )
                                 ),
                                 class = "check_missing_data",
                                 parent = e
@@ -151,7 +164,9 @@ resolve_quo = function(quo, data = NULL, role = "x", idx = 1L) {
 
         ":i_call" = {
             inner = cl$expr[[2]]
-            user_nm = if (!is.null(names(cl$expr)) && nzchar(names(cl$expr)[[2]])) {
+            user_nm = if (
+                !is.null(names(cl$expr)) && nzchar(names(cl$expr)[[2]])
+            ) {
                 names(cl$expr)[[2]]
             } else {
                 NULL
@@ -188,9 +203,7 @@ resolve_quo = function(quo, data = NULL, role = "x", idx = 1L) {
 #' @keywords internal
 #' @noRd
 resolve_inlines = function(cl, data = NULL, role = "x") {
-    inner_quos = rlang::eval_tidy(
-        rlang::new_quosure(cl$expr, cl$env)
-    )
+    inner_quos = rlang::eval_tidy(rlang::new_quosure(cl$expr, cl$env))
 
     user_nms = names(inner_quos)
 
@@ -247,15 +260,7 @@ pairwise_data_extract = function(args, data = NULL) {
     var_names = unlist(lapply(resolved, names))
     selected_data = rlang::exec(vctrs::vec_cbind, !!!resolved)
 
-    pairs = pairs_generator(
-        var_names,
-        direction = direction,
-        simplify = TRUE
-    )
+    pairs = pairs_generator(var_names, direction = direction, simplify = TRUE)
 
-    list(
-        var_names = var_names,
-        pairs = pairs,
-        data = selected_data
-    )
+    list(var_names = var_names, pairs = pairs, data = selected_data)
 }

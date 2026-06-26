@@ -30,7 +30,11 @@
 #' @export
 via = S7::new_generic("via", dispatch_args = c(".x", ".method"))
 
-S7::method(via, list(test_lazy, S7::class_character)) = function(.x, .method, ...) {
+S7::method(via, list(test_lazy, S7::class_character)) = function(
+    .x,
+    .method,
+    ...
+) {
     model_type = if (inherits(.x@var_id, "formula")) {
         "formula"
     } else {
@@ -54,7 +58,11 @@ S7::method(via, list(test_lazy, S7::class_character)) = function(.x, .method, ..
     .x
 }
 
-S7::method(via, list(model_lazy, S7::class_character)) = function(.x, .method, ...) {
+S7::method(via, list(model_lazy, S7::class_character)) = function(
+    .x,
+    .method,
+    ...
+) {
     model_type = if (inherits(.x@var_id, "formula")) {
         "formula"
     } else {

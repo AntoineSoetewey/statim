@@ -69,7 +69,9 @@ baseline = S7::new_class(
             cli::cli_abort("{.arg print} must be a function or {.val NULL}.")
         }
         if (!is.null(claim_parser) && !inherits(claim_parser, "map_claim")) {
-            cli::cli_abort("{.arg claim_parser} must be a {.fn map_claim} object or {.val NULL}.")
+            cli::cli_abort(
+                "{.arg claim_parser} must be a {.fn map_claim} object or {.val NULL}."
+            )
         }
         S7::new_object(
             S7::S7_object(),
@@ -162,7 +164,9 @@ variant = S7::new_class(
             cli::cli_abort("{.arg print} must be a function or {.val NULL}.")
         }
         if (!is.null(claim_parser) && !inherits(claim_parser, "map_claim")) {
-            cli::cli_abort("{.arg claim_parser} must be a {.fn map_claim} object or {.val NULL}.")
+            cli::cli_abort(
+                "{.arg claim_parser} must be a {.fn map_claim} object or {.val NULL}."
+            )
         }
         S7::new_object(
             S7::S7_object(),
@@ -202,7 +206,10 @@ agendas = function(base, ...) {
         if (length(unnamed) > 0) {
             cli::cli_abort("All variants in {.fn agendas} must be named.")
         }
-        bad = Filter(function(nm) !S7::S7_inherits(variants[[nm]], variant), names(variants))
+        bad = Filter(
+            function(nm) !S7::S7_inherits(variants[[nm]], variant),
+            names(variants)
+        )
         if (length(bad) > 0) {
             cli::cli_abort(c(
                 "All additional arguments to {.fn agendas} must be {.cls variant} objects.",

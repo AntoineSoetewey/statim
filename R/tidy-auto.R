@@ -49,7 +49,10 @@ S7::method(auto_tidy, class_stat_infer) = function(x, ...) {
     ))
 }
 
-S7::method(auto_tidy, S7::new_union(class_lm_object, class_glm_object)) = function(x, ...) {
+S7::method(
+    auto_tidy,
+    S7::new_union(class_lm_object, class_glm_object)
+) = function(x, ...) {
     tibble::tibble(x@coefficients)
 }
 

@@ -65,7 +65,11 @@ claim_scalar = function(claim, solve_coef = FALSE) {
     }
 
     op = claim@op
-    lhs_has_only_scalars = !any(vapply(lhs_terms, function(t) t$kind == "param", logical(1)))
+    lhs_has_only_scalars = !any(vapply(
+        lhs_terms,
+        function(t) t$kind == "param",
+        logical(1)
+    ))
     if (lhs_has_only_scalars && length(lhs_terms) > 0L) {
         op = unname(FLIP_OP[op])
     }
@@ -111,33 +115,45 @@ claim_contrast_coefs = function(claim, filter = NULL) {
         ))
     }
 
-    bad = Filter(function(t) {
-        node = t$node
-        cls = S7::S7_class(node)
-        slot_name = if (is.null(filter)) {
-            fmls = names(formals(cls@constructor))
-            matched = intersect(fmls, S7::prop_names(node))
-            if (length(matched) == 0L) return(FALSE)
-            matched[[1]]
-        } else {
-            filter
-        }
-        slot_val = tryCatch(S7::prop(node, slot_name), error = function(e) NULL)
-        is.null(slot_val)
-    }, param_terms)
+    bad = Filter(
+        function(t) {
+            node = t$node
+            cls = S7::S7_class(node)
+            slot_name = if (is.null(filter)) {
+                fmls = names(formals(cls@constructor))
+                matched = intersect(fmls, S7::prop_names(node))
+                if (length(matched) == 0L) {
+                    return(FALSE)
+                }
+                matched[[1]]
+            } else {
+                filter
+            }
+            slot_val = tryCatch(S7::prop(node, slot_name), error = function(e) {
+                NULL
+            })
+            is.null(slot_val)
+        },
+        param_terms
+    )
 
     if (length(bad) > 0L) {
-        slot_name = filter %||% {
-            node = bad[[1]]$node
-            cls = S7::S7_class(node)
-            fmls = names(formals(cls@constructor))
-            intersect(fmls, S7::prop_names(node))[[1]]
-        }
-        bad_labels = vapply(bad, function(t) {
-            cls_name = S7::S7_class(t$node)@name
-            x_lbl = rlang::as_label(t$node@x)
-            paste0(cls_name, "(", x_lbl, ")")
-        }, character(1))
+        slot_name = filter %||%
+            {
+                node = bad[[1]]$node
+                cls = S7::S7_class(node)
+                fmls = names(formals(cls@constructor))
+                intersect(fmls, S7::prop_names(node))[[1]]
+            }
+        bad_labels = vapply(
+            bad,
+            function(t) {
+                cls_name = S7::S7_class(t$node)@name
+                x_lbl = rlang::as_label(t$node@x)
+                paste0(cls_name, "(", x_lbl, ")")
+            },
+            character(1)
+        )
 
         cli::cli_abort(c(
             "All parameter terms must specify {.arg {slot_name}} when used in this context.",
@@ -146,12 +162,20 @@ claim_contrast_coefs = function(claim, filter = NULL) {
         ))
     }
 
-    nms = vapply(param_terms, function(t) extract_param_name(t$node), character(1))
+    nms = vapply(
+        param_terms,
+        function(t) extract_param_name(t$node),
+        character(1)
+    )
     raw_coefs = vapply(param_terms, `[[`, numeric(1), "coef")
     names(raw_coefs) = nms
 
     unique_nms = unique(nms)
-    coefs = vapply(unique_nms, function(nm) sum(raw_coefs[nms == nm]), numeric(1))
+    coefs = vapply(
+        unique_nms,
+        function(nm) sum(raw_coefs[nms == nm]),
+        numeric(1)
+    )
     names(coefs) = unique_nms
 
     zero_terms = names(coefs[coefs == 0])
@@ -166,7 +190,11 @@ claim_contrast_coefs = function(claim, filter = NULL) {
     scalar_val = -Reduce("+", lapply(scalar_terms, `[[`, "value"), 0)
 
     op = claim@op
-    lhs_has_only_scalars = !any(vapply(lhs_terms, function(t) t$kind == "param", logical(1)))
+    lhs_has_only_scalars = !any(vapply(
+        lhs_terms,
+        function(t) t$kind == "param",
+        logical(1)
+    ))
     if (lhs_has_only_scalars && length(lhs_terms) > 0L) {
         op = unname(FLIP_OP[op])
     }
@@ -188,14 +216,18 @@ claim_contrast_coefs = function(claim, filter = NULL) {
 #' @noRd
 claim_args = function(...) {
     args = list(...)
-    if (length(args) == 0L || is.null(names(args)) || any(!nzchar(names(args)))) {
+    if (
+        length(args) == 0L || is.null(names(args)) || any(!nzchar(names(args)))
+    ) {
         cli::cli_abort("All arguments to {.fn claim_args} must be named.")
     }
     structure(args, class = "claim_args")
 }
 
 contains_param = function(node) {
-    if (S7::S7_inherits(node, param_obj)) return(TRUE)
+    if (S7::S7_inherits(node, param_obj)) {
+        return(TRUE)
+    }
     if (inherits(node, "arith_node")) {
         return(any(vapply(node$operands, contains_param, logical(1))))
     }
@@ -203,7 +235,9 @@ contains_param = function(node) {
 }
 
 assert_linear = function(node, call_nm) {
-    if (!inherits(node, "arith_node")) return(invisible(NULL))
+    if (!inherits(node, "arith_node")) {
+        return(invisible(NULL))
+    }
 
     op = node$op
     ops = node$operands
@@ -244,7 +278,11 @@ assert_linear = function(node, call_nm) {
 
 collect_terms = function(node, sign = 1L, coef = 1) {
     if (is.numeric(node)) {
-        return(list(list(kind = "scalar", value = sign * coef * node, node = node)))
+        return(list(list(
+            kind = "scalar",
+            value = sign * coef * node,
+            node = node
+        )))
     }
 
     if (S7::S7_inherits(node, param_obj)) {
@@ -263,7 +301,9 @@ collect_terms = function(node, sign = 1L, coef = 1) {
         }
 
         if (op == "-") {
-            if (length(ops) == 1L) return(collect_terms(ops[[1]], -sign, coef))
+            if (length(ops) == 1L) {
+                return(collect_terms(ops[[1]], -sign, coef))
+            }
             return(c(
                 collect_terms(ops[[1]], sign, coef),
                 collect_terms(ops[[2]], -sign, coef)
@@ -271,7 +311,9 @@ collect_terms = function(node, sign = 1L, coef = 1) {
         }
 
         if (op == "*") {
-            if (is.numeric(ops[[1]])) return(collect_terms(ops[[2]], sign, coef * ops[[1]]))
+            if (is.numeric(ops[[1]])) {
+                return(collect_terms(ops[[2]], sign, coef * ops[[1]]))
+            }
             return(collect_terms(ops[[1]], sign, coef * ops[[2]]))
         }
 

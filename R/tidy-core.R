@@ -76,10 +76,11 @@ S7::method(tidy, cld_exec) = function(.x, ...) {
 
     out = tidy_fn(.x, ...)
 
-    if (!inherits(out, "tbl_df"))
+    if (!inherits(out, "tbl_df")) {
         cli::cli_abort(
             "The output is preferrably in a tibble format, not {.obj_type_friendly {out}}."
         )
+    }
 
     out
 }
@@ -121,9 +122,10 @@ making_tidy_register = function(lhs, rhs) {
     obj = lhs$obj
     model_type = lhs$model_type
 
-    stat_cls = attr(obj, "cls") %||% cli::cli_abort(
-        "{.arg obj} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
-    )
+    stat_cls = attr(obj, "cls") %||%
+        cli::cli_abort(
+            "{.arg obj} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
+        )
     is_var_id_class = inherits(model_type, "S7_class") &&
         identical(model_type@parent, var_id)
     is_formula_class = identical(model_type, S7::class_formula)
@@ -140,12 +142,15 @@ making_tidy_register = function(lhs, rhs) {
 
     key = tidy_registry_key(paste0(stat_cls, "_", model_type_name(model_type)))
     existing = register_tidy[[key]]
-        if (is.null(existing)) {
-            register_tidy[[key]] = rhs
-        } else {
+    if (is.null(existing)) {
+        register_tidy[[key]] = rhs
+    } else {
         merged_default = rhs@default %||% existing@default
         merged_variants = utils::modifyList(existing@variants, rhs@variants)
-        register_tidy[[key]] = do.call(method_tidy, c(list(merged_default), merged_variants))
+        register_tidy[[key]] = do.call(
+            method_tidy,
+            c(list(merged_default), merged_variants)
+        )
     }
     invisible(NULL)
 }

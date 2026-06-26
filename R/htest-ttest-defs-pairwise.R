@@ -53,71 +53,107 @@ NULL
 ttest_def_pairwise = test_define(
     model_type = pairwise,
     impl = agendas(
-        base = baseline(
-            fn = function(.proc, .paired = FALSE, .mu = 0, .alt = "two.sided", .ci = 0.95) {
-                var_names = .proc$var_names
-                pairs = .proc$pairs
-                data = .proc$data
-                direction = .proc$direction %||% "lt"
+        base = baseline(fn = function(
+            .proc,
+            .paired = FALSE,
+            .mu = 0,
+            .alt = "two.sided",
+            .ci = 0.95
+        ) {
+            var_names = .proc$var_names
+            pairs = .proc$pairs
+            data = .proc$data
+            direction = .proc$direction %||% "lt"
 
-                n_vars = length(var_names)
+            n_vars = length(var_names)
 
-                if (length(.mu) == 1L) {
-                    .mu = rep(.mu, n_vars)
-                } else if (length(.mu) != n_vars) {
-                    cli::cli_abort(c(
-                        "{.arg .mu} must be length 1 or length {n_vars} (one per variable).",
-                        "i" = "Variables: {.val {var_names}}.",
-                        "x" = "Got length {length(.mu)}."
-                    ))
-                }
-                names(.mu) = var_names
-
-                tests = lapply(seq_along(pairs), function(i) {
-                    a = pairs[[i]][[1]]
-                    b = pairs[[i]][[2]]
-                    is_one_sample = rlang::exec(identical, !!!pairs[[i]])
-
-                    res = if (is_one_sample) {
-                        stats::t.test(
-                            x = data[[a]],
-                            mu = .mu[[a]],
-                            alternative = .alt,
-                            conf.level = .ci
-                        )
-                    } else {
-                        stats::t.test(
-                            x = data[[a]],
-                            y = data[[b]],
-                            paired = .paired,
-                            mu = .mu[[a]] - .mu[[b]],
-                            alternative = .alt,
-                            conf.level = .ci
-                        )
-                    }
-
-                    list(a = a, b = b, ttest = res)
-                })
-
-                class_ttest_pairwise(
-                    var1 = vapply(tests, function(x) x[["a"]], character(1)),
-                    var2 = vapply(tests, function(x) x[["b"]], character(1)),
-                    est = vapply(tests, function(t) {
-                        est = t$ttest$estimate
-                        if (length(est) == 2L) est[[1L]] - est[[2L]] else est[[1L]]
-                    }, numeric(1)),
-                    df = vapply(tests, function(t) t$ttest$parameter[["df"]], numeric(1)),
-                    t_stat = vapply(tests, function(t) t$ttest$statistic[["t"]], numeric(1)),
-                    p_value = vapply(tests, function(t) t$ttest$p.value, numeric(1)),
-                    lower_ci = vapply(tests, function(t) t$ttest$conf.int[[1L]], numeric(1)),
-                    upper_ci = vapply(tests, function(t) t$ttest$conf.int[[2L]], numeric(1)),
-                    ci_level = .ci,
-                    method_name = vapply(tests, function(t) t$ttest$method, character(1))
-                    # method_name = unique(
-                    #     vapply(tests, function(t) t$ttest$method, character(1))
-                    # )
-                )
+            if (length(.mu) == 1L) {
+                .mu = rep(.mu, n_vars)
+            } else if (length(.mu) != n_vars) {
+                cli::cli_abort(c(
+                    "{.arg .mu} must be length 1 or length {n_vars} (one per variable).",
+                    "i" = "Variables: {.val {var_names}}.",
+                    "x" = "Got length {length(.mu)}."
+                ))
             }
-        )
+            names(.mu) = var_names
+
+            tests = lapply(seq_along(pairs), function(i) {
+                a = pairs[[i]][[1]]
+                b = pairs[[i]][[2]]
+                is_one_sample = rlang::exec(identical, !!!pairs[[i]])
+
+                res = if (is_one_sample) {
+                    stats::t.test(
+                        x = data[[a]],
+                        mu = .mu[[a]],
+                        alternative = .alt,
+                        conf.level = .ci
+                    )
+                } else {
+                    stats::t.test(
+                        x = data[[a]],
+                        y = data[[b]],
+                        paired = .paired,
+                        mu = .mu[[a]] - .mu[[b]],
+                        alternative = .alt,
+                        conf.level = .ci
+                    )
+                }
+
+                list(a = a, b = b, ttest = res)
+            })
+
+            class_ttest_pairwise(
+                var1 = vapply(tests, function(x) x[["a"]], character(1)),
+                var2 = vapply(tests, function(x) x[["b"]], character(1)),
+                est = vapply(
+                    tests,
+                    function(t) {
+                        est = t$ttest$estimate
+                        if (length(est) == 2L) {
+                            est[[1L]] - est[[2L]]
+                        } else {
+                            est[[1L]]
+                        }
+                    },
+                    numeric(1)
+                ),
+                df = vapply(
+                    tests,
+                    function(t) t$ttest$parameter[["df"]],
+                    numeric(1)
+                ),
+                t_stat = vapply(
+                    tests,
+                    function(t) t$ttest$statistic[["t"]],
+                    numeric(1)
+                ),
+                p_value = vapply(
+                    tests,
+                    function(t) t$ttest$p.value,
+                    numeric(1)
+                ),
+                lower_ci = vapply(
+                    tests,
+                    function(t) t$ttest$conf.int[[1L]],
+                    numeric(1)
+                ),
+                upper_ci = vapply(
+                    tests,
+                    function(t) t$ttest$conf.int[[2L]],
+                    numeric(1)
+                ),
+                ci_level = .ci,
+                method_name = vapply(
+                    tests,
+                    function(t) t$ttest$method,
+                    character(1)
+                )
+                # method_name = unique(
+                #     vapply(tests, function(t) t$ttest$method, character(1))
+                # )
+            )
+        })
     )
 )

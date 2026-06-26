@@ -78,11 +78,7 @@
 #' @export
 TTEST = HTEST_FN(
     cls = "ttest",
-    defs = list(
-        ttest_def_two,
-        ttest_def_formula,
-        ttest_def_pairwise
-    ),
+    defs = list(ttest_def_two, ttest_def_formula, ttest_def_pairwise),
     .name = "T-Test"
 )
 
@@ -132,10 +128,16 @@ class_ttest_two = S7::new_class(
             class = S7::class_numeric,
             default = 0.95,
             validator = function(value) {
-                if (length(value) != 1L)
-                    return(paste0("`ci_level` must be length 1, not ", length(value), "."))
-                if (value <= 0 || value >= 1)
+                if (length(value) != 1L) {
+                    return(paste0(
+                        "`ci_level` must be length 1, not ",
+                        length(value),
+                        "."
+                    ))
+                }
+                if (value <= 0 || value >= 1) {
                     "`ci_level` must be between 0 and 1 (exclusive)."
+                }
             }
         )
     )
@@ -238,10 +240,16 @@ class_ttest_pairwise = S7::new_class(
             class = S7::class_numeric,
             default = 0.95,
             validator = function(value) {
-                if (length(value) != 1L)
-                    return(paste0("`ci_level` must be length 1, not ", length(value), "."))
-                if (value <= 0 || value >= 1)
+                if (length(value) != 1L) {
+                    return(paste0(
+                        "`ci_level` must be length 1, not ",
+                        length(value),
+                        "."
+                    ))
+                }
+                if (value <= 0 || value >= 1) {
                     "`ci_level` must be between 0 and 1 (exclusive)."
+                }
             }
         ),
         method_name = S7::new_property(
@@ -259,7 +267,13 @@ class_ttest_pairwise = S7::new_class(
 S7::method(print, class_ttest_pairwise) = function(x, ...) {
     is_one_sample = all(x@var1 == x@var2)
     fmt_ci = function(lo, hi) {
-        fmt = function(v) ifelse(is.infinite(v), ifelse(v > 0, "Inf", "-Inf"), formatC(v, digits = 3, format = "f"))
+        fmt = function(v) {
+            ifelse(
+                is.infinite(v),
+                ifelse(v > 0, "Inf", "-Inf"),
+                formatC(v, digits = 3, format = "f")
+            )
+        }
         paste0("[", fmt(lo), "  ", fmt(hi), "]")
     }
 
@@ -300,7 +314,11 @@ S7::method(print, class_ttest_pairwise) = function(x, ...) {
     }
 
     unique_methods = unique(x@method_name)
-    title = if (length(unique_methods) == 1L) unique_methods else "Pairwise t-Tests"
+    title = if (length(unique_methods) == 1L) {
+        unique_methods
+    } else {
+        "Pairwise t-Tests"
+    }
 
     tabstats::pairwise_matrix(
         spec,
@@ -308,18 +326,16 @@ S7::method(print, class_ttest_pairwise) = function(x, ...) {
         # title = if (nzchar(x@method_name)) x@method_name else "Pairwise t-Tests",
         layout_view = TRUE,
         diag_1 = FALSE,
-        style = tabstats::cm_style(
-            pval = function(x) {
-                x_num = suppressWarnings(as.numeric(x))
-                if (is.na(x_num) || x_num > 0.05) {
-                    cli::style_italic(x)
-                } else if (x_num > 0.01) {
-                    cli::col_red(x)
-                } else {
-                    cli::style_bold("<0.001")
-                }
+        style = tabstats::cm_style(pval = function(x) {
+            x_num = suppressWarnings(as.numeric(x))
+            if (is.na(x_num) || x_num > 0.05) {
+                cli::style_italic(x)
+            } else if (x_num > 0.01) {
+                cli::col_red(x)
+            } else {
+                cli::style_bold("<0.001")
             }
-        )
+        })
     )
 
     invisible(x)

@@ -54,66 +54,81 @@ NULL
 cor_test_formula = test_define(
     model_type = S7::class_formula,
     impl = agendas(
-        base = baseline(
-            fn = function(.proc, .cor_type = "pearson", .alt = "two.sided", .ci = 0.95) {
-                formula = .proc$formula
-                data = .proc$data
+        base = baseline(fn = function(
+            .proc,
+            .cor_type = "pearson",
+            .alt = "two.sided",
+            .ci = 0.95
+        ) {
+            formula = .proc$formula
+            data = .proc$data
 
-                resp_name = all.vars(formula)[1]
-                rhs_labels = attr(terms(formula), "term.labels")
+            resp_name = all.vars(formula)[1]
+            rhs_labels = attr(terms(formula), "term.labels")
 
-                if (length(rhs_labels) == 0L) {
-                    cli::cli_abort(c(
-                        "Formula must have at least one RHS term.",
-                        "i" = "Use {.code y ~ x} or {.code y ~ x1 + x2}."
-                    ))
-                }
-
-                if (nrow(data) < 4L) {
-                    cli::cli_abort(c(
-                        "Correlation test requires at least 4 observations.",
-                        "i" = "Got {nrow(data)}."
-                    ))
-                }
-
-                tests = lapply(rhs_labels, function(x_name) {
-                    res = stats::cor.test(
-                        x = data[[x_name]],
-                        y = data[[resp_name]],
-                        method = .cor_type,
-                        alternative = .alt,
-                        conf.level = .ci
-                    )
-                    list(x_name = x_name, res = res)
-                })
-
-                has_ci = !is.null(tests[[1]]$res$conf.int)
-                has_df = !is.null(tests[[1]]$res$parameter)
-
-                class_corr_two(
-                    ind_vars = vapply(tests, `[[`, character(1), "x_name"),
-                    resp_vars = rep(resp_name, length(tests)),
-                    estimate = vapply(tests, function(t) unname(t$res$estimate), numeric(1)),
-                    statistic = vapply(tests, function(t) unname(t$res$statistic), numeric(1)),
-                    df = if (has_df) {
-                        vapply(tests, function(t) unname(t$res$parameter), numeric(1))
-                    } else {
-                        numeric(0)
-                    },
-                    p_val = vapply(tests, function(t) t$res$p.value, numeric(1)),
-                    lower_ci = if (has_ci) {
-                        vapply(tests, function(t) t$res$conf.int[[1]], numeric(1))
-                    } else {
-                        numeric(0)
-                    },
-                    upper_ci = if (has_ci) {
-                        vapply(tests, function(t) t$res$conf.int[[2]], numeric(1))
-                    } else {
-                        numeric(0)
-                    },
-                    ci_level = .ci
-                )
+            if (length(rhs_labels) == 0L) {
+                cli::cli_abort(c(
+                    "Formula must have at least one RHS term.",
+                    "i" = "Use {.code y ~ x} or {.code y ~ x1 + x2}."
+                ))
             }
-        )
+
+            if (nrow(data) < 4L) {
+                cli::cli_abort(c(
+                    "Correlation test requires at least 4 observations.",
+                    "i" = "Got {nrow(data)}."
+                ))
+            }
+
+            tests = lapply(rhs_labels, function(x_name) {
+                res = stats::cor.test(
+                    x = data[[x_name]],
+                    y = data[[resp_name]],
+                    method = .cor_type,
+                    alternative = .alt,
+                    conf.level = .ci
+                )
+                list(x_name = x_name, res = res)
+            })
+
+            has_ci = !is.null(tests[[1]]$res$conf.int)
+            has_df = !is.null(tests[[1]]$res$parameter)
+
+            class_corr_two(
+                ind_vars = vapply(tests, `[[`, character(1), "x_name"),
+                resp_vars = rep(resp_name, length(tests)),
+                estimate = vapply(
+                    tests,
+                    function(t) unname(t$res$estimate),
+                    numeric(1)
+                ),
+                statistic = vapply(
+                    tests,
+                    function(t) unname(t$res$statistic),
+                    numeric(1)
+                ),
+                df = if (has_df) {
+                    vapply(
+                        tests,
+                        function(t) unname(t$res$parameter),
+                        numeric(1)
+                    )
+                } else {
+                    numeric(0)
+                },
+                p_val = vapply(tests, function(t) t$res$p.value, numeric(1)),
+                lower_ci = if (has_ci) {
+                    vapply(tests, function(t) t$res$conf.int[[1]], numeric(1))
+                } else {
+                    numeric(0)
+                },
+                upper_ci = if (has_ci) {
+                    vapply(tests, function(t) t$res$conf.int[[2]], numeric(1))
+                } else {
+                    numeric(0)
+                },
+                ci_level = .ci
+            )
+        })
     )
 )

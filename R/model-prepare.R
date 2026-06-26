@@ -34,9 +34,16 @@ model_lazy = S7::new_class(
 #'
 #' @name prepare-model
 #' @export
-prepare_model = S7::new_generic("prepare_model", dispatch_args = c(".x", ".model_fn"))
+prepare_model = S7::new_generic(
+    "prepare_model",
+    dispatch_args = c(".x", ".model_fn")
+)
 
-S7::method(prepare_model, list(def_var, S7::class_function)) = function(.x, .model_fn, ...) {
+S7::method(prepare_model, list(def_var, S7::class_function)) = function(
+    .x,
+    .model_fn,
+    ...
+) {
     spec = as_model_spec(.model_fn)
     dots = list(...)
     model_lazy(
@@ -83,10 +90,7 @@ S7::method(update, model_lazy) = function(object, ...) {
             dots
         )
     } else {
-        object@model_spec@args = utils::modifyList(
-            object@model_spec@args,
-            dots
-        )
+        object@model_spec@args = utils::modifyList(object@model_spec@args, dots)
     }
     object
 }

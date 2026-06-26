@@ -124,7 +124,10 @@ ttest_def_formula = test_define(
 
                 tidy_rows = lapply(seq_len(nrow(dat)), function(i) {
                     td = broom::tidy(dat$ttest[[i]])
-                    ci_level = attr(purrr::pluck(dat$ttest[[i]], "conf.int"), "conf.level")
+                    ci_level = attr(
+                        purrr::pluck(dat$ttest[[i]], "conf.int"),
+                        "conf.level"
+                    )
                     lo_name = paste0("lower_", ci_level * 100)
                     up_name = paste0("upper_", ci_level * 100)
 
@@ -174,7 +177,10 @@ ttest_def_formula = test_define(
                 )
                 cat("\n\n")
 
-                cli::cat_line(cli::rule(left = "Confidence Interval", line = "-"), "\n")
+                cli::cat_line(
+                    cli::rule(left = "Confidence Interval", line = "-"),
+                    "\n"
+                )
                 tabstats::table_default(ci_out)
                 cat("\n\n")
 
@@ -187,4 +193,3 @@ ttest_def_formula = test_define(
 make_test = function(type, group, ttest) {
     list(type = type, group = group, ttest = ttest)
 }
-

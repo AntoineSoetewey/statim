@@ -46,10 +46,7 @@ var_id = S7::new_class("var_id", abstract = TRUE)
 x_by = S7::new_class(
     "x_by",
     parent = var_id,
-    properties = list(
-        x = S7::class_any,
-        group = S7::class_any
-    ),
+    properties = list(x = S7::class_any, group = S7::class_any),
     constructor = function(x, group) {
         S7::new_object(
             S7::S7_object(),
@@ -83,10 +80,7 @@ x_by = S7::new_class(
 rel = S7::new_class(
     "rel",
     parent = var_id,
-    properties = list(
-        x = S7::class_any,
-        resp = S7::class_any
-    ),
+    properties = list(x = S7::class_any, resp = S7::class_any),
     constructor = function(x, resp) {
         S7::new_object(
             S7::S7_object(),
@@ -167,25 +161,46 @@ prop = S7::new_class(
         x = S7::new_property(
             class = S7::class_numeric,
             validator = function(value) {
-                if (length(value) != 1L)
-                    return(paste0("`x` must be a scalar, not length ", length(value), "."))
-                if (!is.finite(value) || value != as.integer(value) || value < 0L)
+                if (length(value) != 1L) {
+                    return(paste0(
+                        "`x` must be a scalar, not length ",
+                        length(value),
+                        "."
+                    ))
+                }
+                if (
+                    !is.finite(value) ||
+                        value != as.integer(value) ||
+                        value < 0L
+                ) {
                     "`x` must be a non-negative integer."
+                }
             }
         ),
         n = S7::new_property(
             class = S7::class_numeric,
             validator = function(value) {
-                if (length(value) != 1L)
-                    return(paste0("`n` must be a scalar, not length ", length(value), "."))
-                if (!is.finite(value) || value != as.integer(value) || value < 1L)
+                if (length(value) != 1L) {
+                    return(paste0(
+                        "`n` must be a scalar, not length ",
+                        length(value),
+                        "."
+                    ))
+                }
+                if (
+                    !is.finite(value) ||
+                        value != as.integer(value) ||
+                        value < 1L
+                ) {
                     "`n` must be a positive integer."
+                }
             }
         )
     ),
     constructor = function(x, n) {
-        if (x > n)
+        if (x > n) {
             stop("`x` must not exceed `n`.")
+        }
         S7::new_object(S7::S7_object(), x = x, n = n)
     }
 )

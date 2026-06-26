@@ -44,10 +44,7 @@ S7::method(state_null, test_lazy) = function(.x, expr, ...) {
     )
 }
 
-stated_null = S7::new_class(
-    "stated_null",
-    parent = test_lazy
-)
+stated_null = S7::new_class("stated_null", parent = test_lazy)
 
 S7::method(print, stated_null) = function(x, ...) {
     cat("\n")
@@ -191,14 +188,28 @@ attach_claim_to_lazy = function(lazy, claim) {
 
         used_nodes = collect_param_nodes(claims_list)
         bad = Filter(
-            function(node) !any(vapply(allowed, function(cl) S7::S7_inherits(node, cl), logical(1))),
+            function(node) {
+                !any(vapply(
+                    allowed,
+                    function(cl) S7::S7_inherits(node, cl),
+                    logical(1)
+                ))
+            },
             used_nodes
         )
 
         if (length(bad) > 0L) {
-            bad_nms = unique(vapply(bad, function(n) S7::S7_class(n)@name, character(1)))
+            bad_nms = unique(vapply(
+                bad,
+                function(n) S7::S7_class(n)@name,
+                character(1)
+            ))
             allowed_nms = vapply(allowed, function(cl) cl@name, character(1))
-            param_label = if (length(bad_nms) == 1L) "parameter" else "parameters"
+            param_label = if (length(bad_nms) == 1L) {
+                "parameter"
+            } else {
+                "parameters"
+            }
             cli::cli_abort(c(
                 "Invalid {param_label} for {.val {lazy@test_spec@name}}: {.and {.cls {bad_nms}}}.",
                 "i" = "This test only supports: {.and {.cls {allowed_nms}}}."
@@ -221,10 +232,13 @@ attach_claim_to_lazy = function(lazy, claim) {
 #' @keywords internal
 #' @noRd
 collect_param_nodes = function(claims_list) {
-    unlist(lapply(claims_list, function(cl) {
-        nodes = if (cl@op == "%=%") cl@lhs else list(cl@lhs, cl@rhs)
-        unlist(lapply(nodes, param_nodes_from_node), recursive = FALSE)
-    }), recursive = FALSE)
+    unlist(
+        lapply(claims_list, function(cl) {
+            nodes = if (cl@op == "%=%") cl@lhs else list(cl@lhs, cl@rhs)
+            unlist(lapply(nodes, param_nodes_from_node), recursive = FALSE)
+        }),
+        recursive = FALSE
+    )
 }
 
 # Recursively collect param_obj instances from a node tree.
@@ -232,9 +246,14 @@ collect_param_nodes = function(claims_list) {
 #' @keywords internal
 #' @noRd
 param_nodes_from_node = function(node) {
-    if (S7::S7_inherits(node, param_obj)) return(list(node))
+    if (S7::S7_inherits(node, param_obj)) {
+        return(list(node))
+    }
     if (inherits(node, "arith_node")) {
-        return(unlist(lapply(node$operands, param_nodes_from_node), recursive = FALSE))
+        return(unlist(
+            lapply(node$operands, param_nodes_from_node),
+            recursive = FALSE
+        ))
     }
     list()
 }
@@ -269,7 +288,9 @@ S7::method(print, null_claim) = function(x, ...) {
         labels = vapply(x@lhs, param_node_label, character(1))
         cat("Op  :", x@op, "\n")
         cat("Params :\n")
-        for (lbl in labels) cat("  -", lbl, "\n")
+        for (lbl in labels) {
+            cat("  -", lbl, "\n")
+        }
     } else {
         cat("LHS :", param_node_label(x@lhs), "\n")
         cat("Op  :", x@op, "\n")

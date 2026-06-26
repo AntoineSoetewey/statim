@@ -37,7 +37,11 @@ test_lazy = S7::new_class(
 #' @export
 prepare_test = S7::new_generic("prepare_test", dispatch_args = c(".x", ".test"))
 
-S7::method(prepare_test, list(def_var, S7::class_function)) = function(.x, .test, ...) {
+S7::method(prepare_test, list(def_var, S7::class_function)) = function(
+    .x,
+    .test,
+    ...
+) {
     spec = as_test_spec(.test)
     dots = list(...)
     test_lazy(
@@ -105,10 +109,7 @@ S7::method(update, test_lazy) = function(object, ...) {
             dots
         )
     } else {
-        object@test_spec@args = utils::modifyList(
-            object@test_spec@args,
-            dots
-        )
+        object@test_spec@args = utils::modifyList(object@test_spec@args, dots)
     }
     object
 }

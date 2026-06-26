@@ -106,18 +106,12 @@ class_corr_two = S7::new_class(
     properties = list(
         ind_vars = S7::class_character,
         resp_vars = S7::class_character,
-        pairs = S7::new_property(
-            default = NULL,
-            getter = function(self) {
-                paste(self@resp_vars, "~", self@ind_vars)
-            }
-        ),
+        pairs = S7::new_property(default = NULL, getter = function(self) {
+            paste(self@resp_vars, "~", self@ind_vars)
+        }),
         estimate = S7::class_numeric,
         statistic = S7::class_numeric,
-        df = S7::new_property(
-            class = S7::class_numeric,
-            default = numeric(0)
-        ),
+        df = S7::new_property(class = S7::class_numeric, default = numeric(0)),
         p_val = S7::class_numeric,
         lower_ci = S7::new_property(
             class = S7::class_numeric,
@@ -131,10 +125,16 @@ class_corr_two = S7::new_class(
             class = S7::class_numeric,
             default = 0.95,
             validator = function(value) {
-                if (length(value) != 1L)
-                    return(paste0("`ci_level` must be length 1, not ", length(value), "."))
-                if (value <= 0 || value >= 1)
+                if (length(value) != 1L) {
+                    return(paste0(
+                        "`ci_level` must be length 1, not ",
+                        length(value),
+                        "."
+                    ))
+                }
+                if (value <= 0 || value >= 1) {
                     "`ci_level` must be between 0 and 1 (exclusive)."
+                }
             }
         )
     )
@@ -182,7 +182,11 @@ S7::method(print, class_corr_two) = function(x, ...) {
 
     if (has_ci) {
         fmt_ci = function(val) {
-            ifelse(is.infinite(val), ifelse(val > 0, "Inf", "-Inf"), round(val, 4))
+            ifelse(
+                is.infinite(val),
+                ifelse(val > 0, "Inf", "-Inf"),
+                round(val, 4)
+            )
         }
 
         ci_out = tibble::tibble(

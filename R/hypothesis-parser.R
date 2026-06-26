@@ -95,17 +95,23 @@ validate_top_level_op = function(expr) {
 }
 
 is_param_class = function(x) {
-    if (!inherits(x, "S7_class")) return(FALSE)
+    if (!inherits(x, "S7_class")) {
+        return(FALSE)
+    }
     cls = x
     while (!is.null(cls)) {
-        if (identical(cls, param_obj)) return(TRUE)
+        if (identical(cls, param_obj)) {
+            return(TRUE)
+        }
         cls = cls@parent
     }
     FALSE
 }
 
 parse_param_node = function(expr, env, side = "expression") {
-    if (is.numeric(expr) || is.integer(expr)) return(as.numeric(expr))
+    if (is.numeric(expr) || is.integer(expr)) {
+        return(as.numeric(expr))
+    }
 
     if (rlang::is_call(expr)) {
         fn_name = as.character(expr[[1]])
@@ -146,12 +152,19 @@ parse_param_node = function(expr, env, side = "expression") {
 
 build_arith_node = function(expr, env, side) {
     op = as.character(expr[[1]])
-    operands = lapply(as.list(expr[-1]), function(a) parse_param_node(a, env, side))
-    structure(list(op = op, operands = operands, expr = expr), class = "arith_node")
+    operands = lapply(as.list(expr[-1]), function(a) {
+        parse_param_node(a, env, side)
+    })
+    structure(
+        list(op = op, operands = operands, expr = expr),
+        class = "arith_node"
+    )
 }
 
 param_node_label = function(x) {
-    if (is.numeric(x)) return(as.character(x))
+    if (is.numeric(x)) {
+        return(as.character(x))
+    }
     if (inherits(x, "arith_node")) {
         ops = vapply(x$operands, param_node_label, character(1))
         if (length(ops) == 1L) {

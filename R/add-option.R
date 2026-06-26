@@ -52,7 +52,12 @@
 #' @export
 add_variant = function(obj, model_type, name, origin = c("user", "package")) {
     structure(
-        list(obj = obj, model_type = model_type, name = name, origin = match.arg(origin)),
+        list(
+            obj = obj,
+            model_type = model_type,
+            name = name,
+            origin = match.arg(origin)
+        ),
         class = "add_variant_call"
     )
 }
@@ -64,10 +69,12 @@ add_variant_register = function(lhs, rhs) {
     name = lhs$name
     origin = lhs$origin
 
-    stat_cls = attr(obj, "cls") %||% cli::cli_abort(
-        "{.arg obj} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
-    )
-    is_var_id_class = inherits(model_type, "S7_class") && identical(model_type@parent, var_id)
+    stat_cls = attr(obj, "cls") %||%
+        cli::cli_abort(
+            "{.arg obj} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
+        )
+    is_var_id_class = inherits(model_type, "S7_class") &&
+        identical(model_type@parent, var_id)
     is_formula_class = identical(model_type, S7::class_formula)
     if (!is_var_id_class && !is_formula_class) {
         cli::cli_abort(
@@ -91,10 +98,12 @@ add_variant_register = function(lhs, rhs) {
 #' @rdname add-variant
 #' @export
 remove_variant = function(obj, model_type, name) {
-    stat_cls = attr(obj, "cls") %||% cli::cli_abort(
-        "{.arg obj} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
-    )
-    is_var_id_class = inherits(model_type, "S7_class") && identical(model_type@parent, var_id)
+    stat_cls = attr(obj, "cls") %||%
+        cli::cli_abort(
+            "{.arg obj} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
+        )
+    is_var_id_class = inherits(model_type, "S7_class") &&
+        identical(model_type@parent, var_id)
     is_formula_class = identical(model_type, S7::class_formula)
     if (!is_var_id_class && !is_formula_class) {
         cli::cli_abort(

@@ -92,7 +92,14 @@ ttest_def_two = test_define(
     impl = agendas(
         base = baseline(
             # ---- Default implementation (single grouping variable) ----
-            fn = function(.proc, .paired = FALSE, .mu = 0, .alt = "two.sided", .ci = 0.95, .first_group = NULL) {
+            fn = function(
+                .proc,
+                .paired = FALSE,
+                .mu = 0,
+                .alt = "two.sided",
+                .ci = 0.95,
+                .first_group = NULL
+            ) {
                 x = .proc$x_data[[1]]
                 group_data = .proc$group_data
 
@@ -156,7 +163,8 @@ ttest_def_two = test_define(
                     resolved = claim_contrast_coefs(claim, filter = "given")
                     coefs = resolved$coefs
 
-                    valid_two_sample = length(coefs) == 2L && identical(sort(unname(coefs)), c(-1, 1))
+                    valid_two_sample = length(coefs) == 2L &&
+                        identical(sort(unname(coefs)), c(-1, 1))
 
                     if (!valid_two_sample) {
                         cli::cli_abort(c(
@@ -176,9 +184,12 @@ ttest_def_two = test_define(
                 .alt = function(claim, processed = NULL) {
                     switch(
                         claim@op,
-                        "==" = , "!=" = "two.sided",
-                        ">=" = , ">" = "less",
-                        "<=" = , "<" = "greater"
+                        "==" = ,
+                        "!=" = "two.sided",
+                        ">=" = ,
+                        ">" = "less",
+                        "<=" = ,
+                        "<" = "greater"
                     )
                 }
             )
@@ -223,28 +234,35 @@ ttest_def_two = test_define(
                 se = sqrt(c1^2 * s1 / n1 + c2^2 * s2 / n2)
                 tstat = (est_val - .mu) / se
                 df = (c1^2 * s1 / n1 + c2^2 * s2 / n2)^2 /
-                    ((c1^2 * s1 / n1)^2 / (n1 - 1) + (c2^2 * s2 / n2)^2 / (n2 - 1))
+                    ((c1^2 * s1 / n1)^2 /
+                        (n1 - 1) +
+                        (c2^2 * s2 / n2)^2 / (n2 - 1))
 
                 p.value = switch(
                     .op,
                     "==" = 2 * stats::pt(-abs(tstat), df = df),
-                    ">=" = , ">" = stats::pt(-tstat, df = df, lower.tail = FALSE),
-                    "<=" = , "<" = stats::pt(-tstat, df = df),
+                    ">=" = ,
+                    ">" = stats::pt(-tstat, df = df, lower.tail = FALSE),
+                    "<=" = ,
+                    "<" = stats::pt(-tstat, df = df),
                     "!=" = 2 * stats::pt(-abs(tstat), df = df)
                 )
 
                 alpha = 1 - .ci
                 ci = switch(
                     .op,
-                    "==" = , "!=" = {
+                    "==" = ,
+                    "!=" = {
                         t_crit = stats::qt(1 - alpha / 2, df = df)
                         c(est_val - t_crit * se, est_val + t_crit * se)
                     },
-                    "<=" = , "<" = {
+                    "<=" = ,
+                    "<" = {
                         t_crit = stats::qt(1 - alpha, df = df)
                         c(est_val - t_crit * se, Inf)
                     },
-                    ">=" = , ">" = {
+                    ">=" = ,
+                    ">" = {
                         t_crit = stats::qt(1 - alpha, df = df)
                         c(-Inf, est_val + t_crit * se)
                     }
@@ -262,15 +280,25 @@ ttest_def_two = test_define(
                 )
             },
             claim_parser = map_claim(
-                .mu = function(claim, processed) claim_contrast_coefs(claim)$scalar,
+                .mu = function(claim, processed) {
+                    claim_contrast_coefs(claim)$scalar
+                },
                 .op = function(claim, processed) claim_contrast_coefs(claim)$op,
-                .w = function(claim, processed) claim_contrast_coefs(claim)$coefs
+                .w = function(claim, processed) {
+                    claim_contrast_coefs(claim)$coefs
+                }
             )
         ),
         multi = variant(
             # ---- Multiple grouping variables ----
             # ---- variant: multi ----
-            fn = function(.proc, .paired = FALSE, .mu = 0, .alt = "two.sided", .ci = 0.95) {
+            fn = function(
+                .proc,
+                .paired = FALSE,
+                .mu = 0,
+                .alt = "two.sided",
+                .ci = 0.95
+            ) {
                 x = .proc$x_data[[1]]
                 group_data = .proc$group_data
                 n_groups = length(group_data)
@@ -340,7 +368,9 @@ ttest_def_two = test_define(
                 x = .proc$x_data[[1]]
                 group_data = .proc$group_data
 
-                if (!is.null(seed)) set.seed(seed)
+                if (!is.null(seed)) {
+                    set.seed(seed)
+                }
 
                 grp = as.character(group_data[[1]])
                 lvls = unique(grp)
@@ -364,7 +394,10 @@ ttest_def_two = test_define(
                     vals = c(paste0("[", ci[[1]], ", ", ci[[2]], "]"), x@data$n)
                 )
 
-                cli::cat_line(cli::rule(center = "Bootstrapped T-test", line = "="), "\n\n")
+                cli::cat_line(
+                    cli::rule(center = "Bootstrapped T-test", line = "="),
+                    "\n\n"
+                )
                 cli::cat_line(cli::rule(left = "Summary", line = "-"), "\n")
                 tabstats::table_summary(
                     summary_data,
@@ -382,7 +415,9 @@ ttest_def_two = test_define(
                 x = .proc$x_data[[1]]
                 group_data = .proc$group_data
 
-                if (!is.null(seed)) set.seed(seed)
+                if (!is.null(seed)) {
+                    set.seed(seed)
+                }
 
                 grp = as.character(group_data[[1]])
                 lvls = unique(grp)
@@ -419,7 +454,10 @@ ttest_def_two = test_define(
                     }
                 }
 
-                cli::cat_line(cli::rule(center = "T-test Permutation", line = "="), "\n\n")
+                cli::cat_line(
+                    cli::rule(center = "T-test Permutation", line = "="),
+                    "\n\n"
+                )
                 cli::cat_line(cli::rule(left = "Summary", line = "-"), "\n")
                 tabstats::table_default(
                     summary_data,

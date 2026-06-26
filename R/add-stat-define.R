@@ -98,20 +98,22 @@
 #' @name add-stat-define
 #' @export
 add_stat_define = function(
-        stat_fn,
-        model_type,
-        impl,
-        compatible_params = list(),
-        origin = c("user", "package"),
-        .pkg = NULL
+    stat_fn,
+    model_type,
+    impl,
+    compatible_params = list(),
+    origin = c("user", "package"),
+    .pkg = NULL
 ) {
     origin = match.arg(origin)
 
-    cls = attr(stat_fn, "cls") %||% cli::cli_abort(
-        "{.arg stat_fn} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
-    )
+    cls = attr(stat_fn, "cls") %||%
+        cli::cli_abort(
+            "{.arg stat_fn} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
+        )
 
-    is_var_id_class = inherits(model_type, "S7_class") && identical(model_type@parent, var_id)
+    is_var_id_class = inherits(model_type, "S7_class") &&
+        identical(model_type@parent, var_id)
     is_formula_class = identical(model_type, S7::class_formula)
     if (!is_var_id_class && !is_formula_class) {
         cli::cli_abort(
@@ -186,11 +188,13 @@ add_stat_define = function(
 #' @rdname add-stat-define
 #' @export
 remove_stat_define = function(stat_fn, model_type) {
-    cls = attr(stat_fn, "cls") %||% cli::cli_abort(
-        "{.arg stat_fn} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
-    )
+    cls = attr(stat_fn, "cls") %||%
+        cli::cli_abort(
+            "{.arg stat_fn} must be a function built with {.fn HTEST_FN} or {.fn MODEL_FN}."
+        )
 
-    is_var_id_class = inherits(model_type, "S7_class") && identical(model_type@parent, var_id)
+    is_var_id_class = inherits(model_type, "S7_class") &&
+        identical(model_type@parent, var_id)
     is_formula_class = identical(model_type, S7::class_formula)
     if (!is_var_id_class && !is_formula_class) {
         cli::cli_abort(
@@ -243,10 +247,14 @@ remove_stat_define = function(stat_fn, model_type) {
 purge_stat_defines = function(pkg) {
     for (reg_key in ls(stat_define_registry)) {
         env = stat_define_registry[[reg_key]]
-        if (!is.environment(env)) next
+        if (!is.environment(env)) {
+            next
+        }
         for (mt_name in ls(env)) {
             entry = env[[mt_name]]
-            if (identical(entry$origin, "package") && identical(entry$pkg, pkg)) {
+            if (
+                identical(entry$origin, "package") && identical(entry$pkg, pkg)
+            ) {
                 env[[mt_name]] = NULL
             }
         }
@@ -264,7 +272,9 @@ stat_define_registry_key = function(cls) cls
 detect_pkg = function(call_env) {
     top = topenv(call_env)
     pkg = environmentName(top)
-    if (!nzchar(pkg) || identical(pkg, "R_GlobalEnv")) return(NULL)
+    if (!nzchar(pkg) || identical(pkg, "R_GlobalEnv")) {
+        return(NULL)
+    }
     pkg
 }
 

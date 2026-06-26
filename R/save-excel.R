@@ -32,9 +32,19 @@
 #' }
 #'
 #' @export
-save_excel = S7::new_generic("save_excel", "x", function(x, file, sheet = NULL, overwrite = NULL, ...) S7::S7_dispatch())
+save_excel = S7::new_generic(
+    "save_excel",
+    "x",
+    function(x, file, sheet = NULL, overwrite = NULL, ...) S7::S7_dispatch()
+)
 
-S7::method(save_excel, cld_exec) = function(x, file, sheet = NULL, overwrite = NULL, ...) {
+S7::method(save_excel, cld_exec) = function(
+    x,
+    file,
+    sheet = NULL,
+    overwrite = NULL,
+    ...
+) {
     rlang::check_installed("openxlsx2", reason = "to export results to Excel")
 
     file_exists = file.exists(file)
@@ -42,7 +52,8 @@ S7::method(save_excel, cld_exec) = function(x, file, sheet = NULL, overwrite = N
     meta = x@cld_meta
     sheet = substr(sheet %||% meta$stat_name, 1, 31)
 
-    sheet_exists = file_exists && sheet %in% openxlsx2::wb_get_sheet_names(openxlsx2::wb_load(file))
+    sheet_exists = file_exists &&
+        sheet %in% openxlsx2::wb_get_sheet_names(openxlsx2::wb_load(file))
 
     if (sheet_exists) {
         overwrite = if (is.null(overwrite)) {
@@ -54,11 +65,12 @@ S7::method(save_excel, cld_exec) = function(x, file, sheet = NULL, overwrite = N
                 " " = "[3] Abort"
             ))
             choice = readline("Selection: ")
-            switch(trimws(choice),
-                   "1" = "sheet",
-                   "2" = "file",
-                   "3" = "none",
-                   cli::cli_abort("Invalid selection. Aborting.")
+            switch(
+                trimws(choice),
+                "1" = "sheet",
+                "2" = "file",
+                "3" = "none",
+                cli::cli_abort("Invalid selection. Aborting.")
             )
         } else {
             rlang::arg_match(overwrite, c("none", "sheet", "file"))
@@ -73,7 +85,9 @@ S7::method(save_excel, cld_exec) = function(x, file, sheet = NULL, overwrite = N
 
     lines = capture.output(print(x))
     lines = gsub("\033\\[[0-9;]*m", "", lines)
-    lines = lines[!grepl("^[[:space:]]*[\u250c\u2510\u2514\u2518\u251c\u2524]", lines)]
+    lines = lines[
+        !grepl("^[[:space:]]*[\u250c\u2510\u2514\u2518\u251c\u2524]", lines)
+    ]
 
     wb = if (file_exists && overwrite == "sheet") {
         existing = openxlsx2::wb_load(file)
@@ -118,11 +132,7 @@ S7::method(save_excel, cld_exec) = function(x, file, sheet = NULL, overwrite = N
         cols = 1,
         widths = col_width
     )
-    wb = openxlsx2::wb_freeze_pane(
-        wb,
-        sheet = sheet,
-        first_row = TRUE
-    )
+    wb = openxlsx2::wb_freeze_pane(wb, sheet = sheet, first_row = TRUE)
     wb = openxlsx2::wb_set_row_heights(
         wb,
         sheet = sheet,

@@ -135,7 +135,6 @@ class_lm_object = S7::new_class(
     "lm_object",
     parent = anova_able,
     properties = list(
-
         # ---- Required inputs ----
         fitted = S7::class_numeric,
         residuals = S7::class_numeric,
@@ -143,76 +142,79 @@ class_lm_object = S7::new_class(
         std_beta = S7::class_numeric,
 
         # ---- Computed: per-coefficient stats ----
-        statistic = S7::new_property(
-            getter = function(self) self@beta / self@std_beta
-        ),
-        p_value = S7::new_property(
-            getter = function(self) {
-                2 * pt(abs(self@statistic), df = self@df_residual, lower.tail = FALSE)
-            }
-        ),
+        statistic = S7::new_property(getter = function(self) {
+            self@beta / self@std_beta
+        }),
+        p_value = S7::new_property(getter = function(self) {
+            2 *
+                pt(
+                    abs(self@statistic),
+                    df = self@df_residual,
+                    lower.tail = FALSE
+                )
+        }),
 
         # ---- Computed: coefficients table ----
-        coefficients = S7::new_property(
-            getter = function(self) {
-                nms = if (!is.null(names(self@beta))) {
-                    names(self@beta)
+        coefficients = S7::new_property(getter = function(self) {
+            nms = if (!is.null(names(self@beta))) {
+                names(self@beta)
+            } else {
+                trms = attr(self@terms, "term.labels")
+                if (attr(self@terms, "intercept") == 1L) {
+                    c("(Intercept)", trms)
                 } else {
-                    trms = attr(self@terms, "term.labels")
-                    if (attr(self@terms, "intercept") == 1L) c("(Intercept)", trms) else trms
+                    trms
                 }
-                tibble::tibble(
-                    term = nms,
-                    estimate = unname(self@beta),
-                    std_error = unname(self@std_beta),
-                    statistic = unname(self@statistic),
-                    p_value = unname(self@p_value)
-                )
             }
-        ),
+            tibble::tibble(
+                term = nms,
+                estimate = unname(self@beta),
+                std_error = unname(self@std_beta),
+                statistic = unname(self@statistic),
+                p_value = unname(self@p_value)
+            )
+        }),
 
         # ---- Computed: model fit summary ----
-        fit_summary = S7::new_property(
-            getter = function(self) {
-                y = self@fitted + self@residuals
-                n = length(y)
-                df_res = self@df_residual
-                rss = self@deviance
-                tss = sum((y - mean(y))^2)
-                p = n - df_res - 1L
+        fit_summary = S7::new_property(getter = function(self) {
+            y = self@fitted + self@residuals
+            n = length(y)
+            df_res = self@df_residual
+            rss = self@deviance
+            tss = sum((y - mean(y))^2)
+            p = n - df_res - 1L
 
-                r2 = 1 - rss / tss
-                adj_r2 = 1 - (1 - r2) * (n - 1L) / df_res
-                sigma = sqrt(rss / df_res)
-                f_stat = (r2 / p) / ((1 - r2) / df_res)
-                f_p_value = pf(f_stat, p, df_res, lower.tail = FALSE)
+            r2 = 1 - rss / tss
+            adj_r2 = 1 - (1 - r2) * (n - 1L) / df_res
+            sigma = sqrt(rss / df_res)
+            f_stat = (r2 / p) / ((1 - r2) / df_res)
+            f_p_value = pf(f_stat, p, df_res, lower.tail = FALSE)
 
-                tibble::tibble(
-                    statistic = c(
-                        "R Squared",
-                        "Adj. R Squared",
-                        "Sigma",
-                        "n",
-                        "df (residual)",
-                        "F-statistic",
-                        "df1",
-                        "df2",
-                        "p-value"
-                    ),
-                    value = c(
-                        r2,       # round(r2, 4),
-                        adj_r2,   # round(adj_r2, 4),
-                        sigma,    # round(sigma, 4),
-                        n,        # n,
-                        df_res,   # df_res,
-                        f_stat,   # round(f_stat, 4),
-                        p,        # p,
-                        df_res,   # df_res,
-                        f_p_value # round(f_p_value, 6)
-                    )
+            tibble::tibble(
+                statistic = c(
+                    "R Squared",
+                    "Adj. R Squared",
+                    "Sigma",
+                    "n",
+                    "df (residual)",
+                    "F-statistic",
+                    "df1",
+                    "df2",
+                    "p-value"
+                ),
+                value = c(
+                    r2, # round(r2, 4),
+                    adj_r2, # round(adj_r2, 4),
+                    sigma, # round(sigma, 4),
+                    n, # n,
+                    df_res, # df_res,
+                    f_stat, # round(f_stat, 4),
+                    p, # p,
+                    df_res, # df_res,
+                    f_p_value # round(f_p_value, 6)
                 )
-            }
-        ),
+            )
+        }),
 
         # ---- Must be supplied to obtain type I ANOVA ----
         x_mat = S7::new_property(
@@ -252,22 +254,26 @@ S7::method(print, class_lm_object) = function(x, ...) {
     p_stats = "p-value"
 
     fs = x@fit_summary
-    fs$value = vapply(seq_len(nrow(fs)), function(i) {
-        nm = fs$statistic[[i]]
-        v = fs$value[[i]]
-        if (nm %in% integer_stats) {
-            formatC(as.integer(v), format = "d")
-        } else if (nm %in% p_stats) {
-            x_num = suppressWarnings(as.numeric(v))
-            if (is.na(x_num) || x_num > 0.001) {
-                formatC(x_num, digits = 2, format = "f")
+    fs$value = vapply(
+        seq_len(nrow(fs)),
+        function(i) {
+            nm = fs$statistic[[i]]
+            v = fs$value[[i]]
+            if (nm %in% integer_stats) {
+                formatC(as.integer(v), format = "d")
+            } else if (nm %in% p_stats) {
+                x_num = suppressWarnings(as.numeric(v))
+                if (is.na(x_num) || x_num > 0.001) {
+                    formatC(x_num, digits = 2, format = "f")
+                } else {
+                    "<0.001"
+                }
             } else {
-                "<0.001"
+                formatC(v, digits = 2, format = "f")
             }
-        } else {
-            formatC(v, digits = 2, format = "f")
-        }
-    }, character(1))
+        },
+        character(1)
+    )
 
     cli::cat_line(cli::rule(left = "Model Fit", line = "-"), "\n")
     tabstats::table_summary(

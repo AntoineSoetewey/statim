@@ -136,8 +136,9 @@ class_p_test = S7::new_class(
         true_p = S7::new_property(
             class = S7::class_numeric,
             validator = function(value) {
-                if (!(value > 0 && value < 1))
+                if (!(value > 0 && value < 1)) {
                     "`true_p` must be between 0 and 1 (exclusive)."
+                }
             }
         ),
         estimate = S7::class_numeric,
@@ -149,10 +150,16 @@ class_p_test = S7::new_class(
             class = S7::class_numeric,
             default = 0.95,
             validator = function(value) {
-                if (length(value) != 1L)
-                    return(paste0("`ci_level` must be length 1, not ", length(value), "."))
-                if (value <= 0 || value >= 1)
+                if (length(value) != 1L) {
+                    return(paste0(
+                        "`ci_level` must be length 1, not ",
+                        length(value),
+                        "."
+                    ))
+                }
+                if (value <= 0 || value >= 1) {
                     "`ci_level` must be between 0 and 1 (exclusive)."
+                }
             }
         )
     )

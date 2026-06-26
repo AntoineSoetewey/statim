@@ -118,8 +118,14 @@ class_glm_object = S7::new_class(
     "glm_object",
     parent = anova_able,
     properties = list(
-        coefficients = S7::new_property(class = S7::class_data.frame, default = data.frame()),
-        fit_summary = S7::new_property(class = S7::class_data.frame, default = data.frame())
+        coefficients = S7::new_property(
+            class = S7::class_data.frame,
+            default = data.frame()
+        ),
+        fit_summary = S7::new_property(
+            class = S7::class_data.frame,
+            default = data.frame()
+        )
     )
 )
 

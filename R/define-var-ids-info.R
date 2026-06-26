@@ -54,21 +54,31 @@ class_var_inform = S7::new_class(
         var_id = S7::new_property(
             class = S7::class_any,
             validator = function(value) {
-                if (!S7::S7_inherits(value, var_id) && !inherits(value, "formula"))
+                if (
+                    !S7::S7_inherits(value, var_id) &&
+                        !inherits(value, "formula")
+                ) {
                     "must be a `var_id` subclass or a formula."
+                }
             }
         ),
         model_type = S7::new_property(
             class = S7::class_character,
             getter = function(self) {
-                if (inherits(self@var_id, "formula")) "formula"
-                else S7::S7_class(self@var_id)@name
+                if (inherits(self@var_id, "formula")) {
+                    "formula"
+                } else {
+                    S7::S7_class(self@var_id)@name
+                }
             }
         ),
         args = S7::new_property(class = S7::class_character, default = "<?>"),
         other_info = S7::new_property(class = S7::class_list, default = list()),
         vars = S7::new_property(class = S7::class_list, default = list()),
-        registered = S7::new_property(class = S7::class_logical, default = FALSE)
+        registered = S7::new_property(
+            class = S7::class_logical,
+            default = FALSE
+        )
     )
 )
 
@@ -79,10 +89,7 @@ S7::method(var_id_info, var_id) = function(.var_id, processed = NULL, ...) {
     prop_names = names(S7::S7_class(.var_id)@properties)
     args = if (length(prop_names)) paste(prop_names, collapse = ", ") else "<?>"
 
-    class_var_inform(
-        var_id = .var_id,
-        args = args
-    )
+    class_var_inform(var_id = .var_id, args = args)
 }
 
 S7::method(var_id_info, x_by) = function(.var_id, processed = NULL, ...) {
@@ -97,9 +104,10 @@ S7::method(var_id_info, x_by) = function(.var_id, processed = NULL, ...) {
             x_vars = ncol(processed$x_data),
             by_vars = ncol(processed$group_data)
         )
-        vars = vars_preview(
-            c(as.list(processed$x_data), as.list(processed$group_data))
-        )
+        vars = vars_preview(c(
+            as.list(processed$x_data),
+            as.list(processed$group_data)
+        ))
     }
 
     class_var_inform(
@@ -123,9 +131,10 @@ S7::method(var_id_info, rel) = function(.var_id, processed = NULL, ...) {
             x_vars = ncol(processed$x_data),
             resp_vars = ncol(processed$resp_data)
         )
-        vars = vars_preview(
-            c(as.list(processed$x_data), as.list(processed$resp_data))
-        )
+        vars = vars_preview(c(
+            as.list(processed$x_data),
+            as.list(processed$resp_data)
+        ))
     }
 
     class_var_inform(
@@ -170,16 +179,17 @@ S7::method(var_id_info, prop) = function(.var_id, processed = NULL, ...) {
     )
 }
 
-S7::method(var_id_info, S7::class_formula) = function(.var_id, processed = NULL, ...) {
+S7::method(var_id_info, S7::class_formula) = function(
+    .var_id,
+    processed = NULL,
+    ...
+) {
     data = processed$data %||% NULL
     trms = stats::terms(.var_id, data = data)
     lhs_vars = all.vars(rlang::f_lhs(.var_id))
     rhs_vars = attr(trms, "term.labels")
 
-    other_info = list(
-        left_var = length(lhs_vars),
-        right_var = length(rhs_vars)
-    )
+    other_info = list(left_var = length(lhs_vars), right_var = length(rhs_vars))
     vars = list()
 
     if (!is.null(processed) && length(processed)) {
@@ -218,7 +228,13 @@ vars_preview = function(cols) {
         val = cols[[i]]
         list(
             name = names(cols)[[i]],
-            preview = paste0("<", pillar::type_sum(val), " [", length(val), "]>")
+            preview = paste0(
+                "<",
+                pillar::type_sum(val),
+                " [",
+                length(val),
+                "]>"
+            )
         )
     })
 }

@@ -37,11 +37,21 @@ validate_claim_vars = S7::new_generic(
     fun = function(var_id, processed, claims, ...) S7::S7_dispatch()
 )
 
-S7::method(validate_claim_vars, var_id) = function(var_id, processed, claims, ...) {
+S7::method(validate_claim_vars, var_id) = function(
+    var_id,
+    processed,
+    claims,
+    ...
+) {
     invisible(NULL)
 }
 
-S7::method(validate_claim_vars, x_by) = function(var_id, processed, claims, ...) {
+S7::method(validate_claim_vars, x_by) = function(
+    var_id,
+    processed,
+    claims,
+    ...
+) {
     check_param_nodes(
         claims,
         x_vars = names(processed$x_data),
@@ -49,7 +59,12 @@ S7::method(validate_claim_vars, x_by) = function(var_id, processed, claims, ...)
     )
 }
 
-S7::method(validate_claim_vars, rel) = function(var_id, processed, claims, ...) {
+S7::method(validate_claim_vars, rel) = function(
+    var_id,
+    processed,
+    claims,
+    ...
+) {
     check_param_nodes(
         claims,
         x_vars = c(names(processed$x_data), names(processed$resp_data)),
@@ -57,24 +72,30 @@ S7::method(validate_claim_vars, rel) = function(var_id, processed, claims, ...) 
     )
 }
 
-S7::method(validate_claim_vars, pairwise) = function(var_id, processed, claims, ...) {
-    check_param_nodes(
-        claims,
-        x_vars = processed$var_names,
-        by_vars = NULL
-    )
+S7::method(validate_claim_vars, pairwise) = function(
+    var_id,
+    processed,
+    claims,
+    ...
+) {
+    check_param_nodes(claims, x_vars = processed$var_names, by_vars = NULL)
 }
 
-S7::method(validate_claim_vars, prop) = function(var_id, processed, claims, ...) {
+S7::method(validate_claim_vars, prop) = function(
+    var_id,
+    processed,
+    claims,
+    ...
+) {
     invisible(NULL)
 }
 
-S7::method(validate_claim_vars, S7::class_formula) = function(var_id, processed, claims) {
-    check_param_nodes(
-        claims,
-        x_vars = processed$vars,
-        by_vars = NULL
-    )
+S7::method(validate_claim_vars, S7::class_formula) = function(
+    var_id,
+    processed,
+    claims
+) {
+    check_param_nodes(claims, x_vars = processed$vars, by_vars = NULL)
 }
 
 #' @details
@@ -158,7 +179,11 @@ check_param_nodes = function(claims, x_vars, by_vars) {
 #' @export
 validate_one_param_node = S7::new_generic("validate_one_param_node", "node")
 
-S7::method(validate_one_param_node, param_obj) = function(node, x_vars, by_vars) {
+S7::method(validate_one_param_node, param_obj) = function(
+    node,
+    x_vars,
+    by_vars
+) {
     character(0)
 }
 
@@ -179,10 +204,13 @@ S7::method(validate_one_param_node, RHO) = function(node, x_vars, by_vars) {
     for (slot_quo in list(node@x, node@y)) {
         lbl = rlang::as_label(slot_quo)
         if (!is.null(x_vars) && !lbl %in% x_vars) {
-            errors = c(errors, cli::format_inline(
-                "Unknown variable {.val {lbl}} in {.cls RHO}. ",
-                "Model declares x-variable{?s}: {.and {.val {x_vars}}}."
-            ))
+            errors = c(
+                errors,
+                cli::format_inline(
+                    "Unknown variable {.val {lbl}} in {.cls RHO}. ",
+                    "Model declares x-variable{?s}: {.and {.val {x_vars}}}."
+                )
+            )
         }
     }
     errors
@@ -206,10 +234,13 @@ check_x_and_given = function(x_quo, given_quo, x_vars, by_vars, cls_name) {
     if (!is.null(x_vars) && !is.null(x_quo)) {
         x_lbl = rlang::as_label(x_quo)
         if (!x_lbl %in% x_vars) {
-            errors = c(errors, cli::format_inline(
-                "Unknown variable {.val {x_lbl}} in {.cls {cls_name}}. ",
-                "Model declares x-variable{?s}: {.and {.val {x_vars}}}."
-            ))
+            errors = c(
+                errors,
+                cli::format_inline(
+                    "Unknown variable {.val {x_lbl}} in {.cls {cls_name}}. ",
+                    "Model declares x-variable{?s}: {.and {.val {x_vars}}}."
+                )
+            )
         }
     }
 
@@ -218,10 +249,13 @@ check_x_and_given = function(x_quo, given_quo, x_vars, by_vars, cls_name) {
         if (rlang::is_call(given_expr, "==") && length(given_expr) == 3L) {
             by_lbl = as.character(given_expr[[2]])
             if (!by_lbl %in% by_vars) {
-                errors = c(errors, cli::format_inline(
-                    "Unknown grouping variable {.val {by_lbl}} in {.cls {cls_name}}. ",
-                    "Model declares by-variable{?s}: {.and {.val {by_vars}}}."
-                ))
+                errors = c(
+                    errors,
+                    cli::format_inline(
+                        "Unknown grouping variable {.val {by_lbl}} in {.cls {cls_name}}. ",
+                        "Model declares by-variable{?s}: {.and {.val {by_vars}}}."
+                    )
+                )
             }
         }
     }

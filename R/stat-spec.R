@@ -30,32 +30,49 @@ stat_define = S7::new_class(
         model_type = S7::new_property(
             class = S7::class_any,
             validator = function(value) {
-                is_var_id_class = inherits(value, "S7_class") && identical(value@parent, var_id)
+                is_var_id_class = inherits(value, "S7_class") &&
+                    identical(value@parent, var_id)
                 is_formula_class = identical(value, S7::class_formula)
-                if (!is_var_id_class && !is_formula_class)
+                if (!is_var_id_class && !is_formula_class) {
                     "must be a class that inherits from `var_id`, or `S7::class_formula`"
+                }
             }
         ),
         # impl_class = S7::class_character,
         impl = S7::new_property(
             class = S7::class_any,
             validator = function(value) {
-                if (!inherits(value, "agendas"))
+                if (!inherits(value, "agendas")) {
                     "must be an `agendas` object"
+                }
             }
         ),
         compatible_params = S7::new_property(
             class = S7::class_list,
             default = list(),
             validator = function(value) {
-                if (length(value) == 0L) return(NULL)
-                bad = !vapply(value, function(cl) {
-                    inherits(cl, "S7_class") && is_param_class(cl)
-                }, logical(1))
+                if (length(value) == 0L) {
+                    return(NULL)
+                }
+                bad = !vapply(
+                    value,
+                    function(cl) {
+                        inherits(cl, "S7_class") && is_param_class(cl)
+                    },
+                    logical(1)
+                )
                 if (any(bad)) {
-                    nms = vapply(value[bad], function(cl) {
-                        if (inherits(cl, "S7_class")) cl@name else class(cl)[[1]]
-                    }, character(1))
+                    nms = vapply(
+                        value[bad],
+                        function(cl) {
+                            if (inherits(cl, "S7_class")) {
+                                cl@name
+                            } else {
+                                class(cl)[[1]]
+                            }
+                        },
+                        character(1)
+                    )
                     paste0(
                         "compatible_params must be a list of param_obj subclasses ",
                         "(e.g. list(MU, PI)). Invalid: ",
