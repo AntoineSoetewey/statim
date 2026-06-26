@@ -248,6 +248,44 @@ S7::method(prepare_test, list(expanded_model, S7::class_function)) = function(.x
     multi_lazy(models = models, labels = .x@labels, args = list())
 }
 
+S7::method(prepare, list(expanded_model, S7::class_function)) = function(.x, .fn, ...) {
+    spec = tryCatch(
+        .fn(.var_id = NULL),
+        error = function(e) {
+            cli::cli_abort(
+                "{.arg .fn} must be a function built with {.fn STAT_CONSTRUCTOR}.",
+                parent = e
+            )
+        }
+    )
+
+    builder = if (is_test_spec(spec)) {
+        function(dm) test_lazy(
+            var_id = dm@var_id,
+            processed = dm@processed,
+            test_spec = spec
+        )
+    } else if (is_model_spec(spec)) {
+        function(dm) model_lazy(
+            var_id = dm@var_id,
+            processed = dm@processed,
+            model_spec = spec
+        )
+    } else {
+        cli::cli_abort(
+            "{.arg .fn} must return a {.cls test_spec} or {.cls model_spec}."
+        )
+    }
+
+    models = lapply(.x@models, builder)
+    multi_lazy(models = models, labels = .x@labels, args = list())
+}
+
+S7::method(via, list(multi_lazy, S7::class_character)) = function(.x, .method, ...) {
+    .x@models = lapply(.x@models, function(m) via(m, .method, ...))
+    .x
+}
+
 S7::method(print, multi_lazy) = function(x, ...) {
     cat("\n")
     cat(cli::rule(left = "Models", line = "-"), "\n\n")
