@@ -44,7 +44,8 @@ Suggests:
     dplyr,
     boot,
     knitr,
-    fansi
+    fansi,
+    lintr
 Collate:
     'statim-package.R'
     'ops.R'
