@@ -46,9 +46,19 @@ S7::method(prepare, list(def_var, S7::class_function)) = function(.x, .fn, ...) 
     )
 
     if (is_test_spec(spec)) {
-        prepare_test(.x, .fn, ...)
+        test_lazy(
+            var_id = .x@var_id,
+            processed = .x@processed,
+            test_spec = spec,
+            recalibrate_spec = if (length(list(...)) > 0L) list(args = list(...)) else NULL
+        )
     } else if (is_model_spec(spec)) {
-        prepare_model(.x, .fn, ...)
+        model_lazy(
+            var_id = .x@var_id,
+            processed = .x@processed,
+            model_spec = spec,
+            recalibrate_spec = if (length(list(...)) > 0L) list(args = list(...)) else NULL
+        )
     } else {
         cli::cli_abort("{.arg .fn} must return a {.cls test_spec} or {.cls model_spec}.")
     }
