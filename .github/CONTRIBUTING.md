@@ -32,27 +32,11 @@ devtools::load_all()
 
 This project enforces code style via two tools:
 
-- [Air](https://posit-dev.github.io/air/) — code formatter
-- [lintr](https://lintr.r-lib.org/) — static analysis
+- [Air](https://posit-dev.github.io/air/) for code formatting
+- [lintr](https://lintr.r-lib.org/) for static analysis
 
-### Install Air
+For installation, see the [Air CLI guide](https://posit-dev.github.io/air/cli.html). Verify with `air --version`. For editor integration, see the [editor guides](https://posit-dev.github.io/air/editors.html).
 
-**macOS**
-```bash
-brew install air
-```
-
-**Linux / macOS**
-```bash
-curl -fsSL https://github.com/posit-dev/air/releases/latest/download/air-installer.sh | bash
-```
-
-**Windows**
-```powershell
-irm https://github.com/posit-dev/air/releases/latest/download/air-installer.ps1 | iex
-```
-
-Verify with `air --version`. For editor integration, see Air's [editor guides](https://posit-dev.github.io/air/editors.html).
 The project root contains an `air.toml` — your editor will pick it up automatically.
 
 ## Style Rules
@@ -67,21 +51,21 @@ The project root contains an `air.toml` — your editor will pick it up automati
 - Update documentation for user-facing changes.
 - Format the project before submitting:
 
-```bash
-air format .
-```
+    ```bash
+    air format .
+    ```
 
 - Check for linting issues:
 
-```r
-lintr::lint_package()
-```
+    ```r
+    lintr::lint_package()
+    ```
 
 - Run checks:
 
-```r
-devtools::check()
-```
+    ```r
+    devtools::check()
+    ```
 
 Both `air format .` and `lintr::lint_package()` must produce no errors.
 Every pull request runs automated checks via CI — unformatted code or linting violations will fail the build.
