@@ -100,7 +100,7 @@ ttest_def_two = test_define(
                     cli::cli_abort(c(
                         "Two-sample t-test requires exactly 1 grouping variable.",
                         "i" = "Found {length(group_data)} grouping variable{cli::qty(length(group_data))}{?s}.",
-                        "i" = "Use {.code via(\"multi\")} to test multiple grouping variables."
+                        "i" = "Use {.code via(\"multi\")} (e.g. {.code ... |> prepare(TTEST) |> via(\"multi\")}) to test multiple grouping variables."
                     ))
                 }
 

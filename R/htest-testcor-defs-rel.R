@@ -7,7 +7,7 @@ main_cortest_rel = function(.cor_type) {
             cli::cli_abort(c(
                 "{.arg x} must be a single variable for {.fn rel}.",
                 "i" = "Got {length(x_data)} variable{?s}: {.val {names(x_data)}}.",
-                "i" = "Use {.code via(\"multi\")} to test multiple grouping variables."
+                "i" = "Use {.code via(\"multi\")} (e.g. {.code ... |> prepare(CORTEST) |> via(\"multi\")}) to test multiple grouping variables."
             ))
         }
 
@@ -253,7 +253,7 @@ cor_test_rel = test_define(
                     cli::cli_abort(c(
                         "{.arg x} must be a single variable for {.fn rel}.",
                         "i" = "Got {length(x_data)} variable{?s}: {.val {names(x_data)}}.",
-                        "i" = "Use {.code via(\"multi\")} to test multiple grouping variables."
+                        "i" = "Use {.code via(\"multi\")} (e.g. {.code ... |> prepare(CORTEST) |> via(\"multi\")}) to test multiple grouping variables."
                     ))
                 }
 
