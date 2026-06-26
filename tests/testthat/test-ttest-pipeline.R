@@ -22,7 +22,11 @@ test_that("TTEST() eager result matches base R t.test()", {
     result = TTEST(x_by(extra, group), sleep)
     base = t.test(extra ~ group, data = sleep)
 
-    expect_equal(result@data@t_stat[[1]], unname(base$statistic), tolerance = 1e-6)
+    expect_equal(
+        result@data@t_stat[[1]],
+        unname(base$statistic),
+        tolerance = 1e-6
+    )
     expect_equal(result@data@p_val[[1]], base$p.value, tolerance = 1e-6)
 })
 
@@ -253,7 +257,9 @@ test_that("tidy() on classical pipeline result has expected columns", {
         conclude() |>
         tidy()
 
-    expect_true(all(c("group", "estimate", "t_stat", "p_val") %in% names(result)))
+    expect_true(all(
+        c("group", "estimate", "t_stat", "p_val") %in% names(result)
+    ))
 })
 
 test_that("tidy() on boot variant returns a tibble", {

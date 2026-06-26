@@ -24,11 +24,27 @@ test_that("CORTEST() eager result matches base R cor.test()", {
     result = CORTEST(rel(speed, dist), cars)
     base = cor.test(cars$speed, cars$dist, method = "pearson")
 
-    expect_equal(result@data@estimate[[1]], unname(base$estimate), tolerance = 1e-6)
-    expect_equal(result@data@statistic[[1]], unname(base$statistic), tolerance = 1e-6)
+    expect_equal(
+        result@data@estimate[[1]],
+        unname(base$estimate),
+        tolerance = 1e-6
+    )
+    expect_equal(
+        result@data@statistic[[1]],
+        unname(base$statistic),
+        tolerance = 1e-6
+    )
     expect_equal(result@data@p_val[[1]], base$p.value, tolerance = 1e-6)
-    expect_equal(result@data@lower_ci[[1]], base$conf.int[[1]], tolerance = 1e-6)
-    expect_equal(result@data@upper_ci[[1]], base$conf.int[[2]], tolerance = 1e-6)
+    expect_equal(
+        result@data@lower_ci[[1]],
+        base$conf.int[[1]],
+        tolerance = 1e-6
+    )
+    expect_equal(
+        result@data@upper_ci[[1]],
+        base$conf.int[[2]],
+        tolerance = 1e-6
+    )
 })
 
 test_that("CORTEST() eager print returns invisibly", {
@@ -120,11 +136,17 @@ test_that("spearman variant matches base R cor.test()", {
             conclude()
     )
 
-    base = suppressWarnings(
-        cor.test(iris$Sepal.Length, iris$Petal.Length, method = "spearman")
-    )
+    base = suppressWarnings(cor.test(
+        iris$Sepal.Length,
+        iris$Petal.Length,
+        method = "spearman"
+    ))
 
-    expect_equal(result@data@estimate[[1]], unname(base$estimate), tolerance = 1e-6)
+    expect_equal(
+        result@data@estimate[[1]],
+        unname(base$estimate),
+        tolerance = 1e-6
+    )
     expect_equal(result@data@p_val[[1]], base$p.value, tolerance = 1e-6)
 })
 
@@ -162,7 +184,11 @@ test_that("kendall variant matches base R cor.test()", {
 
     base = cor.test(cars$speed, cars$dist, method = "kendall")
 
-    expect_equal(result@data@estimate[[1]], unname(base$estimate), tolerance = 1e-6)
+    expect_equal(
+        result@data@estimate[[1]],
+        unname(base$estimate),
+        tolerance = 1e-6
+    )
     expect_equal(result@data@p_val[[1]], base$p.value, tolerance = 1e-6)
 })
 
@@ -190,9 +216,10 @@ test_that("non-zero .rho triggers Fisher-z path", {
         prepare_test(CORTEST) |>
         conclude()
 
-    expect_false(
-        isTRUE(all.equal(result@data@statistic, base_result@data@statistic))
-    )
+    expect_false(isTRUE(all.equal(
+        result@data@statistic,
+        base_result@data@statistic
+    )))
 })
 
 test_that("Fisher-z result p_val is in [0, 1]", {
@@ -228,10 +255,7 @@ test_that("Fisher-z errors on |.rho| >= 1", {
 })
 
 test_that("Fisher-z errors on n < 4", {
-    expect_error(
-        CORTEST(rel(speed, dist), cars[1:3, ]),
-        class = "rlang_error"
-    )
+    expect_error(CORTEST(rel(speed, dist), cars[1:3, ]), class = "rlang_error")
 })
 
 test_that("state_null() with RHO == 0 runs through to conclude()", {
@@ -357,8 +381,16 @@ test_that("multi variant matches base R cor.test() per variable", {
     base_wt = cor.test(mtcars$wt, mtcars$mpg, method = "pearson")
     base_hp = cor.test(mtcars$hp, mtcars$mpg, method = "pearson")
 
-    expect_equal(result@data@estimate[[1]], unname(base_wt$estimate), tolerance = 1e-6)
-    expect_equal(result@data@estimate[[2]], unname(base_hp$estimate), tolerance = 1e-6)
+    expect_equal(
+        result@data@estimate[[1]],
+        unname(base_wt$estimate),
+        tolerance = 1e-6
+    )
+    expect_equal(
+        result@data@estimate[[2]],
+        unname(base_hp$estimate),
+        tolerance = 1e-6
+    )
     expect_equal(result@data@p_val[[1]], base_wt$p.value, tolerance = 1e-6)
     expect_equal(result@data@p_val[[2]], base_hp$p.value, tolerance = 1e-6)
 })
@@ -373,11 +405,27 @@ test_that("multi variant respects .cor_type for all variables", {
             conclude()
     )
 
-    base_wt = suppressWarnings(cor.test(mtcars$wt, mtcars$mpg, method = "spearman"))
-    base_hp = suppressWarnings(cor.test(mtcars$hp, mtcars$mpg, method = "spearman"))
+    base_wt = suppressWarnings(cor.test(
+        mtcars$wt,
+        mtcars$mpg,
+        method = "spearman"
+    ))
+    base_hp = suppressWarnings(cor.test(
+        mtcars$hp,
+        mtcars$mpg,
+        method = "spearman"
+    ))
 
-    expect_equal(result@data@estimate[[1]], unname(base_wt$estimate), tolerance = 1e-6)
-    expect_equal(result@data@estimate[[2]], unname(base_hp$estimate), tolerance = 1e-6)
+    expect_equal(
+        result@data@estimate[[1]],
+        unname(base_wt$estimate),
+        tolerance = 1e-6
+    )
+    expect_equal(
+        result@data@estimate[[2]],
+        unname(base_hp$estimate),
+        tolerance = 1e-6
+    )
     expect_length(result@data@lower_ci, 0L)
     expect_length(result@data@df, 0L)
 })
@@ -441,7 +489,9 @@ test_that("tidy() on classical pipeline result has expected columns", {
         conclude() |>
         tidy()
 
-    expect_true(all(c("pair", "estimate", "statistic", "p_val") %in% names(result)))
+    expect_true(all(
+        c("pair", "estimate", "statistic", "p_val") %in% names(result)
+    ))
 })
 
 test_that("tidy() includes CI columns for Pearson", {

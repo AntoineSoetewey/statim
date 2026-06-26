@@ -1,15 +1,11 @@
 test_that("prepare_test() returns a test_lazy", {
-    tl = sleep |>
-        define_model(x_by(extra, group)) |>
-        prepare_test(TTEST)
+    tl = sleep |> define_model(x_by(extra, group)) |> prepare_test(TTEST)
 
     expect_s7_class(tl, test_lazy)
 })
 
 test_that("prepare_test() stores var_id, processed, test_spec", {
-    tl = sleep |>
-        define_model(x_by(extra, group)) |>
-        prepare_test(TTEST)
+    tl = sleep |> define_model(x_by(extra, group)) |> prepare_test(TTEST)
 
     expect_s7_class(tl@var_id, x_by)
     expect_s7_class(tl@test_spec, test_spec)
@@ -19,10 +15,7 @@ test_that("prepare_test() stores var_id, processed, test_spec", {
 test_that("prepare_test() with a model function errors", {
     dm = define_model(rel(speed, dist), cars)
 
-    expect_error(
-        prepare_test(dm, LINEAR_REG),
-        class = "rlang_error"
-    )
+    expect_error(prepare_test(dm, LINEAR_REG), class = "rlang_error")
 })
 
 test_that("prepare_test() with a non-function errors", {
@@ -32,48 +25,35 @@ test_that("prepare_test() with a non-function errors", {
 })
 
 test_that("as_test_spec() rejects a model function", {
-    expect_error(
-        as_test_spec(LINEAR_REG),
-        class = "rlang_error"
-    )
+    expect_error(as_test_spec(LINEAR_REG), class = "rlang_error")
 })
 
 test_that("test_lazy recalibrate_spec is NULL by default", {
-    tl = sleep |>
-        define_model(x_by(extra, group)) |>
-        prepare_test(TTEST)
+    tl = sleep |> define_model(x_by(extra, group)) |> prepare_test(TTEST)
 
     expect_null(tl@recalibrate_spec)
 })
 
 test_that("test_lazy claims is NULL by default", {
-    tl = sleep |>
-        define_model(x_by(extra, group)) |>
-        prepare_test(TTEST)
+    tl = sleep |> define_model(x_by(extra, group)) |> prepare_test(TTEST)
 
     expect_null(tl@claims)
 })
 
 test_that("test_lazy data_name is empty string by default", {
-    tl = sleep |>
-        define_model(x_by(extra, group)) |>
-        prepare_test(TTEST)
+    tl = sleep |> define_model(x_by(extra, group)) |> prepare_test(TTEST)
 
     expect_equal(tl@data_name, "")
 })
 
 test_that("print.test_lazy() returns invisibly", {
-    tl = sleep |>
-        define_model(x_by(extra, group)) |>
-        prepare_test(TTEST)
+    tl = sleep |> define_model(x_by(extra, group)) |> prepare_test(TTEST)
 
     expect_invisible(print(tl))
 })
 
 test_that("update() on test_lazy modifies test_spec args when no recalibrate_spec", {
-    tl = sleep |>
-        define_model(x_by(extra, group)) |>
-        prepare_test(TTEST)
+    tl = sleep |> define_model(x_by(extra, group)) |> prepare_test(TTEST)
 
     tl2 = update(tl, .paired = TRUE)
 
@@ -112,9 +92,7 @@ test_that("via() with an unregistered variant errors", {
 })
 
 test_that("via() preserves all other test_lazy fields", {
-    tl = sleep |>
-        define_model(x_by(extra, group)) |>
-        prepare_test(TTEST)
+    tl = sleep |> define_model(x_by(extra, group)) |> prepare_test(TTEST)
 
     tl_via = via(tl, "permute", n = 100L)
 

@@ -94,10 +94,7 @@ test_that("%by% is an alias for x_by()", {
     m2 = extra %by% group
 
     expect_s7_class(m2, x_by)
-    expect_equal(
-        rlang::as_label(m1@x),
-        rlang::as_label(m2@x)
-    )
+    expect_equal(rlang::as_label(m1@x), rlang::as_label(m2@x))
 })
 
 # ---- rel ----
@@ -171,7 +168,11 @@ test_that("pairwise() with direction = 'eq' returns only self-pairs", {
     dm = define_model(pairwise(a, b, c, direction = "eq"), df)
 
     expect_length(dm@processed$pairs, 3)
-    expect_true(all(vapply(dm@processed$pairs, \(p) p[[1]] == p[[2]], logical(1))))
+    expect_true(all(vapply(
+        dm@processed$pairs,
+        \(p) p[[1]] == p[[2]],
+        logical(1)
+    )))
 })
 
 # ---- var_id_info ----
@@ -237,7 +238,11 @@ test_that("var_id_info() for formula reports left_var and right_var", {
 })
 
 test_that("var_id_info() for unregistered subclass returns property names in args", {
-    my_id = S7::new_class("my_id", parent = var_id, properties = list(foo = S7::class_any))
+    my_id = S7::new_class(
+        "my_id",
+        parent = var_id,
+        properties = list(foo = S7::class_any)
+    )
     info = var_id_info(my_id(foo = 1))
 
     expect_equal(info@model_type, "my_id")
@@ -248,7 +253,11 @@ test_that("var_id_info() for unregistered subclass returns property names in arg
 })
 
 test_that("define_model() with unregistered var_id subclass prints without error", {
-    my_id = S7::new_class("my_id", parent = var_id, properties = list(foo = S7::class_any))
+    my_id = S7::new_class(
+        "my_id",
+        parent = var_id,
+        properties = list(foo = S7::class_any)
+    )
     dm = define_model(my_id(foo = 1))
 
     expect_invisible(print(dm))

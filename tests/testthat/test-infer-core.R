@@ -21,10 +21,7 @@ test_that("find_def() returns the matched def", {
 test_that("find_def() errors on unknown model type", {
     lookup = build_lookup(list(ttest_def_two), cls = "ttest")
 
-    expect_error(
-        find_def(lookup, "nonexistent"),
-        class = "rlang_error"
-    )
+    expect_error(find_def(lookup, "nonexistent"), class = "rlang_error")
 })
 
 test_that("model_type_name() extracts name from S7_class", {
@@ -41,7 +38,10 @@ test_that("get_model_type() extracts name from an instantiated S7 model ID", {
 
 test_that("impl_cls_from_model() concatenates stat_cls and model name", {
     expect_equal(impl_cls_from_model("ttest", x_by(extra, group)), "ttest_x_by")
-    expect_equal(impl_cls_from_model("linear_reg", rel(speed, dist)), "linear_reg_rel")
+    expect_equal(
+        impl_cls_from_model("linear_reg", rel(speed, dist)),
+        "linear_reg_rel"
+    )
     expect_equal(impl_cls_from_model("ttest", extra ~ group), "ttest_formula")
 })
 
@@ -61,9 +61,11 @@ test_that("inject_and_run() prefers user args over fn defaults", {
     impl = ttest_def_two@impl$base
     processed = model_processor(x_by(extra, group), sleep)
 
-    expect_no_error(
-        inject_and_run(impl, processed, args = list(.paired = FALSE))
-    )
+    expect_no_error(inject_and_run(
+        impl,
+        processed,
+        args = list(.paired = FALSE)
+    ))
 })
 
 test_that("inject_and_run() errors when required arg is missing", {
@@ -84,10 +86,7 @@ test_that("baseline() errors when fn does not start with .proc", {
 })
 
 test_that("variant() errors when fn does not start with .proc", {
-    expect_error(
-        variant(fn = function(x, group_data) x),
-        class = "rlang_error"
-    )
+    expect_error(variant(fn = function(x, group_data) x), class = "rlang_error")
 })
 
 test_that("inject_and_run() errors on unknown arg when fn has no ...", {
@@ -114,9 +113,11 @@ test_that("inject_and_run() error message lists accepted args", {
     impl = ttest_def_two@impl$base
     processed = model_processor(x_by(extra, group), sleep)
 
-    err = rlang::catch_cnd(
-        inject_and_run(impl, processed, args = list(foo = 1))
-    )
+    err = rlang::catch_cnd(inject_and_run(
+        impl,
+        processed,
+        args = list(foo = 1)
+    ))
     full_msg = rlang::cnd_message(err)
 
     expect_match(full_msg, "foo")
@@ -136,9 +137,7 @@ test_that("inject_and_run() does not error when args is empty", {
     impl = ttest_def_two@impl$base
     processed = model_processor(x_by(extra, group), sleep)
 
-    expect_no_error(
-        inject_and_run(impl, processed, args = list())
-    )
+    expect_no_error(inject_and_run(impl, processed, args = list()))
 })
 
 # stat_infer_spec / cld_exec ---------------------------------------------------

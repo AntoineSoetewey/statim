@@ -1,15 +1,11 @@
 test_that("prepare_model() returns a model_lazy", {
-    ml = cars |>
-        define_model(rel(speed, dist)) |>
-        prepare_model(LINEAR_REG)
+    ml = cars |> define_model(rel(speed, dist)) |> prepare_model(LINEAR_REG)
 
     expect_s7_class(ml, statim:::model_lazy)
 })
 
 test_that("prepare_model() stores var_id, processed, model_spec", {
-    ml = cars |>
-        define_model(rel(speed, dist)) |>
-        prepare_model(LINEAR_REG)
+    ml = cars |> define_model(rel(speed, dist)) |> prepare_model(LINEAR_REG)
 
     expect_s7_class(ml@var_id, statim::rel)
     expect_s7_class(ml@model_spec, statim:::model_spec)
@@ -17,9 +13,7 @@ test_that("prepare_model() stores var_id, processed, model_spec", {
 })
 
 test_that("prepare_model() with formula dispatches correctly", {
-    ml = cars |>
-        define_model(dist ~ speed) |>
-        prepare_model(LINEAR_REG)
+    ml = cars |> define_model(dist ~ speed) |> prepare_model(LINEAR_REG)
 
     expect_s7_class(ml, statim:::model_lazy)
     expect_true(inherits(ml@var_id, "formula"))
@@ -28,10 +22,7 @@ test_that("prepare_model() with formula dispatches correctly", {
 test_that("prepare_model() with a test function errors", {
     dm = define_model(x_by(extra, group), sleep)
 
-    expect_error(
-        prepare_model(dm, TTEST),
-        class = "rlang_error"
-    )
+    expect_error(prepare_model(dm, TTEST), class = "rlang_error")
 })
 
 test_that("prepare_model() with a non-function errors", {
@@ -41,40 +32,29 @@ test_that("prepare_model() with a non-function errors", {
 })
 
 test_that("as_model_spec() rejects a test function", {
-    expect_error(
-        statim:::as_model_spec(TTEST),
-        class = "rlang_error"
-    )
+    expect_error(statim:::as_model_spec(TTEST), class = "rlang_error")
 })
 
 test_that("model_lazy recalibrate_spec is NULL by default", {
-    ml = cars |>
-        define_model(rel(speed, dist)) |>
-        prepare_model(LINEAR_REG)
+    ml = cars |> define_model(rel(speed, dist)) |> prepare_model(LINEAR_REG)
 
     expect_null(ml@recalibrate_spec)
 })
 
 test_that("model_lazy data_name is empty string by default", {
-    ml = cars |>
-        define_model(rel(speed, dist)) |>
-        prepare_model(LINEAR_REG)
+    ml = cars |> define_model(rel(speed, dist)) |> prepare_model(LINEAR_REG)
 
     expect_equal(ml@data_name, "")
 })
 
 test_that("print.model_lazy() returns invisibly", {
-    ml = cars |>
-        define_model(rel(speed, dist)) |>
-        prepare_model(LINEAR_REG)
+    ml = cars |> define_model(rel(speed, dist)) |> prepare_model(LINEAR_REG)
 
     expect_invisible(print(ml))
 })
 
 test_that("update() on model_lazy modifies model_spec args when no recalibrate_spec", {
-    ml = cars |>
-        define_model(rel(speed, dist)) |>
-        prepare_model(LINEAR_REG)
+    ml = cars |> define_model(rel(speed, dist)) |> prepare_model(LINEAR_REG)
 
     ml2 = update(ml, some_arg = TRUE)
 
@@ -92,9 +72,7 @@ test_that("via() on model_lazy errors for unregistered variant", {
 })
 
 test_that("via() preserves all other model_lazy fields", {
-    ml = cars |>
-        define_model(rel(speed, dist)) |>
-        prepare_model(LINEAR_REG)
+    ml = cars |> define_model(rel(speed, dist)) |> prepare_model(LINEAR_REG)
 
     # LINEAR_REG has no variants, so via() should error —
     # confirming via() actually validates against the def

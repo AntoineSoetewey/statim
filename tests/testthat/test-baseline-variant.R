@@ -1,17 +1,11 @@
 # baseline() ---------------------------------------------------------------
 
 test_that("baseline() errors if fn is not a function", {
-    expect_error(
-        baseline(fn = "not_a_function"),
-        class = "rlang_error"
-    )
+    expect_error(baseline(fn = "not_a_function"), class = "rlang_error")
 })
 
 test_that("baseline() errors if fn does not start with .proc", {
-    expect_error(
-        baseline(fn = function(x) x),
-        class = "rlang_error"
-    )
+    expect_error(baseline(fn = function(x) x), class = "rlang_error")
 })
 
 test_that("baseline() errors if print is not NULL or a function", {
@@ -43,17 +37,11 @@ test_that("baseline() stores a custom print function", {
 # variant() ----------------------------------------------------------------
 
 test_that("variant() errors if fn is not a function", {
-    expect_error(
-        variant(fn = 42L),
-        class = "rlang_error"
-    )
+    expect_error(variant(fn = 42L), class = "rlang_error")
 })
 
 test_that("variant() errors if fn does not start with .proc", {
-    expect_error(
-        variant(fn = function(x) x),
-        class = "rlang_error"
-    )
+    expect_error(variant(fn = function(x) x), class = "rlang_error")
 })
 
 test_that("variant() errors if print is not NULL or a function", {
@@ -83,29 +71,20 @@ test_that("agendas() errors if base is missing", {
 
 test_that("agendas() errors if base is not a baseline object", {
     v = variant(fn = function(.proc) .proc)
-    expect_error(
-        agendas(base = v),
-        class = "rlang_error"
-    )
+    expect_error(agendas(base = v), class = "rlang_error")
 })
 
 test_that("agendas() errors if a variant argument is unnamed (all unnamed)", {
     b = baseline(fn = function(.proc) .proc)
     v = variant(fn = function(.proc) .proc)
-    expect_error(
-        agendas(base = b, v),
-        class = "rlang_error"
-    )
+    expect_error(agendas(base = b, v), class = "rlang_error")
 })
 
 test_that("agendas() errors if a variant argument is unnamed (mixed named/unnamed)", {
     b = baseline(fn = function(.proc) .proc)
     v1 = variant(fn = function(.proc) .proc)
     v2 = variant(fn = function(.proc) .proc)
-    expect_error(
-        agendas(base = b, ok = v1, v2),
-        class = "rlang_error"
-    )
+    expect_error(agendas(base = b, ok = v1, v2), class = "rlang_error")
 })
 
 test_that("agendas() errors if a named argument is not a variant", {

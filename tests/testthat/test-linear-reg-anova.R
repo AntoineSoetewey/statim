@@ -6,16 +6,11 @@
 # ---- helpers ----
 
 pipeline_conclude = function(data, formula) {
-    data |>
-        define_model(formula) |>
-        prepare_model(LINEAR_REG) |>
-        conclude()
+    data |> define_model(formula) |> prepare_model(LINEAR_REG) |> conclude()
 }
 
 pipeline_lazy = function(data, formula) {
-    data |>
-        define_model(formula) |>
-        prepare_model(LINEAR_REG)
+    data |> define_model(formula) |> prepare_model(LINEAR_REG)
 }
 
 ref_anova_single = function(data, formula) {
@@ -44,7 +39,7 @@ test_that("single-model anova() table has correct columns", {
 
 test_that("single-model anova() has one row per term plus Residuals", {
     tbl = pipeline_conclude(cars, dist ~ speed) |> anova() |> (\(x) x@data)()
-    expect_equal(nrow(tbl), 2L)  # It concatenates "residuals" part, i.e. speed + Residuals
+    expect_equal(nrow(tbl), 2L) # It concatenates "residuals" part, i.e. speed + Residuals
     expect_equal(tbl$term, c("speed", "Residuals"))
 })
 
@@ -119,7 +114,11 @@ test_that("single-model anova() with dot formula p-values match stats::anova()",
     ref = ref_anova_single(mtcars, mpg ~ .)
     tbl = pipeline_conclude(mtcars, mpg ~ .) |> anova() |> (\(x) x@data)()
 
-    expect_equal(tbl$p_value[-nrow(tbl)], ref$`Pr(>F)`[-nrow(ref)], tolerance = 1e-8)
+    expect_equal(
+        tbl$p_value[-nrow(tbl)],
+        ref$`Pr(>F)`[-nrow(ref)],
+        tolerance = 1e-8
+    )
 })
 
 # ---- Single-model: pipeline variants ----
@@ -132,7 +131,9 @@ test_that("single-model `anova()` works from model_lazy (no conclude)", {
 
 test_that("single-model `anova()` lazy and conclude paths produce equal SS", {
     tbl_lazy = pipeline_lazy(cars, dist ~ speed) |> anova() |> (\(x) x@data)()
-    tbl_exec = pipeline_conclude(cars, dist ~ speed) |> anova() |> (\(x) x@data)()
+    tbl_exec = pipeline_conclude(cars, dist ~ speed) |>
+        anova() |>
+        (\(x) x@data)()
 
     expect_equal(tbl_lazy$ss, tbl_exec$ss, tolerance = 1e-10)
 })
@@ -177,7 +178,10 @@ test_that("multi-model anova() table has correct columns", {
     mod2 = pipeline_conclude(LifeCycleSavings, sr ~ pop15)
     tbl = anova(mod1, mod2)@data
 
-    expect_named(tbl, c("model", "res_df", "deviance", "df", "dev_diff", "f_value", "p_value"))
+    expect_named(
+        tbl,
+        c("model", "res_df", "deviance", "df", "dev_diff", "f_value", "p_value")
+    )
 })
 
 test_that("multi-model anova() has one row per model", {
@@ -192,11 +196,7 @@ test_that("multi-model anova() has one row per model", {
 # ---- Multi-model: numerical correctness ----
 
 test_that("multi-model `anova()` F value matches `stats::anova()`", {
-    ref = ref_anova_multi(
-        LifeCycleSavings,
-        sr ~ 1,
-        sr ~ pop15
-    )
+    ref = ref_anova_multi(LifeCycleSavings, sr ~ 1, sr ~ pop15)
     mod1 = pipeline_conclude(LifeCycleSavings, sr ~ 1)
     mod2 = pipeline_conclude(LifeCycleSavings, sr ~ pop15)
     tbl = anova(mod1, mod2)@data
@@ -205,11 +205,7 @@ test_that("multi-model `anova()` F value matches `stats::anova()`", {
 })
 
 test_that("multi-model anova() p-value matches stats::anova()", {
-    ref = ref_anova_multi(
-        LifeCycleSavings,
-        sr ~ 1,
-        sr ~ pop15
-    )
+    ref = ref_anova_multi(LifeCycleSavings, sr ~ 1, sr ~ pop15)
     mod1 = pipeline_conclude(LifeCycleSavings, sr ~ 1)
     mod2 = pipeline_conclude(LifeCycleSavings, sr ~ pop15)
     tbl = anova(mod1, mod2)@data
@@ -239,25 +235,26 @@ test_that("write_models() |> anova() matches direct anova() call", {
     }
 
     wm_tbl = LifeCycleSavings |>
-        write_models(
-            f1 = sr ~ 1,
-            f2 = sr ~ pop15,
-            f3 = sr ~ pop15 + pop75
-        ) |>
+        write_models(f1 = sr ~ 1, f2 = sr ~ pop15, f3 = sr ~ pop15 + pop75) |>
         prepare_model(LINEAR_REG) |>
         anova() |>
         (\(x) x@data)()
 
-    expect_equal(unname(wm_tbl[-1, ]$f_value), ref_tbl[-1, ]$f_value, tolerance = 1e-10)
-    expect_equal(unname(wm_tbl[-1, ]$p_value), ref_tbl[-1, ]$p_value, tolerance = 1e-10)
+    expect_equal(
+        unname(wm_tbl[-1, ]$f_value),
+        ref_tbl[-1, ]$f_value,
+        tolerance = 1e-10
+    )
+    expect_equal(
+        unname(wm_tbl[-1, ]$p_value),
+        ref_tbl[-1, ]$p_value,
+        tolerance = 1e-10
+    )
 })
 
 test_that("write_models() anova() uses model labels as row names", {
     tbl = LifeCycleSavings |>
-        write_models(
-            null = sr ~ 1,
-            main = sr ~ pop15
-        ) |>
+        write_models(null = sr ~ 1, main = sr ~ pop15) |>
         prepare_model(LINEAR_REG) |>
         anova() |>
         (\(x) x@data)()

@@ -91,36 +91,42 @@ test_that("var_id_info() for prop always includes vars", {
 # ---- P-TEST ----
 
 test_that("class_p_test() errors when ci_level is not length 1", {
-    expect_error(
-        class_p_test(
-            x = 45, n = 100, estimate = 0.45,
-            statistic = 45, p_val = 0.368,
-            lower_ci = 0.35, upper_ci = 0.55,
-            ci_level = c(0.95, 0.99)
-        )
-    )
+    expect_error(class_p_test(
+        x = 45,
+        n = 100,
+        estimate = 0.45,
+        statistic = 45,
+        p_val = 0.368,
+        lower_ci = 0.35,
+        upper_ci = 0.55,
+        ci_level = c(0.95, 0.99)
+    ))
 })
 
 test_that("class_p_test() errors when ci_level >= 1", {
-    expect_error(
-        class_p_test(
-            x = 45, n = 100, estimate = 0.45,
-            statistic = 45, p_val = 0.368,
-            lower_ci = 0.35, upper_ci = 0.55,
-            ci_level = 1
-        )
-    )
+    expect_error(class_p_test(
+        x = 45,
+        n = 100,
+        estimate = 0.45,
+        statistic = 45,
+        p_val = 0.368,
+        lower_ci = 0.35,
+        upper_ci = 0.55,
+        ci_level = 1
+    ))
 })
 
 test_that("class_p_test() errors when ci_level <= 0", {
-    expect_error(
-        class_p_test(
-            x = 45, n = 100, estimate = 0.45,
-            statistic = 45, p_val = 0.368,
-            lower_ci = 0.35, upper_ci = 0.55,
-            ci_level = 0
-        )
-    )
+    expect_error(class_p_test(
+        x = 45,
+        n = 100,
+        estimate = 0.45,
+        statistic = 45,
+        p_val = 0.368,
+        lower_ci = 0.35,
+        upper_ci = 0.55,
+        ci_level = 0
+    ))
 })
 
 test_that("P_TEST() eager path returns a cld_exec object", {
@@ -152,9 +158,7 @@ test_that("P_TEST() eager path stores x and n", {
 
 test_that("P_TEST() pipeline produces same test_out as eager path", {
     eager = P_TEST(prop(45, 100))
-    pipeline = define_model(prop(45, 100)) |>
-        prepare_test(P_TEST) |>
-        conclude()
+    pipeline = define_model(prop(45, 100)) |> prepare_test(P_TEST) |> conclude()
 
     expect_equal(eager@data@estimate, pipeline@data@estimate)
     expect_equal(eager@data@p_val, pipeline@data@p_val)

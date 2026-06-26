@@ -6,17 +6,17 @@ test_that("glm_to_glm_object() returns a class_glm_object from a fitted glm", {
 })
 
 test_that("glm_to_glm_object() errors on non-glm input", {
-    expect_error(
-        glm_to_glm_object(list(x = 1)),
-        class = "rlang_error"
-    )
+    expect_error(glm_to_glm_object(list(x = 1)), class = "rlang_error")
 })
 
 test_that("glm_to_glm_object() coefficients df has correct columns", {
     fit = glm(am ~ wt + hp, data = mtcars, family = binomial())
     obj = glm_to_glm_object(fit)
 
-    expect_named(obj@coefficients, c("term", "estimate", "std_error", "statistic", "p_value"))
+    expect_named(
+        obj@coefficients,
+        c("term", "estimate", "std_error", "statistic", "p_value")
+    )
 })
 
 test_that("glm_to_glm_object() fit_summary has correct columns", {
@@ -25,7 +25,15 @@ test_that("glm_to_glm_object() fit_summary has correct columns", {
 
     expect_named(
         obj@fit_summary,
-        c("family", "link", "null_deviance", "deviance", "df_residual", "aic", "n_obs")
+        c(
+            "family",
+            "link",
+            "null_deviance",
+            "deviance",
+            "df_residual",
+            "aic",
+            "n_obs"
+        )
     )
 })
 

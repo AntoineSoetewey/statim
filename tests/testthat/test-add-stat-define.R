@@ -2,7 +2,9 @@ detect_pkg = function(call_env) {
     top = topenv(call_env)
     pkg = environmentName(top)
     excluded = c("", "R_GlobalEnv", "base", "testthat", "devtools", "pkgload")
-    if (pkg %in% excluded || !isNamespace(top)) return(NULL)
+    if (pkg %in% excluded || !isNamespace(top)) {
+        return(NULL)
+    }
     pkg
 }
 
@@ -73,9 +75,11 @@ test_that("add_stat_define conflict error names the prior registrant", {
 
     add_stat_define(P_TEST, mt, impl = make_trivial_impl())
 
-    err = rlang::catch_cnd(
-        add_stat_define(P_TEST, mt, impl = make_trivial_impl())
-    )
+    err = rlang::catch_cnd(add_stat_define(
+        P_TEST,
+        mt,
+        impl = make_trivial_impl()
+    ))
     expect_match(conditionMessage(err), "user-scoped")
 })
 
@@ -129,10 +133,7 @@ test_that("remove_stat_define removes a user-scoped entry", {
 test_that("remove_stat_define aborts when entry does not exist", {
     mt = make_local_model_type()
 
-    expect_error(
-        remove_stat_define(P_TEST, mt),
-        regexp = "not registered for"
-    )
+    expect_error(remove_stat_define(P_TEST, mt), regexp = "not registered for")
 })
 
 test_that("remove_stat_define aborts on package-scoped entry", {
@@ -148,14 +149,13 @@ test_that("remove_stat_define aborts on package-scoped entry", {
         pkg = "fauxpackage"
     )
     on.exit(
-        { stat_define_registry[[reg_key]][[mt@name]] = NULL },
+        {
+            stat_define_registry[[reg_key]][[mt@name]] = NULL
+        },
         add = TRUE
     )
 
-    expect_error(
-        remove_stat_define(P_TEST, mt),
-        regexp = "package.*scoped"
-    )
+    expect_error(remove_stat_define(P_TEST, mt), regexp = "package.*scoped")
 })
 
 # ---- purge_stat_defines ----
@@ -180,10 +180,13 @@ test_that("purge_stat_defines removes only entries matching the named package", 
         origin = "package",
         pkg = "pkgB"
     )
-    on.exit({
-        env[[mt_a@name]] = NULL
-        env[[mt_b@name]] = NULL
-    }, add = TRUE)
+    on.exit(
+        {
+            env[[mt_a@name]] = NULL
+            env[[mt_b@name]] = NULL
+        },
+        add = TRUE
+    )
 
     purge_stat_defines("pkgA")
 
@@ -249,9 +252,7 @@ test_that("conclude() detects stale cache when add_stat_define called after prep
 
     add_stat_define(P_TEST, mt, impl = make_trivial_impl())
 
-    expect_false(
-        identical(v_at_prepare, stat_define_registry$.version)
-    )
+    expect_false(identical(v_at_prepare, stat_define_registry$.version))
 })
 
 test_that("prepare_test stamps current registry version into test_spec", {

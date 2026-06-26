@@ -1,14 +1,9 @@
 pipeline_conclude = function(data, formula) {
-    data |>
-        define_model(formula) |>
-        prepare_model(LINEAR_REG) |>
-        conclude()
+    data |> define_model(formula) |> prepare_model(LINEAR_REG) |> conclude()
 }
 
 pipeline_lazy = function(data, formula) {
-    data |>
-        define_model(formula) |>
-        prepare_model(LINEAR_REG)
+    data |> define_model(formula) |> prepare_model(LINEAR_REG)
 }
 
 is_cld_anova = function(x) S7::S7_inherits(x, cld_anova)
@@ -65,10 +60,7 @@ test_that("anova() errors when models have different families", {
         update(family = binomial()) |>
         conclude()
 
-    expect_error(
-        anova(gaussian_mod, binomial_mod),
-        class = "rlang_error"
-    )
+    expect_error(anova(gaussian_mod, binomial_mod), class = "rlang_error")
     expect_error(
         anova(gaussian_mod, binomial_mod),
         regexp = "same error family"
@@ -88,14 +80,8 @@ test_that("anova() errors when models are fitted on different numbers of observa
         prepare_model(LINEAR_REG) |>
         conclude()
 
-    expect_error(
-        anova(mod1, mod2),
-        class = "rlang_error"
-    )
-    expect_error(
-        anova(mod1, mod2),
-        regexp = "same number of observations"
-    )
+    expect_error(anova(mod1, mod2), class = "rlang_error")
+    expect_error(anova(mod1, mod2), regexp = "same number of observations")
 })
 
 # ---- print(anova_lazy): Args line ----
@@ -114,10 +100,7 @@ test_that("print(anova_lazy) shows Args line when recalibrate_spec has args", {
 
 test_that("update() on multi_lazy applies args to all model_lazy models", {
     ml = mtcars |>
-        write_models(
-            null = am ~ 1,
-            main = am ~ wt
-        ) |>
+        write_models(null = am ~ 1, main = am ~ wt) |>
         prepare_model(GLM)
 
     updated = stats::update(ml, family = binomial())
@@ -128,10 +111,7 @@ test_that("update() on multi_lazy applies args to all model_lazy models", {
 
 test_that("update() on multi_lazy feeds correctly into anova()", {
     result = mtcars |>
-        write_models(
-            null = am ~ 1,
-            main = am ~ wt
-        ) |>
+        write_models(null = am ~ 1, main = am ~ wt) |>
         prepare_model(GLM) |>
         update(family = binomial()) |>
         anova(test = "LRT")
@@ -143,10 +123,7 @@ test_that("update() on multi_lazy feeds correctly into anova()", {
 
 test_that("update() on multi_lazy second call takes recalibrate_spec branch", {
     ml = mtcars |>
-        write_models(
-            null = am ~ 1,
-            main = am ~ wt
-        ) |>
+        write_models(null = am ~ 1, main = am ~ wt) |>
         prepare_model(GLM)
 
     once = stats::update(ml, family = binomial())
@@ -159,11 +136,7 @@ test_that("update() on multi_lazy second call takes recalibrate_spec branch", {
 # ---- write_models(): rel() var_id ----
 
 test_that("write_models() accepts rel() as var_id", {
-    em = mtcars |>
-        write_models(
-            m1 = rel(wt, mpg),
-            m2 = rel(hp, mpg)
-        )
+    em = mtcars |> write_models(m1 = rel(wt, mpg), m2 = rel(hp, mpg))
 
     expect_s7_class(em, expanded_model)
     expect_length(em@models, 2L)
@@ -172,10 +145,7 @@ test_that("write_models() accepts rel() as var_id", {
 
 test_that("write_models() with rel() feeds correctly into prepare_model()", {
     ml = mtcars |>
-        write_models(
-            m1 = rel(wt, mpg),
-            m2 = rel(hp, mpg)
-        ) |>
+        write_models(m1 = rel(wt, mpg), m2 = rel(hp, mpg)) |>
         prepare_model(LINEAR_REG)
 
     expect_s7_class(ml, multi_lazy)
@@ -184,10 +154,7 @@ test_that("write_models() with rel() feeds correctly into prepare_model()", {
 
 test_that("write_models() with rel() conclude() returns multi_exec", {
     me = mtcars |>
-        write_models(
-            m1 = rel(wt, mpg),
-            m2 = rel(hp, mpg)
-        ) |>
+        write_models(m1 = rel(wt, mpg), m2 = rel(hp, mpg)) |>
         prepare_model(LINEAR_REG) |>
         conclude()
 
@@ -200,11 +167,7 @@ test_that("write_models() with rel() conclude() returns multi_exec", {
 
 test_that("write_models() accepts mixed formula and rel() in one call", {
     em = mtcars |>
-        write_models(
-            null = mpg ~ 1,
-            m1 = rel(wt, mpg),
-            m2 = rel(hp, mpg)
-        )
+        write_models(null = mpg ~ 1, m1 = rel(wt, mpg), m2 = rel(hp, mpg))
 
     expect_s7_class(em, expanded_model)
     expect_length(em@models, 3L)
@@ -213,11 +176,7 @@ test_that("write_models() accepts mixed formula and rel() in one call", {
 
 test_that("write_models() mixed var_id types feed correctly into conclude()", {
     me = mtcars |>
-        write_models(
-            null = mpg ~ 1,
-            m1 = rel(wt, mpg),
-            m2 = rel(hp, mpg)
-        ) |>
+        write_models(null = mpg ~ 1, m1 = rel(wt, mpg), m2 = rel(hp, mpg)) |>
         prepare_model(LINEAR_REG) |>
         conclude()
 
@@ -228,11 +187,7 @@ test_that("write_models() mixed var_id types feed correctly into conclude()", {
 
 test_that("write_models() mixed var_id types each result is a cld_exec", {
     me = mtcars |>
-        write_models(
-            null = mpg ~ 1,
-            m1 = rel(wt, mpg),
-            m2 = rel(hp, mpg)
-        ) |>
+        write_models(null = mpg ~ 1, m1 = rel(wt, mpg), m2 = rel(hp, mpg)) |>
         prepare_model(LINEAR_REG) |>
         conclude()
 
@@ -245,10 +200,7 @@ test_that("write_models() mixed var_id types each result is a cld_exec", {
 
 test_that("write_models() feeds correctly into prepare_test()", {
     ml = mtcars |>
-        write_models(
-            by_am = x_by(mpg, am),
-            by_vs = x_by(mpg, vs)
-        ) |>
+        write_models(by_am = x_by(mpg, am), by_vs = x_by(mpg, vs)) |>
         prepare_test(TTEST)
 
     expect_s7_class(ml, multi_lazy)
@@ -258,10 +210,7 @@ test_that("write_models() feeds correctly into prepare_test()", {
 
 test_that("write_models() with prepare_test() conclude() returns multi_exec", {
     me = mtcars |>
-        write_models(
-            by_am = x_by(mpg, am),
-            by_vs = x_by(mpg, vs)
-        ) |>
+        write_models(by_am = x_by(mpg, am), by_vs = x_by(mpg, vs)) |>
         prepare_test(TTEST) |>
         conclude()
 
@@ -272,10 +221,7 @@ test_that("write_models() with prepare_test() conclude() returns multi_exec", {
 
 test_that("write_models() with prepare_test() each result is a cld_exec", {
     me = mtcars |>
-        write_models(
-            by_am = x_by(mpg, am),
-            by_vs = x_by(mpg, vs)
-        ) |>
+        write_models(by_am = x_by(mpg, am), by_vs = x_by(mpg, vs)) |>
         prepare_test(TTEST) |>
         conclude()
 

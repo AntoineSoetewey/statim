@@ -102,24 +102,21 @@ test_that("claim_args: returns a named list with claim_args class", {
 # ---- `map_claim` ----
 
 test_that("map_claim: errors when all arguments are unnamed", {
-    expect_error(
-        map_claim(function(claim, processed) 1),
-        class = "rlang_error"
-    )
+    expect_error(map_claim(function(claim, processed) 1), class = "rlang_error")
 })
 
 test_that("map_claim: errors when some arguments are unnamed", {
     expect_error(
-        map_claim(.mu = function(claim, processed) 0, function(claim, processed) 1),
+        map_claim(
+            .mu = function(claim, processed) 0,
+            function(claim, processed) 1
+        ),
         class = "rlang_error"
     )
 })
 
 test_that("map_claim: errors when an argument is not a function", {
-    expect_error(
-        map_claim(.mu = 5),
-        class = "rlang_error"
-    )
+    expect_error(map_claim(.mu = 5), class = "rlang_error")
 })
 
 test_that("map_claim: returns a function carrying the map_claim class", {
@@ -174,24 +171,30 @@ test_that("claim_scalar: errors when solving with a zero coefficient", {
 })
 
 test_that("claim_scalar: errors when no parameter term is found", {
-    claim = null_claim(lhs = 5, rhs = 3, op = "==", alt_op = "!=", expr = quote(5 == 3))
-    expect_error(
-        claim_scalar(claim),
-        regexp = "No population parameter"
+    claim = null_claim(
+        lhs = 5,
+        rhs = 3,
+        op = "==",
+        alt_op = "!=",
+        expr = quote(5 == 3)
     )
+    expect_error(claim_scalar(claim), regexp = "No population parameter")
 })
 
 test_that("claim_scalar: errors when more than one parameter term is found", {
     claim = parse_null_claim(rlang::quo(MU(extra) + MU(other) == 0))
-    expect_error(
-        claim_scalar(claim),
-        regexp = "single parameter"
-    )
+    expect_error(claim_scalar(claim), regexp = "single parameter")
 })
 
 test_that("claim_scalar: flips the operator when LHS contains only scalars", {
     p = MU(extra)
-    claim = null_claim(lhs = 5, rhs = p, op = "<", alt_op = ">=", expr = quote(5 < MU(extra)))
+    claim = null_claim(
+        lhs = 5,
+        rhs = p,
+        op = "<",
+        alt_op = ">=",
+        expr = quote(5 < MU(extra))
+    )
     result = claim_scalar(claim)
     expect_equal(result$op, ">=")
     expect_equal(result$scalar, -5)
@@ -210,18 +213,15 @@ test_that("claim_scalar: aborts on an unreducible term", {
         alt_op = "!=",
         expr = quote(x)
     )
-    expect_error(
-        claim_scalar(claim),
-        regexp = "Cannot reduce"
-    )
+    expect_error(claim_scalar(claim), regexp = "Cannot reduce")
 })
 
 # ---- `claim_contrast_coefs` ----
 
 test_that("claim_contrast_coefs: resolves two-group contrast coefficients", {
-    claim = parse_null_claim(
-        rlang::quo(2 * MU(extra, group == "1") - MU(extra, group == "2") == 4)
-    )
+    claim = parse_null_claim(rlang::quo(
+        2 * MU(extra, group == "1") - MU(extra, group == "2") == 4
+    ))
     result = claim_contrast_coefs(claim, filter = "given")
     expect_equal(unname(result$coefs[["1"]]), 2)
     expect_equal(unname(result$coefs[["2"]]), -1)
@@ -244,7 +244,13 @@ test_that("claim_contrast_coefs: extracts the coefficient through division", {
 })
 
 test_that("claim_contrast_coefs: errors when no parameter term is found", {
-    claim = null_claim(lhs = 5, rhs = 3, op = "==", alt_op = "!=", expr = quote(5 == 3))
+    claim = null_claim(
+        lhs = 5,
+        rhs = 3,
+        op = "==",
+        alt_op = "!=",
+        expr = quote(5 == 3)
+    )
     expect_error(
         claim_contrast_coefs(claim),
         regexp = "No population parameter"
@@ -253,26 +259,17 @@ test_that("claim_contrast_coefs: errors when no parameter term is found", {
 
 test_that("claim_contrast_coefs: rejects a parameter multiplied by a parameter", {
     claim = parse_null_claim(rlang::quo(MU(extra) * MU(other) == 0))
-    expect_error(
-        claim_contrast_coefs(claim),
-        regexp = "Non-linear hypothesis"
-    )
+    expect_error(claim_contrast_coefs(claim), regexp = "Non-linear hypothesis")
 })
 
 test_that("claim_contrast_coefs: rejects a parameter in the denominator", {
     claim = parse_null_claim(rlang::quo(5 / MU(extra) == 0))
-    expect_error(
-        claim_contrast_coefs(claim),
-        regexp = "denominator"
-    )
+    expect_error(claim_contrast_coefs(claim), regexp = "denominator")
 })
 
 test_that("claim_contrast_coefs: rejects a parameter raised to a power", {
     claim = parse_null_claim(rlang::quo(MU(extra)^2 == 0))
-    expect_error(
-        claim_contrast_coefs(claim),
-        regexp = "raised to a power"
-    )
+    expect_error(claim_contrast_coefs(claim), regexp = "raised to a power")
 })
 
 test_that("claim_contrast_coefs: errors when a required slot is missing (explicit filter)", {
@@ -285,26 +282,23 @@ test_that("claim_contrast_coefs: errors when a required slot is missing (explici
 
 test_that("claim_contrast_coefs: auto-detects the required slot when filter is NULL", {
     claim = parse_null_claim(rlang::quo(PI() == 0.5))
-    expect_error(
-        claim_contrast_coefs(claim),
-        regexp = "must specify"
-    )
+    expect_error(claim_contrast_coefs(claim), regexp = "must specify")
 })
 
 test_that("claim_contrast_coefs: warns when duplicate terms cancel to zero", {
-    claim = parse_null_claim(
-        rlang::quo(MU(extra, group == "1") - MU(extra, group == "1") == 0)
-    )
-    expect_warning(
-        claim_contrast_coefs(claim),
-        regexp = "cancelled out"
-    )
+    claim = parse_null_claim(rlang::quo(
+        MU(extra, group == "1") - MU(extra, group == "1") == 0
+    ))
+    expect_warning(claim_contrast_coefs(claim), regexp = "cancelled out")
 })
 
 test_that("claim_contrast_coefs: flips the operator when LHS contains only scalars", {
     p = MU(extra, group == "1")
     claim = null_claim(
-        lhs = 3, rhs = p, op = ">", alt_op = "<=",
+        lhs = 3,
+        rhs = p,
+        op = ">",
+        alt_op = "<=",
         expr = quote(3 > MU(extra, group == "1"))
     )
     result = claim_contrast_coefs(claim, filter = "given")
@@ -330,7 +324,10 @@ test_that("extract_param_name: MU with an == given returns the RHS value", {
 
 test_that("extract_param_name: MU with a non-== given returns the deparsed expression", {
     node = MU(extra, group %in% c("1", "2"))
-    expect_equal(extract_param_name(node), deparse(quote(group %in% c("1", "2"))))
+    expect_equal(
+        extract_param_name(node),
+        deparse(quote(group %in% c("1", "2")))
+    )
 })
 
 test_that("extract_param_name: errors for a non-param_obj node", {

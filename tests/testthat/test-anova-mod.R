@@ -9,16 +9,11 @@
 # write_models() expressions feeding into anova().
 
 pipeline_conclude = function(data, formula) {
-    data |>
-        define_model(formula) |>
-        prepare_model(LINEAR_REG) |>
-        conclude()
+    data |> define_model(formula) |> prepare_model(LINEAR_REG) |> conclude()
 }
 
 pipeline_lazy = function(data, formula) {
-    data |>
-        define_model(formula) |>
-        prepare_model(LINEAR_REG)
+    data |> define_model(formula) |> prepare_model(LINEAR_REG)
 }
 
 is_cld_anova = function(x) S7::S7_inherits(x, cld_anova)
@@ -54,10 +49,7 @@ test_that("anova() on model_lazy with multiple models matches cld_exec path", {
 test_that("anova() on model_lazy errors when a non-model_lazy argument is passed", {
     mod1 = pipeline_lazy(LifeCycleSavings, sr ~ 1)
 
-    expect_error(
-        anova(mod1, 42),
-        class = "rlang_error"
-    )
+    expect_error(anova(mod1, 42), class = "rlang_error")
 })
 
 test_that("anova() on model_lazy errors identify the offending argument position", {
@@ -65,10 +57,7 @@ test_that("anova() on model_lazy errors identify the offending argument position
     mod2 = pipeline_lazy(LifeCycleSavings, sr ~ pop15)
 
     # argument 3 (42) is not a model_lazy
-    expect_error(
-        anova(mod1, mod2, 42),
-        class = "rlang_error"
-    )
+    expect_error(anova(mod1, mod2, 42), class = "rlang_error")
 })
 
 # ---- anova(cld_exec, ...) with multiple cld_exec objects (3+) ----
@@ -92,10 +81,7 @@ test_that("anova() on cld_exec errors when any later argument is not cld_exec", 
     mod1 = pipeline_conclude(LifeCycleSavings, sr ~ 1)
     mod2 = pipeline_conclude(LifeCycleSavings, sr ~ pop15)
 
-    expect_error(
-        anova(mod1, mod2, "not a model"),
-        class = "rlang_error"
-    )
+    expect_error(anova(mod1, mod2, "not a model"), class = "rlang_error")
 })
 
 # ---- print(anova_lazy) ----
@@ -188,11 +174,7 @@ test_that("print() on cld_anova with method = 'default' uses stat_name only", {
         print_fn = NULL,
         name = "ANOVA",
         labels = character(0),
-        cld_meta = list(
-            stat_name = "ANOVA",
-            method = "default",
-            data_name = ""
-        )
+        cld_meta = list(stat_name = "ANOVA", method = "default", data_name = "")
     )
 
     out = capture.output(print(obj))
@@ -219,10 +201,7 @@ test_that("print() on cld_anova p_value styler colors small p-values", {
     # predictors on LifeCycleSavings produces p_value < 0.01 for at
     # least one row, exercising the cli::style_bold("<0.001") branch.
     result = LifeCycleSavings |>
-        write_models(
-            f1 = sr ~ 1,
-            f2 = sr ~ pop15 + pop75 + dpi + ddpi
-        ) |>
+        write_models(f1 = sr ~ 1, f2 = sr ~ pop15 + pop75 + dpi + ddpi) |>
         prepare_model(LINEAR_REG) |>
         anova()
 
@@ -246,10 +225,7 @@ test_that("anova() on binomial GLMs with test = 'F' switches to LRT with a messa
         update(family = binomial()) |>
         conclude()
 
-    expect_message(
-        result <- anova(mod1, mod2, test = "F"),
-        "Switching to LRT"
-    )
+    expect_message(result <- anova(mod1, mod2, test = "F"), "Switching to LRT")
 
     expect_true(is_cld_anova(result))
     expect_true("chisq_value" %in% names(result@data))
@@ -304,14 +280,8 @@ test_that("single-model anova() on a GLM errors because Type I is LM-only", {
         update(family = binomial()) |>
         conclude()
 
-    expect_error(
-        anova(glm_result),
-        class = "rlang_error"
-    )
-    expect_error(
-        anova(glm_result),
-        regexp = "class_lm_object"
-    )
+    expect_error(anova(glm_result), class = "rlang_error")
+    expect_error(anova(glm_result), regexp = "class_lm_object")
 })
 
 # ---- valid_tests() ----
@@ -320,19 +290,13 @@ test_that("anova() errors on an invalid test argument", {
     mod1 = pipeline_conclude(LifeCycleSavings, sr ~ 1)
     mod2 = pipeline_conclude(LifeCycleSavings, sr ~ pop15)
 
-    expect_error(
-        anova(mod1, mod2, test = "bogus"),
-        class = "rlang_error"
-    )
+    expect_error(anova(mod1, mod2, test = "bogus"), class = "rlang_error")
 })
 
 test_that("anova() errors on invalid test argument for single-model path too", {
     mod1 = pipeline_conclude(cars, dist ~ speed)
 
-    expect_error(
-        anova(mod1, test = "bogus"),
-        class = "rlang_error"
-    )
+    expect_error(anova(mod1, test = "bogus"), class = "rlang_error")
 })
 
 
@@ -342,21 +306,13 @@ test_that("anova() errors on invalid test argument for single-model path too", {
 # ---- print(expanded_model) ----
 
 test_that("print() on expanded_model runs without error and is invisible", {
-    em = LifeCycleSavings |>
-        write_models(
-            f1 = sr ~ 1,
-            f2 = sr ~ pop15
-        )
+    em = LifeCycleSavings |> write_models(f1 = sr ~ 1, f2 = sr ~ pop15)
 
     expect_invisible(print(em))
 })
 
 test_that("print() on expanded_model output includes model labels and formulas", {
-    em = LifeCycleSavings |>
-        write_models(
-            f1 = sr ~ 1,
-            f2 = sr ~ pop15
-        )
+    em = LifeCycleSavings |> write_models(f1 = sr ~ 1, f2 = sr ~ pop15)
 
     out = capture.output(print(em))
     full = paste(out, collapse = "\n")
@@ -370,10 +326,7 @@ test_that("print() on expanded_model output includes model labels and formulas",
 
 test_that("print() on multi_lazy runs without error and is invisible", {
     ml = LifeCycleSavings |>
-        write_models(
-            f1 = sr ~ 1,
-            f2 = sr ~ pop15
-        ) |>
+        write_models(f1 = sr ~ 1, f2 = sr ~ pop15) |>
         prepare_model(LINEAR_REG)
 
     expect_invisible(print(ml))
@@ -381,10 +334,7 @@ test_that("print() on multi_lazy runs without error and is invisible", {
 
 test_that("print() on multi_lazy output includes model labels", {
     ml = LifeCycleSavings |>
-        write_models(
-            f1 = sr ~ 1,
-            f2 = sr ~ pop15
-        ) |>
+        write_models(f1 = sr ~ 1, f2 = sr ~ pop15) |>
         prepare_model(LINEAR_REG)
 
     out = capture.output(print(ml))
@@ -398,11 +348,7 @@ test_that("print() on multi_lazy output includes model labels", {
 
 test_that("conclude() on multi_lazy returns a multi_exec", {
     me = LifeCycleSavings |>
-        write_models(
-            f1 = sr ~ 1,
-            f2 = sr ~ pop15,
-            f3 = sr ~ pop15 + pop75
-        ) |>
+        write_models(f1 = sr ~ 1, f2 = sr ~ pop15, f3 = sr ~ pop15 + pop75) |>
         prepare_model(LINEAR_REG) |>
         conclude()
 
@@ -413,10 +359,7 @@ test_that("conclude() on multi_lazy returns a multi_exec", {
 
 test_that("print() on multi_exec runs without error and is invisible", {
     me = LifeCycleSavings |>
-        write_models(
-            f1 = sr ~ 1,
-            f2 = sr ~ pop15
-        ) |>
+        write_models(f1 = sr ~ 1, f2 = sr ~ pop15) |>
         prepare_model(LINEAR_REG) |>
         conclude()
 
@@ -425,10 +368,7 @@ test_that("print() on multi_exec runs without error and is invisible", {
 
 test_that("print() on multi_exec output includes header with stat_name and labels", {
     me = LifeCycleSavings |>
-        write_models(
-            f1 = sr ~ 1,
-            f2 = sr ~ pop15
-        ) |>
+        write_models(f1 = sr ~ 1, f2 = sr ~ pop15) |>
         prepare_model(LINEAR_REG) |>
         conclude()
 
@@ -456,10 +396,7 @@ test_that("print() on multi_exec with a single model uses singular 'model'", {
 
 test_that("tidy() on multi_exec returns a tibble with model and outs columns", {
     me = LifeCycleSavings |>
-        write_models(
-            f1 = sr ~ 1,
-            f2 = sr ~ pop15
-        ) |>
+        write_models(f1 = sr ~ 1, f2 = sr ~ pop15) |>
         prepare_model(LINEAR_REG) |>
         conclude() |>
         tidy()
@@ -472,10 +409,7 @@ test_that("tidy() on multi_exec returns a tibble with model and outs columns", {
 
 test_that("tidy() on multi_exec each element of outs is itself a tibble", {
     me = LifeCycleSavings |>
-        write_models(
-            f1 = sr ~ 1,
-            f2 = sr ~ pop15
-        ) |>
+        write_models(f1 = sr ~ 1, f2 = sr ~ pop15) |>
         prepare_model(LINEAR_REG) |>
         conclude() |>
         tidy()
@@ -488,30 +422,21 @@ test_that("tidy() on multi_exec each element of outs is itself a tibble", {
 
 test_that("write_models() errors when any argument is unnamed", {
     expect_error(
-        LifeCycleSavings |>
-            write_models(
-                f1 = sr ~ 1,
-                sr ~ pop15
-            ),
+        LifeCycleSavings |> write_models(f1 = sr ~ 1, sr ~ pop15),
         class = "rlang_error"
     )
 })
 
 test_that("write_models() errors when all arguments are unnamed", {
     expect_error(
-        LifeCycleSavings |>
-            write_models(
-                sr ~ 1,
-                sr ~ pop15
-            ),
+        LifeCycleSavings |> write_models(sr ~ 1, sr ~ pop15),
         class = "rlang_error"
     )
 })
 
 test_that("write_models() error message mentions write_models", {
     expect_error(
-        LifeCycleSavings |>
-            write_models(sr ~ 1),
+        LifeCycleSavings |> write_models(sr ~ 1),
         regexp = "write_models"
     )
 })
@@ -522,8 +447,8 @@ test_that("write_models() supports update() chaining across named expressions", 
     em = LifeCycleSavings |>
         write_models(
             f1 = sr ~ 1,
-            f2 = update(f1, ~. + pop15),
-            f3 = update(f2, ~. + pop75)
+            f2 = update(f1, ~ . + pop15),
+            f3 = update(f2, ~ . + pop75)
         )
 
     expect_length(em@models, 3L)
@@ -537,8 +462,8 @@ test_that("write_models() with update() chaining feeds correctly into anova()", 
     result = LifeCycleSavings |>
         write_models(
             f1 = sr ~ 1,
-            f2 = update(f1, ~. + pop15),
-            f3 = update(f2, ~. + pop75)
+            f2 = update(f1, ~ . + pop15),
+            f3 = update(f2, ~ . + pop75)
         ) |>
         prepare_model(LINEAR_REG) |>
         anova()
@@ -548,16 +473,11 @@ test_that("write_models() with update() chaining feeds correctly into anova()", 
 })
 
 pipeline_conclude = function(data, formula) {
-    data |>
-        define_model(formula) |>
-        prepare_model(LINEAR_REG) |>
-        conclude()
+    data |> define_model(formula) |> prepare_model(LINEAR_REG) |> conclude()
 }
 
 pipeline_lazy = function(data, formula) {
-    data |>
-        define_model(formula) |>
-        prepare_model(LINEAR_REG)
+    data |> define_model(formula) |> prepare_model(LINEAR_REG)
 }
 
 is_cld_anova = function(x) S7::S7_inherits(x, cld_anova)
@@ -568,10 +488,7 @@ test_that("anova() warns when models have equal complexity", {
     mod1 = pipeline_conclude(mtcars, mpg ~ wt)
     mod2 = pipeline_conclude(mtcars, mpg ~ hp)
 
-    expect_warning(
-        anova(mod1, mod2),
-        regexp = "non-nested"
-    )
+    expect_warning(anova(mod1, mod2), regexp = "non-nested")
 })
 
 test_that("anova() with non-nested models still returns a cld_anova", {
@@ -607,10 +524,7 @@ test_that("anova() warns only for non-nested pairs, not nested ones", {
     mod2 = pipeline_conclude(mtcars, mpg ~ hp)
     mod3 = pipeline_conclude(mtcars, mpg ~ wt + hp)
 
-    expect_warning(
-        anova(mod1, mod2, mod3),
-        regexp = "non-nested"
-    )
+    expect_warning(anova(mod1, mod2, mod3), regexp = "non-nested")
 })
 
 test_that("anova() nested models produce no non-nested warning", {

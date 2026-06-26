@@ -36,9 +36,17 @@ test_that("TTEST formula result matches base R t.test()", {
 
     base = t.test(extra ~ group, data = sleep)
 
-    expect_equal(result@data$ttest[[1]]$statistic, base$statistic, tolerance = 1e-6)
+    expect_equal(
+        result@data$ttest[[1]]$statistic,
+        base$statistic,
+        tolerance = 1e-6
+    )
     expect_equal(result@data$ttest[[1]]$p.value, base$p.value, tolerance = 1e-6)
-    expect_equal(result@data$ttest[[1]]$conf.int, base$conf.int, tolerance = 1e-4)
+    expect_equal(
+        result@data$ttest[[1]]$conf.int,
+        base$conf.int,
+        tolerance = 1e-4
+    )
 })
 
 test_that("TTEST formula type field is 'two sample' for a grouping variable", {
@@ -118,7 +126,11 @@ test_that("TTEST formula one-sample matches base R t.test()", {
 
     base = t.test(sleep$extra)
 
-    expect_equal(result@data$ttest[[1]]$statistic, base$statistic, tolerance = 1e-6)
+    expect_equal(
+        result@data$ttest[[1]]$statistic,
+        base$statistic,
+        tolerance = 1e-6
+    )
     expect_equal(result@data$ttest[[1]]$p.value, base$p.value, tolerance = 1e-6)
 })
 
@@ -131,8 +143,12 @@ test_that("TTEST formula one-sample with .mu = 1 matches base R", {
 
     base = t.test(sleep$extra, mu = 1)
 
-    expect_equal(result@data$ttest[[1]]$statistic, base$statistic, tolerance = 1e-6)
-    expect_equal(result@data$ttest[[1]]$p.value,   base$p.value,   tolerance = 1e-6)
+    expect_equal(
+        result@data$ttest[[1]]$statistic,
+        base$statistic,
+        tolerance = 1e-6
+    )
+    expect_equal(result@data$ttest[[1]]$p.value, base$p.value, tolerance = 1e-6)
 })
 
 # TTEST formula — tidy() ---------------------------------------------------
@@ -154,7 +170,9 @@ test_that("tidy() on TTEST formula result has expected columns", {
         conclude() |>
         tidy()
 
-    expect_true(all(c("type", "groups", "statistic", "p.value") %in% names(result)))
+    expect_true(all(
+        c("type", "groups", "statistic", "p.value") %in% names(result)
+    ))
 })
 
 test_that("tidy() on TTEST formula result statistic matches base R", {

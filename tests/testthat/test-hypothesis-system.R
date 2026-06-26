@@ -1,8 +1,5 @@
 test_that("parse_null_claim: rejects non-relational top-level expression", {
-    expect_error(
-        parse_null_claim(rlang::quo(MU(x) + 1)),
-        class = "rlang_error"
-    )
+    expect_error(parse_null_claim(rlang::quo(MU(x) + 1)), class = "rlang_error")
 })
 
 test_that("parse_null_claim: rejects unsupported operator", {
@@ -56,10 +53,7 @@ test_that("parse_null_claim: parses arithmetic LHS", {
 })
 
 test_that("parse_null_claim: rejects non-param, non-numeric symbol", {
-    expect_error(
-        parse_null_claim(rlang::quo(foo == 0)),
-        class = "rlang_error"
-    )
+    expect_error(parse_null_claim(rlang::quo(foo == 0)), class = "rlang_error")
 })
 
 # ---- `<param_obj> constructors ----
@@ -150,11 +144,7 @@ test_that("parse_param_call MU: rejects more than two arguments", {
     expect_error(
         parse_param_call(
             MU(),
-            args = list(
-                quote(x),
-                quote(g == "1"),
-                quote(extra)
-            ),
+            args = list(quote(x), quote(g == "1"), quote(extra)),
             env = rlang::base_env()
         ),
         class = "rlang_error"
@@ -165,11 +155,7 @@ test_that("parse_param_call PI: rejects more than two arguments", {
     expect_error(
         parse_param_call(
             PI(),
-            args = list(
-                quote(x),
-                quote(g == "1"),
-                quote(extra)
-            ),
+            args = list(quote(x), quote(g == "1"), quote(extra)),
             env = rlang::base_env()
         ),
         class = "rlang_error"
@@ -178,13 +164,21 @@ test_that("parse_param_call PI: rejects more than two arguments", {
 
 test_that("parse_param_call RHO: rejects non-two arguments", {
     expect_error(
-        parse_param_call(RHO(x, y), args = list(quote(x)), env = rlang::base_env()),
+        parse_param_call(
+            RHO(x, y),
+            args = list(quote(x)),
+            env = rlang::base_env()
+        ),
         class = "rlang_error"
     )
 })
 
 test_that("parse_param_call PI: resolves x only", {
-    obj = parse_param_call(PI(), args = list(quote(success)), env = rlang::base_env())
+    obj = parse_param_call(
+        PI(),
+        args = list(quote(success)),
+        env = rlang::base_env()
+    )
     expect_equal(rlang::as_label(obj@x), "success")
     expect_null(obj@given)
 })
@@ -293,9 +287,7 @@ test_that("state_null: returns stated_null subclass", {
 # })
 
 test_that("state_null: errors when used without `prepare_test()` / `prepare_model()`", {
-    expect_error(
-        state_null(list(), MU(extra) == 0)
-    )
+    expect_error(state_null(list(), MU(extra) == 0))
 })
 
 # ---- Testing `<param_obj>` compatibility ----
@@ -373,9 +365,7 @@ test_that("validate_claim_vars x_by: accepts correct given reference", {
         sleep |>
             define_model(x_by(extra, group)) |>
             prepare_test(TTEST) |>
-            state_null(
-                2 * MU(extra, group == "1") >= MU(extra, group == "2")
-            )
+            state_null(2 * MU(extra, group == "1") >= MU(extra, group == "2"))
     )
 })
 
@@ -398,9 +388,11 @@ test_that("validate_claim_vars unknown var_id: passes through silently", {
 
 test_that("check_param_nodes: passes for correct references", {
     claim = parse_null_claim(rlang::quo(MU(extra) == 0))
-    expect_no_error(
-        check_param_nodes(claim, x_vars = "extra", by_vars = "group")
-    )
+    expect_no_error(check_param_nodes(
+        claim,
+        x_vars = "extra",
+        by_vars = "group"
+    ))
 })
 
 test_that("check_param_nodes: collects multiple errors in one abort", {
@@ -419,10 +411,13 @@ test_that("check_param_nodes: deduplicates identical errors across nodes", {
         class = "rlang_error"
     )
     # Two nodes, same error — should appear only once
-    expect_equal(lengths(regmatches(
-        conditionMessage(err),
-        gregexpr("Unknown variable", conditionMessage(err))
-    )), 1L)
+    expect_equal(
+        lengths(regmatches(
+            conditionMessage(err),
+            gregexpr("Unknown variable", conditionMessage(err))
+        )),
+        1L
+    )
 })
 
 test_that("validate_one_param_node MU: returns empty for valid references", {
@@ -455,26 +450,50 @@ test_that("validate_one_param_node unknown param_obj: returns empty", {
 # ---- Checking vars from `x` and `by` ----
 
 test_that("check_x_and_given: returns empty when both NULL", {
-    errs = check_x_and_given(NULL, NULL, x_vars = "extra", by_vars = "group", cls_name = "MU")
+    errs = check_x_and_given(
+        NULL,
+        NULL,
+        x_vars = "extra",
+        by_vars = "group",
+        cls_name = "MU"
+    )
     expect_equal(errs, character(0))
 })
 
 test_that("check_x_and_given: returns empty when x_vars and by_vars are NULL", {
     x_quo = rlang::quo(wrong)
-    errs = check_x_and_given(x_quo, NULL, x_vars = NULL, by_vars = NULL, cls_name = "MU")
+    errs = check_x_and_given(
+        x_quo,
+        NULL,
+        x_vars = NULL,
+        by_vars = NULL,
+        cls_name = "MU"
+    )
     expect_equal(errs, character(0))
 })
 
 test_that("check_x_and_given: catches bad x", {
     x_quo = rlang::quo(wrong)
-    errs = check_x_and_given(x_quo, NULL, x_vars = "extra", by_vars = NULL, cls_name = "MU")
+    errs = check_x_and_given(
+        x_quo,
+        NULL,
+        x_vars = "extra",
+        by_vars = NULL,
+        cls_name = "MU"
+    )
     expect_length(errs, 1L)
     expect_match(errs, "Unknown variable")
 })
 
 test_that("check_x_and_given: catches bad given", {
     given_quo = rlang::quo(wrong == "1")
-    errs = check_x_and_given(NULL, given_quo, x_vars = NULL, by_vars = "group", cls_name = "MU")
+    errs = check_x_and_given(
+        NULL,
+        given_quo,
+        x_vars = NULL,
+        by_vars = "group",
+        cls_name = "MU"
+    )
     expect_length(errs, 1L)
     expect_match(errs, "Unknown grouping variable")
 })
@@ -482,13 +501,25 @@ test_that("check_x_and_given: catches bad given", {
 test_that("check_x_and_given: catches both bad x and bad given", {
     x_quo = rlang::quo(wrong)
     given_quo = rlang::quo(bad == "1")
-    errs = check_x_and_given(x_quo, given_quo, x_vars = "extra", by_vars = "group", cls_name = "MU")
+    errs = check_x_and_given(
+        x_quo,
+        given_quo,
+        x_vars = "extra",
+        by_vars = "group",
+        cls_name = "MU"
+    )
     expect_length(errs, 2L)
 })
 
 test_that("check_x_and_given: ignores given with non-== predicate", {
     given_quo = rlang::quo(group %in% c("1", "2"))
-    errs = check_x_and_given(NULL, given_quo, x_vars = NULL, by_vars = "group", cls_name = "MU")
+    errs = check_x_and_given(
+        NULL,
+        given_quo,
+        x_vars = NULL,
+        by_vars = "group",
+        cls_name = "MU"
+    )
     expect_equal(errs, character(0))
 })
 
@@ -512,13 +543,11 @@ test_that("validate_claim_vars rel: rejects an unknown variable", {
 
 test_that("validate_claim_vars rel: accepts a known x or response variable", {
     claim = parse_null_claim(rlang::quo(MU(mpg) == 0))
-    expect_no_error(
-        validate_claim_vars(
-            rel(mpg, wt),
-            processed = list(x_data = list(wt = 1), resp_data = list(mpg = 1)),
-            claims = claim
-        )
-    )
+    expect_no_error(validate_claim_vars(
+        rel(mpg, wt),
+        processed = list(x_data = list(wt = 1), resp_data = list(mpg = 1)),
+        claims = claim
+    ))
 })
 
 test_that("validate_claim_vars pairwise: rejects an unknown variable", {
@@ -536,19 +565,21 @@ test_that("validate_claim_vars pairwise: rejects an unknown variable", {
 
 test_that("validate_claim_vars pairwise: accepts a known variable", {
     claim = parse_null_claim(rlang::quo(MU(Sepal.Length) == 0))
-    expect_no_error(
-        validate_claim_vars(
-            pairwise(Sepal.Length, Sepal.Width),
-            processed = list(var_names = c("Sepal.Length", "Sepal.Width")),
-            claims = claim
-        )
-    )
+    expect_no_error(validate_claim_vars(
+        pairwise(Sepal.Length, Sepal.Width),
+        processed = list(var_names = c("Sepal.Length", "Sepal.Width")),
+        claims = claim
+    ))
 })
 
 test_that("validate_claim_vars formula: rejects an unknown variable", {
     claim = parse_null_claim(rlang::quo(MU(wrong) == 0))
     expect_error(
-        validate_claim_vars(mpg ~ wt, processed = list(vars = c("mpg", "wt")), claims = claim),
+        validate_claim_vars(
+            mpg ~ wt,
+            processed = list(vars = c("mpg", "wt")),
+            claims = claim
+        ),
         regexp = "Unknown variable",
         class = "rlang_error"
     )
@@ -556,14 +587,18 @@ test_that("validate_claim_vars formula: rejects an unknown variable", {
 
 test_that("validate_claim_vars formula: accepts a known variable", {
     claim = parse_null_claim(rlang::quo(MU(wt) == 0))
-    expect_no_error(
-        validate_claim_vars(mpg ~ wt, processed = list(vars = c("mpg", "wt")), claims = claim)
-    )
+    expect_no_error(validate_claim_vars(
+        mpg ~ wt,
+        processed = list(vars = c("mpg", "wt")),
+        claims = claim
+    ))
 })
 
 test_that("validate_claim_vars prop: passes through without validation", {
     claim = parse_null_claim(rlang::quo(PI() == 0.5))
-    expect_no_error(
-        validate_claim_vars(prop(45, 100), processed = list(), claims = claim)
-    )
+    expect_no_error(validate_claim_vars(
+        prop(45, 100),
+        processed = list(),
+        claims = claim
+    ))
 })

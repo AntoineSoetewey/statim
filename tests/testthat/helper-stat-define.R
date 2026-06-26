@@ -1,10 +1,8 @@
 make_trivial_impl = function() {
     agendas(
-        base = baseline(
-            fn = function(.proc, .value = 1) {
-                list(value = .value)
-            }
-        )
+        base = baseline(fn = function(.proc, .value = 1) {
+            list(value = .value)
+        })
     )
 }
 

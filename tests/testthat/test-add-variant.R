@@ -1,15 +1,13 @@
-simple_variant = variant(
-    fn = function(.proc, .n = 100L) {
-        x = .proc$x_data[[1]]
-        group_data = .proc$group_data
+simple_variant = variant(fn = function(.proc, .n = 100L) {
+    x = .proc$x_data[[1]]
+    group_data = .proc$group_data
 
-        grp = as.character(group_data[[1]])
-        lvls = unique(grp)
-        x1 = x[grp == lvls[[1]]]
-        x2 = x[grp == lvls[[2]]]
-        list(diff = mean(x1) - mean(x2), n = .n)
-    }
-)
+    grp = as.character(group_data[[1]])
+    lvls = unique(grp)
+    x1 = x[grp == lvls[[1]]]
+    x2 = x[grp == lvls[[2]]]
+    list(diff = mean(x1) - mean(x2), n = .n)
+})
 
 test_that("add_variant %<-% registers variant into registry", {
     add_variant(TTEST, x_by, "test_simple") %<-% simple_variant
@@ -51,9 +49,7 @@ test_that("add_variant %<-% silently replaces existing user variant", {
     on.exit(remove_variant(TTEST, x_by, "test_simple"))
 
     replacement = variant(fn = function(.proc) list(replaced = TRUE))
-    expect_no_error(
-        add_variant(TTEST, x_by, "test_simple") %<-% replacement
-    )
+    expect_no_error(add_variant(TTEST, x_by, "test_simple") %<-% replacement)
 
     # key = variant_registry_key("ttest", "x_by")
     # entry = variant_registry[[key]][["test_simple"]]
@@ -105,10 +101,7 @@ test_that("remove_variant errors on unregistered name", {
 })
 
 test_that("remove_variant errors on 'default' name", {
-    expect_error(
-        remove_variant(TTEST, x_by, "default"),
-        class = "rlang_error"
-    )
+    expect_error(remove_variant(TTEST, x_by, "default"), class = "rlang_error")
 })
 
 test_that("remove_variant errors on package-scoped variant", {

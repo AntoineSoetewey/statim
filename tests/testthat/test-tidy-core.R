@@ -1,29 +1,25 @@
 PLAIN_TEST = HTEST_FN(
     cls = "plain_test",
-    defs = list(
-        test_define(
-            model_type = prop,
-            impl = agendas(
-                base = baseline(
-                    fn = function(.proc, .p = 0.5) {
-                        list(x = .proc$x, n = .proc$n, p = .p)
-                    }
-                ),
-                with_p = variant(
-                    fn = function(.proc, .p = 0.5) {
-                        list(x = .proc$x, n = .proc$n, p = .p)
-                    }
-                )
-            ),
-            compatible_params = list(PI)
-        )
-    ),
+    defs = list(test_define(
+        model_type = prop,
+        impl = agendas(
+            base = baseline(fn = function(.proc, .p = 0.5) {
+                list(x = .proc$x, n = .proc$n, p = .p)
+            }),
+            with_p = variant(fn = function(.proc, .p = 0.5) {
+                list(x = .proc$x, n = .proc$n, p = .p)
+            })
+        ),
+        compatible_params = list(PI)
+    )),
     .name = "Plain Test"
 )
 
 plain_pipeline = function(variant_name = NULL) {
     p = define_model(prop(45, 100)) |> prepare_test(PLAIN_TEST)
-    if (!is.null(variant_name)) p = via(p, variant_name)
+    if (!is.null(variant_name)) {
+        p = via(p, variant_name)
+    }
     conclude(p)
 }
 
@@ -54,12 +50,11 @@ test_that("tidy() errors when no registry entry exists for a plain-return stat",
 
 test_that("tidy() errors when the variant name has no making_tidy entry", {
     # Register default only — no "with_p" variant in the tidy registry.
-    making_tidy(PLAIN_TEST, prop) %<-% method_tidy(
-        default = function(.x, ...) {
+    making_tidy(PLAIN_TEST, prop) %<-%
+        method_tidy(default = function(.x, ...) {
             d = .x@data
             tibble::tibble(x = d$x, n = d$n, p = d$p)
-        }
-    )
+        })
 
     exec = plain_pipeline(variant_name = "with_p")
 
@@ -96,9 +91,8 @@ test_that("making_tidy() errors when obj has no cls attribute", {
     raw_fn = function() NULL
 
     expect_error(
-        making_tidy(raw_fn, prop) %<-% method_tidy(
-            default = function(.x, ...) tibble::tibble()
-        ),
+        making_tidy(raw_fn, prop) %<-%
+            method_tidy(default = function(.x, ...) tibble::tibble()),
         regexp = "`obj` must be a function built with",
         class = "rlang_error"
     )
@@ -106,9 +100,8 @@ test_that("making_tidy() errors when obj has no cls attribute", {
 
 test_that("making_tidy() errors when model_type is not a var_id subclass or class_formula", {
     expect_error(
-        making_tidy(P_TEST, list()) %<-% method_tidy(
-            default = function(.x, ...) tibble::tibble()
-        ),
+        making_tidy(P_TEST, list()) %<-%
+            method_tidy(default = function(.x, ...) tibble::tibble()),
         regexp = "must be a class inheriting from",
         class = "rlang_error"
     )

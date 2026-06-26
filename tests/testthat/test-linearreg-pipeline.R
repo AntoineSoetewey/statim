@@ -6,27 +6,24 @@ test_that("lm_to_lm_object() returns a class_lm_object from a fitted lm", {
 })
 
 test_that("lm_to_lm_object() errors on non-lm input", {
-    expect_error(
-        lm_to_lm_object(list(x = 1)),
-        class = "rlang_error"
-    )
+    expect_error(lm_to_lm_object(list(x = 1)), class = "rlang_error")
 })
 
 test_that("lm_to_lm_object() coefficients df has correct columns", {
     fit = lm(dist ~ speed, data = cars)
     obj = lm_to_lm_object(fit)
 
-    expect_named(obj@coefficients, c("term", "estimate", "std_error", "statistic", "p_value"))
+    expect_named(
+        obj@coefficients,
+        c("term", "estimate", "std_error", "statistic", "p_value")
+    )
 })
 
 test_that("lm_to_lm_object() fit_summary has correct columns", {
     fit = lm(dist ~ speed, data = cars)
     obj = lm_to_lm_object(fit)
 
-    expect_named(
-        obj@fit_summary,
-        c("statistic", "value")
-    )
+    expect_named(obj@fit_summary, c("statistic", "value"))
 })
 
 test_that("lm_to_lm_object() residuals match base lm residuals", {
@@ -105,7 +102,9 @@ test_that("`{statim}` pipeline matches base lm() r_squared", {
     # expect_equal(result@data@fit_summary$r_squared, base$r.squared, tolerance = 1e-8)
 
     base = lm(dist ~ speed, data = cars) |> summary()
-    r2 = result@data@fit_summary$value[result@data@fit_summary$statistic == "R Squared"]
+    r2 = result@data@fit_summary$value[
+        result@data@fit_summary$statistic == "R Squared"
+    ]
     expect_equal(r2, base$r.squared, tolerance = 1e-4)
 })
 

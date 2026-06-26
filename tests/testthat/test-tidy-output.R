@@ -72,15 +72,16 @@ test_that("tidy() errors when no method registered for variant", {
 })
 
 test_that("making_tidy %<-% registers tidy method for new variant", {
-    simple_variant = variant(fn = function(.proc) list(diff = mean(.proc$x_data[[1]], na.rm = TRUE)))
+    simple_variant = variant(fn = function(.proc) {
+        list(diff = mean(.proc$x_data[[1]], na.rm = TRUE))
+    })
     add_variant(TTEST, x_by, "test_tidy_reg") %<-% simple_variant
     on.exit(remove_variant(TTEST, x_by, "test_tidy_reg"))
 
-    making_tidy(TTEST, x_by) %<-% method_tidy(
-        test_tidy_reg = function(.x, ...) {
+    making_tidy(TTEST, x_by) %<-%
+        method_tidy(test_tidy_reg = function(.x, ...) {
             tibble::tibble(diff = .x@data$diff)
-        }
-    )
+        })
 
     result = sleep |>
         define_model(extra %by% group) |>
@@ -96,12 +97,15 @@ test_that("making_tidy %<-% registers tidy method for new variant", {
 test_that("making_tidy %<-% merges variants without overwriting existing ones", {
     key = tidy_registry_key("ttest_x_by")
     existing = register_tidy[[key]]
-    on.exit({ register_tidy[[key]] = existing })
+    on.exit({
+        register_tidy[[key]] = existing
+    })
 
-    making_tidy(TTEST, x_by) %<-% method_tidy(
-        default = function(.x, ...) tibble::tibble(merged = TRUE),
-        test_merge = function(.x, ...) tibble::tibble(merged = TRUE)
-    )
+    making_tidy(TTEST, x_by) %<-%
+        method_tidy(
+            default = function(.x, ...) tibble::tibble(merged = TRUE),
+            test_merge = function(.x, ...) tibble::tibble(merged = TRUE)
+        )
 
     updated = register_tidy[[key]]
     expect_false(is.null(updated@variants[["test_merge"]]))
