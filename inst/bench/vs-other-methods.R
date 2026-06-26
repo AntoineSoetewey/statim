@@ -3,10 +3,7 @@
 # Case: n = 1,000,000
 
 box::use(
-    statim[
-        define_model, `%by%`, TTEST, prepare,
-        state_null, via, conclude
-    ],
+    statim[define_model, `%by%`, TTEST, prepare, state_null, via, conclude],
     infer[specify, hypothesize, calculate, t_test1 = t_test],
     stats[t.test],
     dplyr[slice_sample],

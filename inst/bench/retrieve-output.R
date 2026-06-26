@@ -4,8 +4,15 @@
 
 box::use(
     statim[
-        define_model, `%by%`, TTEST, prepare_test,
-        state_null, via, conclude, auto_tidy, tidy
+        define_model,
+        `%by%`,
+        TTEST,
+        prepare_test,
+        state_null,
+        via,
+        conclude,
+        auto_tidy,
+        tidy
     ],
     dplyr[slice_sample]
 )
