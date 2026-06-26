@@ -13,9 +13,10 @@ vignette: |
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>"
+    collapse = FALSE,
+    comment = ""
 )
+fansi::set_knit_hooks(knitr::knit_hooks)
 library(statim)
 ```
 
@@ -25,19 +26,20 @@ When you fit a linear model with `{statim}`, the model is a `class_lm_object` st
 
 `{statim}` supports two distinct ANOVA questions:
 
-- **Single model (Type I)**: how much does each predictor reduce residual variance, in the order the terms were added? One row per term, plus a Residuals row.
-- **Multiple models (incremental F or LRT)**: is the extra complexity of a larger model justified over a simpler nested model? One row per model.
+1.  **Single model (Type I)**: how much does each predictor reduce residual variance, in the order the terms were added? One row per term, plus a Residuals row.
+
+2.  **Multiple models (incremental F or LRT)**: is the extra complexity of a larger model justified over a simpler nested model? One row per model.
 
 Both questions are answered by the same `anova()` generic, dispatched on whatever object you hand it.
 
 ## Single model: Type I ANOVA
 
-The pipeline follows the standard declarative grammar. Here the `cars` dataset is used, which ships with base R: `speed` predicts stopping `dist`.
+The code below follows the standard declarative grammar. Here the `cars` dataset is used, which ships with base R: `speed` predicts stopping `dist`.
 
 ### Define and fit
 
 ```{r}
-result = cars |>
+cars_lr = cars |>
     define_model(dist ~ speed) |>
     prepare_model(LINEAR_REG) |>
     conclude()
@@ -48,7 +50,7 @@ result = cars |>
 ### Run the ANOVA
 
 ```{r}
-anova(result)
+anova(cars_lr)
 ```
 
 The returned `cld_anova` prints the full Type I table. The final row is always Residuals, with `f_value` and `p_value` set to `NA`. A small p-value for `speed` says that adding `speed` to the intercept-only model significantly reduced the residual variance.
@@ -58,7 +60,7 @@ The returned `cld_anova` prints the full Type I table. The final row is always R
 `tidy()` takes the `cld_exec` returned by `conclude()` and extracts a tibble of primary results. For a `LINEAR_REG` model, that tibble is the coefficient table: one row per term, with columns `term`, `estimate`, `std_error`, `statistic`, and `p_value`.
 
 ```{r}
-result |> tidy()
+cars_lr |> tidy()
 ```
 
 This is the programmatic form of the Coefficients section that `print()` displays. Using `tidy()` is useful when you need the estimates downstream, for example to filter significant terms, pass them to another function, or bind rows across multiple models.
@@ -74,7 +76,7 @@ cars |>
     anova()
 ```
 
-The printed result is identical.
+The out is identical as above.
 
 ## Multiple models: incremental F-test
 
@@ -163,7 +165,7 @@ LifeCycleSavings |>
 
 For non-Gaussian families, `anova()` performs a likelihood ratio test (LRT) and reports a chi-squared statistic instead of an F-statistic. Pass `test = "LRT"` explicitly; `"F"` is not meaningful for GLMs.
 
-Supply the family directly to `prepare_model()` — it is forwarded to every model in the pipeline:
+Supply the family directly to `prepare_model()`. It is forwarded to every model in the pipeline:
 
 ```{r}
 mtcars |>
