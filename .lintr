@@ -1,0 +1,6 @@
+linters: {
+    list(
+        assignment_linter = lintr::assignment_linter(operator = "=")
+    )
+  }
+exclusions: list("vignettes", "tests")
