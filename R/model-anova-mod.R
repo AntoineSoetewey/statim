@@ -382,6 +382,10 @@ S7::method(print, cld_anova) = function(x, ...) {
     invisible(x)
 }
 
+S7::method(tidy, cld_anova) = function(.x, ...) {
+    .x@data
+}
+
 valid_tests = function(test) {
     valid = c("F", "LRT", "Chisq")
     if (!test %in% valid) {
