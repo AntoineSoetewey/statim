@@ -45,7 +45,10 @@ Suggests:
     boot,
     knitr,
     fansi,
-    lintr
+    lintr,
+    box,
+    rstatix,
+    readr
 Collate:
     'statim-package.R'
     'ops.R'
