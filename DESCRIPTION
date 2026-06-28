@@ -48,7 +48,8 @@ Suggests:
     lintr,
     box,
     rstatix,
-    readr
+    readr,
+    withr
 Collate:
     'statim-package.R'
     'ops.R'
