@@ -40,12 +40,20 @@
 #' @seealso [tidy()], [making_tidy()], [method_tidy()], [class_stat_infer]
 #'
 #' @export
-auto_tidy = S7::new_generic("auto_tidy", "x")
+auto_tidy = S7::new_generic("auto_tidy", "x", fun = function(x, ...) {
+    if (!is_class_stat_infer(x)) {
+        cli::cli_abort(c(
+            "{.arg x} must inherit {.cls class_stat_infer}.",
+            "x" = "Got {.cls {class(x)[[1]]}}."
+        ))
+    }
+    S7::S7_dispatch()
+})
 
 S7::method(auto_tidy, class_stat_infer) = function(x, ...) {
     cli::cli_abort(c(
         "No {.fn auto_tidy} method for {.cls {class(x)[[1]]}}.",
-        "i" = "Implement {.fn auto_tidy} on your different {<{.cls class_stat_infer}>} class."
+        "i" = "Implement {.fn auto_tidy} on your {.cls {class(x)[[1]]}} class."
     ))
 }
 
