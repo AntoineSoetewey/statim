@@ -59,3 +59,5 @@
 #'
 #' @export
 class_stat_infer = S7::new_class("stat_infer", abstract = TRUE)
+
+is_class_stat_infer = function(x) S7::S7_inherits(x, class_stat_infer)

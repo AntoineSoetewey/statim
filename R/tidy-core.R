@@ -37,7 +37,7 @@
 tidy = S7::new_generic("tidy", ".x")
 
 S7::method(tidy, cld_exec) = function(.x, ...) {
-    if (S7::S7_inherits(.x@data, class_stat_infer)) {
+    if (is_class_stat_infer(.x@data)) {
         return(auto_tidy(.x@data, ...))
     }
 
