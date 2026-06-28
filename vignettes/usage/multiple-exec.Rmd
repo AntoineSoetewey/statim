@@ -1,13 +1,68 @@
 ---
-title: "Multiple executions in a single line"
+title: "Applications of multiple model layouts with `write_models()`"
 subtitle: "Definitive guide"
-description: "A guide on using statim R package"
+description: > 
+    "A guide on using statim R package"
 output: 
     rmarkdown::html_vignette:
         toc: true
 vignette: |
-    %\VignetteIndexEntry{Multiple executions in a single line}
+    %\VignetteIndexEntry{Applications of multiple model layouts}
     %\VignetteEngine{knitr::rmarkdown}
     \usepackage[utf8]{inputenc}
 ---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = FALSE,
+    comment = ""
+)
+fansi::set_knit_hooks(knitr::knit_hooks)
+```
+
+## The Convenience of `write_models()`
+
+The `write_models()` function is good at its job. It handles multiple `<var_id>` object layouts or mappers, and you can perform:
+
+1.  Multiple executions
+2.  ANOVA models
+3.  Comparison between models (soon)
+
+These mappers must share the same `<STAT_FN>` estimation method, else the execution will be aborted. 
+
+## How to load
+
+Just like this [vignette](./htest.html), let us use the usual workflow of `{statim}`'s author in his daily basis on statistical analysis, where `{box}` is a main tool to handle code reusability and package imports.
+
+```{r}
+box::use(
+    statim[
+        write_models, prepare, anova, conclude, via, 
+        TTEST, CORTEST, LINEAR_REG, anova,
+        x_by, rel, pairwise
+    ]
+)
+```
+
+
+```{r}
+iris |> 
+    write_models(
+        mod1 = rel(Sepal.Length, Petal.Width), 
+        mod2 = pairwise(where(is.numeric))
+    )
+```
+
+```{r}
+mtcars |> 
+    write_models(
+        f1 = mpg ~ 1, 
+        f2 = update(f1, ~ . + disp),
+        f3 = update(f2, ~ . + hp),
+        f4 = update(f3, ~ . + drat), 
+        f5 = update(f4, ~ . + wt)
+    ) |> 
+    prepare(LINEAR_REG) |> 
+    anova()
+```
 
