@@ -23,22 +23,67 @@ plain_pipeline = function(variant_name = NULL) {
     conclude(p)
 }
 
-test_that("tidy() dispatches auto_tidy() for class_stat_infer results", {
+register_plain_tidy = function() {
+    making_tidy(PLAIN_TEST, prop) %<-%
+        method_tidy(default = function(.x, ...) {
+            d = .x@data
+            tibble::tibble(x = d$x, n = d$n, p = d$p)
+        })
+}
+
+# ---- auto_tidy() guard ----
+
+test_that("auto_tidy() errors on non-class_stat_infer input", {
+    expect_error(
+        auto_tidy(list(x = 1)),
+        regexp = "`x` must inherit",
+        class = "rlang_error"
+    )
+    expect_error(
+        auto_tidy(data.frame(x = 1)),
+        regexp = "Got <data.frame>",
+        class = "rlang_error"
+    )
+})
+
+test_that("auto_tidy() errors with no registered method on bare class_stat_infer subclass", {
+    bare = S7::new_class("bare_infer", parent = class_stat_infer)
+    expect_error(
+        auto_tidy(bare()),
+        regexp = "No.*auto_tidy.*method",
+        class = "rlang_error"
+    )
+})
+
+# ---- tidy() -> auto_tidy() dispatch --------
+
+test_that("tidy() dispatches auto_tidy() for class_stat_infer and returns correct shape", {
     out = define_model(prop(45, 100)) |>
         prepare_test(P_TEST) |>
         conclude() |>
         tidy()
 
     expect_s3_class(out, "tbl_df")
-    expect_true("statistic" %in% names(out))
-    expect_true("p_val" %in% names(out))
+    expect_equal(nrow(out), 1L)
+    expect_named(
+        out,
+        c(
+            "successes",
+            "total",
+            "true_p",
+            "estimate",
+            "statistic",
+            "p_val",
+            "lower_95",
+            "upper_95"
+        )
+    )
 })
 
-# ── no making_tidy entry (lines 70–73) ───────────────────────────────────────
+# ---- no making_tidy entry ----
 
 test_that("tidy() errors when no registry entry exists for a plain-return stat", {
     exec = plain_pipeline()
-
     expect_error(
         tidy(exec),
         regexp = "No tidy method found",
@@ -46,26 +91,21 @@ test_that("tidy() errors when no registry entry exists for a plain-return stat",
     )
 })
 
-# ── variant name absent in registry (lines 79–81) ────────────────────────────
+# ---- variant name absent in registry ----
 
 test_that("tidy() errors when the variant name has no making_tidy entry", {
-    # Register default only — no "with_p" variant in the tidy registry.
-    making_tidy(PLAIN_TEST, prop) %<-%
-        method_tidy(default = function(.x, ...) {
-            d = .x@data
-            tibble::tibble(x = d$x, n = d$n, p = d$p)
-        })
-
-    exec = plain_pipeline(variant_name = "with_p")
-
-    expect_error(
-        tidy(exec),
-        regexp = "No tidy entry for variant",
-        class = "rlang_error"
-    )
+    withr::with_environment(new.env(parent = emptyenv()), {
+        register_plain_tidy()
+        exec = plain_pipeline(variant_name = "with_p")
+        expect_error(
+            tidy(exec),
+            regexp = "No tidy entry for variant",
+            class = "rlang_error"
+        )
+    })
 })
 
-# ── method_tidy() constructor errors (lines 131–132, 136–137, 144) ───────────
+# ---- method_tidy() constructor ----
 
 test_that("method_tidy() errors when default is not a function", {
     expect_error(
@@ -77,7 +117,6 @@ test_that("method_tidy() errors when default is not a function", {
 
 test_that("method_tidy() errors when a variant entry is not a function", {
     good_fn = function(.x, ...) tibble::tibble()
-
     expect_error(
         method_tidy(default = good_fn, bad_variant = "not_a_function"),
         regexp = "All variant entries must be functions",
@@ -85,11 +124,10 @@ test_that("method_tidy() errors when a variant entry is not a function", {
     )
 })
 
-# ── making_tidy_register() validation (lines 178, 182–183, 187) ──────────────
+# ---- making_tidy_register() validation ----
 
 test_that("making_tidy() errors when obj has no cls attribute", {
     raw_fn = function() NULL
-
     expect_error(
         making_tidy(raw_fn, prop) %<-%
             method_tidy(default = function(.x, ...) tibble::tibble()),
