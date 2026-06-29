@@ -51,7 +51,7 @@ reference:
     - rel
     - pairwise
     - prop
-    - each
+    - on
 
   - subtitle: Statistical Inference Parameterization
     desc: Verbs used for preparing and parameterize the equation of statistical inference
