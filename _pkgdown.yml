@@ -135,8 +135,9 @@ reference:
     desc: With different implementation but the same class, the methods, e.g. `tidy()`, will be shareable
     contents:
     - class_stat_infer
-    - class_ttest_pairwise
+    - class_ttest_one
     - class_ttest_two
+    - class_ttest_pairwise
     - class_p_test
     - class_corr_two
     - class_lm_object
