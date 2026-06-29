@@ -79,7 +79,12 @@
 #' @export
 TTEST = HTEST_FN(
     cls = "ttest",
-    defs = list(ttest_def_on, ttest_def_two, ttest_def_formula, ttest_def_pairwise),
+    defs = list(
+        ttest_def_on,
+        ttest_def_two,
+        ttest_def_formula,
+        ttest_def_pairwise
+    ),
     .name = "T-Test"
 )
 
