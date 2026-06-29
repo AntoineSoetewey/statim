@@ -310,6 +310,19 @@ test_that("model_processor() for formula resolves variables from environment whe
     expect_equal(result$data$extra, extra)
 })
 
+test_that("model_processor() for on() returns data and block_data", {
+    proc = model_processor(on(extra), sleep)
+
+    expect_named(proc, c("data", "block_data"))
+    expect_equal(proc$data$extra, sleep$extra)
+})
+
+test_that("model_processor() for on() without .block has NULL block_data", {
+    proc = model_processor(on(extra), sleep)
+
+    expect_null(proc$block_data)
+})
+
 # ---- vars_preview + format_quo_label ----
 # This is only used to display info from `var_id` objects
 
@@ -341,4 +354,49 @@ test_that("format_quo_label() returns '<inline>' for I()", {
 test_that("format_quo_label() returns '<inlines>' for inlines()", {
     quo = rlang::quo(inlines(rnorm(10), rnorm(10)))
     expect_equal(format_quo_label(quo), "<inlines>")
+})
+
+# ---- multiple_vars_extract() ----
+
+test_that("multiple_vars_extract() returns data and block_data", {
+    m = on(extra)
+    proc = multiple_vars_extract(m, sleep)
+
+    expect_named(proc, c("data", "block_data"))
+})
+
+test_that("multiple_vars_extract() single variable extracts correct column", {
+    m = on(extra)
+    proc = multiple_vars_extract(m, sleep)
+
+    expect_equal(proc$data$extra, sleep$extra)
+    expect_null(proc$block_data)
+})
+
+test_that("multiple_vars_extract() multiple variables extracts all columns", {
+    df = data.frame(a = 1:10, b = 11:20, c = 21:30)
+    proc = multiple_vars_extract(on(a, b, c), df)
+
+    expect_equal(ncol(proc$data), 3)
+    expect_named(proc$data, c("a", "b", "c"))
+    expect_null(proc$block_data)
+})
+
+test_that("multiple_vars_extract() with .block extracts block_data separately", {
+    df = data.frame(
+        pre = c(10, 12, 9),
+        post = c(11, 14, 10),
+        subject = c("s1", "s2", "s3")
+    )
+    proc = multiple_vars_extract(on(pre, post, .block = subject), df)
+
+    expect_equal(ncol(proc$data), 2)
+    expect_named(proc$data, c("pre", "post"))
+    expect_equal(proc$block_data$subject, df$subject)
+})
+
+test_that("multiple_vars_extract() without .block has NULL block_data", {
+    proc = multiple_vars_extract(on(extra), sleep)
+
+    expect_null(proc$block_data)
 })

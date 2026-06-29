@@ -175,6 +175,96 @@ test_that("pairwise() with direction = 'eq' returns only self-pairs", {
     )))
 })
 
+# ---- on ----
+
+test_that("on() produces an on/var_id object", {
+    m = on(x)
+
+    expect_s7_class(m, on)
+    expect_s7_class(m, var_id)
+})
+
+test_that("on() stores quosures in @dots_quos", {
+    m = on(a, b, c)
+
+    expect_true(all(vapply(m@dots_quos, rlang::is_quosure, logical(1))))
+    expect_length(m@dots_quos, 3)
+})
+
+test_that("on() without .block has a null quosure in @block", {
+    m = on(x)
+
+    expect_true(rlang::quo_is_null(m@block))
+})
+
+test_that("on() with .block stores the block quosure", {
+    m = on(pre, post, .block = subject)
+
+    expect_false(rlang::quo_is_null(m@block))
+    expect_equal(rlang::as_label(m@block), "subject")
+})
+
+test_that("on() is a registered var_id subclass", {
+    expect_true(var_id_info(on(x))@registered)
+})
+
+test_that("define_model() with on() produces def_var", {
+    dm = define_model(on(extra), sleep)
+
+    expect_s7_class(dm, def_var)
+    expect_s7_class(dm@var_id, on)
+    expect_named(dm@processed, c("data", "block_data"))
+})
+
+test_that("define_model() data-frame first with on() matches model-ID first", {
+    dm_mf = define_model(on(extra), sleep)
+    dm_df = sleep |> define_model(on(extra))
+
+    expect_equal(dm_mf@processed, dm_df@processed)
+})
+
+test_that("define_model() with on() and inline data via I()", {
+    dm = define_model(on(I(score = rnorm(30))), NULL)
+
+    expect_named(dm@processed$data, "score")
+    expect_length(dm@processed$data$score, 30)
+})
+
+test_that("define_model() with on() and c() selects multiple columns", {
+    df = data.frame(x1 = 1:10, x2 = 11:20, x3 = 21:30)
+    dm = define_model(on(c(x1, x2)), df)
+
+    expect_equal(ncol(dm@processed$data), 2)
+    expect_named(dm@processed$data, c("x1", "x2"))
+})
+
+test_that("define_model() with on() and tidyselect helper", {
+    df = data.frame(score_a = 1:5, score_b = 6:10, group = letters[1:5])
+    dm = define_model(on(starts_with("score")), df)
+
+    expect_equal(ncol(dm@processed$data), 2)
+    expect_named(dm@processed$data, c("score_a", "score_b"))
+})
+
+test_that("define_model() with on() and .block populates block_data", {
+    df = data.frame(
+        pre = c(10, 12, 9),
+        post = c(11, 14, 10),
+        subject = c("s1", "s2", "s3")
+    )
+    dm = define_model(on(pre, post, .block = subject), df)
+
+    expect_equal(ncol(dm@processed$data), 2)
+    expect_named(dm@processed$data, c("pre", "post"))
+    expect_equal(dm@processed$block_data$subject, df$subject)
+})
+
+test_that("define_model() with on() without .block has NULL block_data", {
+    dm = define_model(on(extra), sleep)
+
+    expect_null(dm@processed$block_data)
+})
+
 # ---- var_id_info ----
 
 test_that("var_id_info() for x_by without processed omits vars and counts", {
@@ -271,6 +361,42 @@ test_that("var_id_info() for known subclasses sets registered = TRUE", {
     expect_true(var_id_info(prop(45, 100))@registered)
 })
 
+# ---- var_id_info() for on() ----
+
+test_that("var_id_info() for on() without processed omits vars", {
+    info = var_id_info(on(a, b))
+
+    expect_equal(info@model_type, "on")
+    expect_match(info@args, "a")
+    expect_match(info@args, "b")
+    expect_length(info@vars, 0)
+})
+
+test_that("var_id_info() for on() with processed includes vars", {
+    df = data.frame(a = 1:5, b = 6:10)
+    dm = define_model(on(a, b), df)
+    info = var_id_info(dm@var_id, dm@processed)
+
+    expect_length(info@vars, 2)
+    expect_equal(info@vars[[1]]$name, "a")
+    expect_equal(info@vars[[2]]$name, "b")
+})
+
+test_that("var_id_info() for on() with .block includes block in args and other_info", {
+    info = var_id_info(on(pre, post, .block = subject))
+
+    expect_match(info@args, "block")
+    expect_match(info@args, "subject")
+    expect_true("block" %in% names(info@other_info))
+    expect_equal(info@other_info$block, "subject")
+})
+
+test_that("var_id_info() for on() without .block has empty other_info", {
+    info = var_id_info(on(a, b))
+
+    expect_length(info@other_info, 0)
+})
+
 # ---- prop ----
 
 test_that("define_model() with prop() dispatches on model-ID first style", {
@@ -310,4 +436,15 @@ test_that("print.var_id() returns invisibly", {
     expect_invisible(print(x_by(extra, group)))
     expect_invisible(print(rel(speed, dist)))
     expect_invisible(print(pairwise(a, b, c)))
+})
+
+test_that("print.var_id() returns invisibly for on()", {
+    expect_invisible(print(on(a, b)))
+})
+
+test_that("print.def_var() returns invisibly for on()", {
+    df = data.frame(a = 1:5, b = 6:10)
+    dm = define_model(on(a, b), df)
+
+    expect_invisible(print(dm))
 })
