@@ -61,6 +61,7 @@ iris |>
 \seealso{
 Other ttest-implementations: 
 \code{\link{ttest-formula}},
+\code{\link{ttest-on}},
 \code{\link{ttest-xby}}
 }
 \concept{ttest-implementations}

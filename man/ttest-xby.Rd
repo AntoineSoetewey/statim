@@ -100,6 +100,7 @@ sleep |>
 \seealso{
 Other ttest-implementations: 
 \code{\link{ttest-formula}},
+\code{\link{ttest-on}},
 \code{\link{ttest-pairwise}}
 }
 \concept{ttest-implementations}

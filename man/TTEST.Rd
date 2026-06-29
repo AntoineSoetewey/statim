@@ -35,6 +35,7 @@ supply \code{TTEST} as a function within i.e. \code{prepare_test(.test = TTEST)}
 Each variable mapper \verb{<var_id>} routes to a separate implementation. See the linked pages
 for full argument lists, variants, and result class details:
 \itemize{
+\item \code{on()}: one-sample t-test. See details from \link{ttest-on}.
 \item \code{x_by()}: two-sample or paired t-test. See details from \link{ttest-xby}.
 \item \code{pairwise()}: pairwise t-tests across variables. See details from \link{ttest-pairwise}.
 \item \verb{<formula>}: one-sample and/or two-sample t-test. See details from \link{ttest-formula}.
@@ -100,7 +101,7 @@ iris |>
 
 }
 \seealso{
-\link{ttest-xby}, \link{ttest-pairwise}, \link{ttest-formula} for per-implementation
+\link{ttest-on}, \link{ttest-xby}, \link{ttest-pairwise}, \link{ttest-formula} for per-implementation
 details. \link{class_ttest_two}, \link{class_ttest_pairwise} for result class
 slots. \code{\link[=via]{via()}}, \code{\link[=state_null]{state_null()}}, \code{\link[=conclude]{conclude()}}, \code{\link[=auto_tidy]{auto_tidy()}}.
 }

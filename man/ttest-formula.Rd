@@ -65,6 +65,7 @@ sleep |>
 }
 \seealso{
 Other ttest-implementations: 
+\code{\link{ttest-on}},
 \code{\link{ttest-pairwise}},
 \code{\link{ttest-xby}}
 }

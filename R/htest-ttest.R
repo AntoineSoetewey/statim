@@ -21,6 +21,7 @@
 #' Each variable mapper `<var_id>` routes to a separate implementation. See the linked pages
 #' for full argument lists, variants, and result class details:
 #'
+#' - `on()`: one-sample t-test. See details from [ttest-on].
 #' - `x_by()`: two-sample or paired t-test. See details from [ttest-xby].
 #' - `pairwise()`: pairwise t-tests across variables. See details from [ttest-pairwise].
 #' - `<formula>`: one-sample and/or two-sample t-test. See details from [ttest-formula].
@@ -71,14 +72,14 @@
 #' @inheritSection ttest-xby References
 #'
 #' @seealso
-#' [ttest-xby], [ttest-pairwise], [ttest-formula] for per-implementation
+#' [ttest-on], [ttest-xby], [ttest-pairwise], [ttest-formula] for per-implementation
 #' details. [class_ttest_two], [class_ttest_pairwise] for result class
 #' slots. [via()], [state_null()], [conclude()], [auto_tidy()].
 #'
 #' @export
 TTEST = HTEST_FN(
     cls = "ttest",
-    defs = list(ttest_def_two, ttest_def_formula, ttest_def_pairwise),
+    defs = list(ttest_def_on, ttest_def_two, ttest_def_formula, ttest_def_pairwise),
     .name = "T-Test"
 )
 
