@@ -52,7 +52,7 @@ box::use(
         # Current grammars
         define_model, prepare, via, state_null, conclude, 
         # Mappers
-        x_by, rel, prop, 
+        x_by, rel, prop, on, 
         MU, RHO, PI
     ],
     rstatix[t_test, cor_test, binom_test]
@@ -105,20 +105,34 @@ $$H_1: \mu\neq120$$
 
 ### statim
 
-We can use either the main semantic:
+There are two ways to make this done using this package: 
 
-```{r}
-heart |> 
-    define_model(trestbps ~ 1) |> 
-    prepare(TTEST) |> 
-    conclude()
-```
+1.  We can use either the main semantic:
 
-Or the eager form: 
+    a. `on()`
 
-```{r}
-TTEST(trestbps ~ 1, heart, .mu = 120)
-```
+        ```{r}
+        heart |> 
+            define_model(on(trestbps)) |> 
+            prepare(TTEST) |> 
+            conclude()
+        ```
+    
+    b.  `<formula>`
+
+        ```{r}
+        heart |> 
+            define_model(trestbps ~ 1) |> 
+            prepare(TTEST) |> 
+            conclude()
+        ```
+
+2.  Or the eager form: 
+
+    ```{r}
+    TTEST(on(trestbps), heart, .mu = 120)
+    TTEST(trestbps ~ 1, heart, .mu = 120)
+    ```
 
 ### rstatix
 
@@ -170,23 +184,30 @@ There are two ways to make this done using this package:
 
 1.  The piped/grammar syntax. 
 
-    ```{r}
-    # Using `x_by()` 
-    heart |> 
-        define_model(x_by(thalach, sex)) |> 
-        prepare(TTEST) |> 
-        state_null(
-            MU(thalach, sex == "Female") == MU(thalach, sex == "Male")
-        ) |> 
-        conclude()
-    
-    # Formula
-    heart |> 
-        define_model(thalach ~ sex) |> 
-        prepare(TTEST) |> 
-        conclude()
-    ```
+    a.  Using `x_by()` 
 
+        ```{r}
+        heart |> 
+            define_model(x_by(thalach, sex)) |> 
+            prepare(TTEST) |> 
+            state_null(
+                MU(thalach, sex == "Female") == MU(thalach, sex == "Male")
+            ) |> 
+            conclude()
+        ```
+    
+    b.  `<formula>`
+    
+        ```{r}
+        heart |> 
+            define_model(x_by(thalach, sex)) |> 
+            prepare(TTEST) |> 
+            state_null(
+                MU(thalach, sex == "Female") == MU(thalach, sex == "Male")
+            ) |> 
+            conclude()
+        ```
+    
 2.  Eager form
 
     ```{r}
@@ -250,22 +271,27 @@ There are two ways to make this done using this package:
 
 1.  The piped/grammar syntax. 
 
-    ```{r}
-    # Using `rel()` 
-    heart |> 
-        define_model(rel(thalach, age)) |> 
-        prepare(CORTEST) |> 
-        state_null(
-            RHO(thalach, age) == 0
-        ) |> 
-        conclude()
+
+    a.  Using `rel()` 
     
-    # Formula
-    heart |> 
-        define_model(thalach ~ age) |> 
-        prepare(CORTEST) |> 
-        conclude()
-    ```
+        ```{r}
+        heart |> 
+            define_model(rel(thalach, age)) |> 
+            prepare(CORTEST) |> 
+            state_null(
+                RHO(thalach, age) == 0
+            ) |> 
+            conclude()
+        ```
+    
+    b.  `<formula>`
+
+        ```{r}
+        heart |> 
+            define_model(thalach ~ age) |> 
+            prepare(CORTEST) |> 
+            conclude()
+        ```
 
 2.  Eager form
 
