@@ -24,19 +24,29 @@
 #'     across all variables or must match their count.}
 #' }
 #'
+#' @section One-sample t-test default class:
+#' By default, returns a [class_ttest_one] object. All variants that also return
+#' [class_ttest_one] inherit [auto_tidy()] and [print()] automatically. Otherwise,
+#' to process outputs:
+#'
+#' -  `print()`: Write it down through `print` from [variant()].
+#' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
+#'
 #' @section Hypothesis claims:
 #' Supports [MU()] via [state_null()]:
 #'
-#' ```r
-#' define_model(on(extra), sleep) |>
+#' ``` r
+#' define_model(on(x), <data>) |>
 #'     prepare_test(TTEST) |>
-#'     state_null(MU(extra) >= 1) |>
+#'     state_null(MU(x) >= 1) |>
 #'     conclude()
 #' ```
 #'
 #' Scaled claims are supported: `2 * MU(extra) == 4` tests `MU(extra) == 2`.
 #' `true_mu` in the output shows the right-hand scalar as written (`4`), while
 #' the test runs on the solved value (`2`).
+#'
+#'
 #'
 #' @examples
 #' # single variable
@@ -45,7 +55,7 @@
 #'     prepare_test(TTEST) |>
 #'     conclude()
 #'
-#' # hypothesis claim
+#' # null hypothesis expression
 #' sleep |>
 #'     define_model(on(extra)) |>
 #'     prepare_test(TTEST) |>
@@ -53,8 +63,8 @@
 #'     conclude()
 #'
 #' # multiple variables
-#' sleep |>
-#'     define_model(on(extra)) |>
+#' iris |>
+#'     define_model(on(where(is.numeric))) |>
 #'     prepare_test(TTEST) |>
 #'     via("multi") |>
 #'     conclude()
@@ -161,6 +171,7 @@ ttest_def_on = test_define(
                     term = term,
                     estimate = unname(res$estimate),
                     statistic = unname(res$statistic),
+                    df = unname(res$parameter),
                     p_val = res$p.value,
                     lower_ci = res$conf.int[[1]],
                     upper_ci = res$conf.int[[2]]
@@ -171,7 +182,7 @@ ttest_def_on = test_define(
                 term = vapply(tests, \(t) t$term, character(1)),
                 estimate = vapply(tests, \(t) t$estimate, numeric(1)),
                 true_mu = .mu,
-                df = vapply(tests, \(t) t$parameter, numeric(1)),
+                df = vapply(tests, \(t) t$df, numeric(1)),
                 t_stat = vapply(tests, \(t) t$statistic, numeric(1)),
                 p_val = vapply(tests, \(t) t$p_val, numeric(1)),
                 lower_ci = vapply(tests, \(t) t$lower_ci, numeric(1)),
