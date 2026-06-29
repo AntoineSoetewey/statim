@@ -31,13 +31,24 @@ across all variables or must match their count.}
 }
 }
 
+\section{One-sample t-test default class}{
+
+By default, returns a \link{class_ttest_one} object. All variants that also return
+\link{class_ttest_one} inherit \code{\link[=auto_tidy]{auto_tidy()}} and \code{\link[=print]{print()}} automatically. Otherwise,
+to process outputs:
+\itemize{
+\item \code{print()}: Write it down through \code{print} from \code{\link[=variant]{variant()}}.
+\item \code{tidy()}: Use \code{\link[=making_tidy]{making_tidy()}} to register a tidy method if needed.
+}
+}
+
 \section{Hypothesis claims}{
 
 Supports \code{\link[=MU]{MU()}} via \code{\link[=state_null]{state_null()}}:
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{define_model(on(extra), sleep) |>
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{define_model(on(x), <data>) |>
     prepare_test(TTEST) |>
-    state_null(MU(extra) >= 1) |>
+    state_null(MU(x) >= 1) |>
     conclude()
 }\if{html}{\out{</div>}}
 
@@ -53,7 +64,7 @@ sleep |>
     prepare_test(TTEST) |>
     conclude()
 
-# hypothesis claim
+# null hypothesis expression
 sleep |>
     define_model(on(extra)) |>
     prepare_test(TTEST) |>
@@ -61,8 +72,8 @@ sleep |>
     conclude()
 
 # multiple variables
-sleep |>
-    define_model(on(extra)) |>
+iris |>
+    define_model(on(where(is.numeric))) |>
     prepare_test(TTEST) |>
     via("multi") |>
     conclude()
