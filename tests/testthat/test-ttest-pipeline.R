@@ -4,10 +4,22 @@ test_that("TTEST() eager form returns stat_infer_spec", {
     expect_s7_class(result, stat_infer_spec)
 })
 
-test_that("TTEST() eager result data is a class_ttest_two", {
+test_that("TTEST() eager result data for `on()` is a class_ttest_one", {
+    result = TTEST(on(Sepal.Length), .mu = 5.8, iris)
+
+    expect_s7_class(result@data, class_ttest_one)
+})
+
+test_that("TTEST() eager result data for `x_by()` is a class_ttest_two", {
     result = TTEST(x_by(extra, group), sleep)
 
     expect_s7_class(result@data, class_ttest_two)
+})
+
+test_that("TTEST() eager result data for `pairwise()` is a class_ttest_pairwise", {
+    result = TTEST(pairwise(where(is.numeric)), iris)
+
+    expect_s7_class(result@data, class_ttest_pairwise)
 })
 
 test_that("TTEST() eager result data has expected slots", {
@@ -31,9 +43,13 @@ test_that("TTEST() eager result matches base R t.test()", {
 })
 
 test_that("TTEST() eager print returns invisibly", {
-    result = TTEST(x_by(extra, group), sleep)
+    out1 = TTEST(on(extra), sleep)
+    out2 = TTEST(x_by(extra, group), sleep)
+    out3 = TTEST(pairwise(where(is.numeric)), iris)
 
-    expect_invisible(print(result))
+    expect_invisible(print(out1))
+    expect_invisible(print(out2))
+    expect_invisible(print(out3))
 })
 
 test_that("classical pipeline returns cld_exec", {
