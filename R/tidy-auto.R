@@ -70,7 +70,7 @@ S7::method(auto_tidy, class_ttest_one) = function(x, ...) {
     up_name = paste0("upper_", ci_level)
 
     tibble::tibble(
-        group = x@group,
+        term = x@term,
         estimate = x@estimate,
         true_mu = x@true_mu,
         t_stat = x@t_stat,
