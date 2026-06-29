@@ -204,6 +204,8 @@ test_that("print() uses method_name as title when length-1", {
 })
 
 test_that("print() falls back to 'Pairwise t-Tests' when method_name has length > 1", {
-    x = make_pairwise(method_name = c("Welch Two Sample t-test", "One Sample t-test"))
+    x = make_pairwise(
+        method_name = c("Welch Two Sample t-test", "One Sample t-test")
+    )
     expect_output(print(x), "Pairwise t-Tests")
 })
