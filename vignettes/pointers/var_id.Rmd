@@ -40,6 +40,7 @@ The existing `<formula>` objects in R is often used to describe the relationship
 - `rel(x, resp)`: describe the relationship of `x` to `resp`, e.g. `rel(speed, dist)`.
 - `pairwise(...)`: generate all unique pairwise combinations of a set of variables.
 - `prop(x, n)`: describe a proportion test from a count `x` out of `n` trials.
+- `on(...)`: independently tests the selected variables.
 
 Each of these is a `var_id` subclass, and each is paired with a `model_processor()` method that resolves the variables into a list of data structures (usually data frames), ready to be picked up by `define_model()`.
 
