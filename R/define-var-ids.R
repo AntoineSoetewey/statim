@@ -205,6 +205,65 @@ prop = S7::new_class(
     }
 )
 
+#' Specify variables for independent testing
+#'
+#' `on()` creates an `on` Variable Mapper that describes one or more variables
+#' to be tested independently. Expressions are captured unevaluated, similar to
+#' how [ggplot2::aes()] captures aesthetics.
+#'
+#' When multiple variables are supplied, the intended test is run once per
+#' variable with no pairwise combinations formed — for that, use [pairwise()].
+#'
+#' The optional `.block` argument identifies the experimental unit (e.g. a
+#' subject ID column). When supplied, rows in the extracted data are aligned by
+#' block before the test is run — this is required for blocked designs such as
+#' the Friedman test where row position encodes block identity.
+#'
+#' @param ... Bare variable names, tidyselect helpers (requires `data` in
+#'   [define_model()]), or `I(expr)` for inline data.
+#' @param .block Optional. The blocking variable identifying experimental units.
+#'   Accepts a bare name, a tidyselect helper, or `I(expr)` for inline data.
+#'   When supplied, rows are sorted by this variable before injection into the
+#'   test function. Required for tests such as "repeated measures ANOVA".
+#'
+#' @return An `on` / `var_id` S7 object.
+#'
+#' @examples
+#' # Single variable
+#' on(x)
+#'
+#' # Multiple variables — test on independently
+#' on(a, b, c)
+#'
+#' # Multiple variables — With a blocking factor
+#' on(pre, post, followup, .block = subject)
+#'
+#' # Tidyselect (requires data in define_model())
+#' on(where(is.numeric))
+#'
+#' @seealso [x_by()], [rel()], [pairwise()], [prop()]
+#'
+#' @export
+on = S7::new_class(
+    "on",
+    parent = var_id,
+    properties = list(
+        dots = S7::class_any,
+        dots_quos = S7::new_property(S7::class_list),
+        block = S7::new_property(S7::class_any)
+    ),
+    constructor = function(..., .block = NULL) {
+        dots = rlang::enquos(...)
+        S7::new_object(
+            S7::S7_object(),
+            dots = rlang::expr(c(!!!dots)),
+            dots_quos = dots,
+            block = rlang::enquo(.block)
+            # block = if (rlang::quo_is_null(block)) NULL else block
+        )
+    }
+)
+
 S7::method(print, var_id) = function(x, ...) {
     info = var_id_info(x)
 
