@@ -225,6 +225,38 @@ auto_name = function(role, idx) {
     paste0(role, "v", idx)
 }
 
+multiple_vars_extract = function(args, data = NULL) {
+    dots_quos = args@dots_quos
+    block_quo = args@block
+
+    dots_resolved = if (!is.null(data) && is.data.frame(data)) {
+        lapply(dots_quos, function(q) {
+            cols = tidyselect::eval_select(expr = q, data = data)
+            data[, cols, drop = FALSE]
+        })
+    } else {
+        lapply(seq_along(dots_quos), function(i) {
+            resolve_quo(dots_quos[[i]], data = data, role = "x", idx = i)
+        })
+    }
+
+    extracted = rlang::exec(vctrs::vec_cbind, !!!dots_resolved)
+
+    has_block = !rlang::quo_is_null(block_quo)
+    block_data = if (has_block) {
+        if (!is.null(data) && is.data.frame(data)) {
+            cols = tidyselect::eval_select(expr = block_quo, data = data)
+            data[, cols, drop = FALSE]
+        } else {
+            resolve_quo(block_quo, data = data, role = "block", idx = 1L)
+        }
+    } else {
+        NULL
+    }
+
+    list(data = extracted, block_data = block_data)
+}
+
 two_vars_extract = function(x_quo, x2_quo, data = NULL, role1 = "x", role2) {
     x1_df = if (!is.null(data) && is.data.frame(data)) {
         cols = tidyselect::eval_select(expr = x_quo, data = data)

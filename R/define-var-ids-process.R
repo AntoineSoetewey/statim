@@ -56,3 +56,7 @@ S7::method(model_processor, pairwise) = function(x, data = NULL, ...) {
 S7::method(model_processor, prop) = function(x, data = NULL, ...) {
     list(x = x@x, n = x@n)
 }
+
+S7::method(model_processor, on) = function(x, data = NULL, ...) {
+    multiple_vars_extract(x, data)
+}

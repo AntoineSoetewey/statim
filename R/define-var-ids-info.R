@@ -179,6 +179,37 @@ S7::method(var_id_info, prop) = function(.var_id, processed = NULL, ...) {
     )
 }
 
+S7::method(var_id_info, on) = function(.var_id, processed = NULL, ...) {
+    lbls = vapply(.var_id@dots_quos, format_quo_label, character(1))
+
+    has_block = !is.null(.var_id@block)
+    block_lbl = if (has_block) format_quo_label(.var_id@block) else NULL
+
+    args = paste(lbls, collapse = ", ")
+    if (has_block) {
+        args = paste0(args, " | block: ", block_lbl)
+    }
+
+    other_info = if (has_block) list(block = block_lbl) else list()
+    vars = list()
+
+    if (!is.null(processed) && length(processed)) {
+        all_cols = as.list(processed$data)
+        if (has_block && !is.null(processed$block_data)) {
+            all_cols = c(all_cols, as.list(processed$block_data))
+        }
+        vars = vars_preview(all_cols)
+    }
+
+    class_var_inform(
+        var_id = .var_id,
+        args = args,
+        other_info = other_info,
+        vars = vars,
+        registered = TRUE
+    )
+}
+
 S7::method(var_id_info, S7::class_formula) = function(
     .var_id,
     processed = NULL,
