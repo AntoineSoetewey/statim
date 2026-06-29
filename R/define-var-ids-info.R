@@ -182,7 +182,7 @@ S7::method(var_id_info, prop) = function(.var_id, processed = NULL, ...) {
 S7::method(var_id_info, on) = function(.var_id, processed = NULL, ...) {
     lbls = vapply(.var_id@dots_quos, format_quo_label, character(1))
 
-    has_block = !is.null(.var_id@block)
+    has_block = !rlang::quo_is_null(.var_id@block)
     block_lbl = if (has_block) format_quo_label(.var_id@block) else NULL
 
     args = paste(lbls, collapse = ", ")
