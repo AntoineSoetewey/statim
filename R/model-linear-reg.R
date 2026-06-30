@@ -324,3 +324,7 @@ lm_to_lm_object = function(fit) {
         x_assign = attr(mm, "assign")
     )
 }
+
+S7::method(n_params, class_lm_object) = function(model) {
+    length(model@beta)
+}

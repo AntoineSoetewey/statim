@@ -209,3 +209,7 @@ glm_to_glm_object = function(fit) {
         fit_summary = fit_tbl
     )
 }
+
+S7::method(n_params, class_glm_object) = function(model) {
+    nrow(model@coefficients)
+}

@@ -1,4 +1,5 @@
 anova_lazy = S7::new_class("anova_lazy", parent = multi_lazy)
+n_params = S7::new_generic("n_params", "model")
 
 #' ANOVA table for linear model comparisons
 #'
@@ -221,9 +222,10 @@ S7::method(build_anova, S7::class_list) = function(fitted, labels, test) {
     nobs = vapply(
         fitted,
         function(f) {
-            p = length(attr(f@terms, "term.labels")) +
-                attr(f@terms, "intercept")
-            as.integer(f@df_residual) + p
+            # p = length(attr(f@terms, "term.labels")) +
+            #     attr(f@terms, "intercept")
+            # as.integer(f@df_residual) + p
+            as.integer(f@df_residual) + n_params(f)
         },
         integer(1)
     )
