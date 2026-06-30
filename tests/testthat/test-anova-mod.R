@@ -551,6 +551,7 @@ test_that("Type I ANOVA matches stats::anova() for factor predictors", {
 
     expect_equal(observed@data$df, expected$Df)
     expect_equal(observed@data$ss, expected$`Sum Sq`)
+    expect_equal(observed@data$ms, expected$`Mean Sq`)
     expect_equal(observed@data$f_value[1:2], expected$`F value`[1:2])
     expect_equal(observed@data$p_value[1:2], expected$`Pr(>F)`[1:2])
 })
