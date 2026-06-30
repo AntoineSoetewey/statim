@@ -1,5 +1,4 @@
 anova_lazy = S7::new_class("anova_lazy", parent = multi_lazy)
-n_params = S7::new_generic("n_params", "model")
 
 #' ANOVA table for linear model comparisons
 #'
@@ -316,6 +315,18 @@ anova_able = S7::new_class(
         )
     )
 )
+
+is_anova_able = function(x) S7::S7_inherits(x, anova_able)
+
+n_params = S7::new_generic("n_params", "model", fun = function(model, ...) {
+    if (!is_anova_able(model)) {
+        cli::cli_abort(c(
+            "No {.fn n_params} method defined for class {.cls {class(model)[1]}}.",
+            "i" = "Extension packages must implement {.fn n_params} for custom {.cls anova_able} subclasses."
+        ))
+    }
+    S7::S7_dispatch()
+})
 
 S7::method(update, anova_lazy) = function(object, ...) {
     dots = list(...)
