@@ -225,7 +225,12 @@ test_that("anova() on binomial GLMs with test = 'F' switches to LRT with a messa
         update(family = binomial()) |>
         conclude()
 
-    expect_message(result <- anova(mod1, mod2, test = "F"), "Switching to LRT")
+    expect_message(
+        {
+            result = anova(mod1, mod2, test = "F")
+        },
+        "Switching to LRT"
+    )
 
     expect_true(is_cld_anova(result))
     expect_true("chisq_value" %in% names(result@data))
@@ -532,4 +537,20 @@ test_that("anova() nested models produce no non-nested warning", {
     mod2 = pipeline_conclude(mtcars, mpg ~ wt + hp)
 
     expect_no_warning(anova(mod1, mod2))
+})
+
+# ---- Extra: Comparison with base R ----
+
+test_that("Type I ANOVA matches stats::anova() for factor predictors", {
+    fit = lm(mpg ~ factor(cyl) + wt, data = mtcars)
+    model = define_model(mpg ~ factor(cyl) + wt, mtcars) |>
+        prepare_model(LINEAR_REG)
+
+    expected = stats::anova(fit)
+    observed = anova(model)
+
+    expect_equal(observed@data$df, expected$Df)
+    expect_equal(observed@data$ss, expected$`Sum Sq`)
+    expect_equal(observed@data$f_value[1:2], expected$`F value`[1:2])
+    expect_equal(observed@data$p_value[1:2], expected$`Pr(>F)`[1:2])
 })
