@@ -316,7 +316,8 @@ pairwise_data_extract = function(args, data = NULL) {
     }
 
     var_names = unlist(lapply(resolved, names))
-    selected_data = rlang::exec(vctrs::vec_cbind, !!!resolved)
+    # selected_data = rlang::exec(vctrs::vec_cbind, !!!resolved)
+    selected_data = unlist(lapply(resolved, as.list), recursive = FALSE)
 
     pairs = pairs_generator(var_names, direction = direction, simplify = TRUE)
 
