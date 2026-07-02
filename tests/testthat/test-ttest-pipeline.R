@@ -205,7 +205,10 @@ test_that("multi variant works on uneven selected data under `on()`", {
 
 test_that("TTEST base errs cleanly when on() carries more than one variable", {
     expect_error(
-        iris |> define_model(on(Sepal.Length, Sepal.Width)) |> prepare_test(TTEST) |> conclude(),
+        iris |>
+            define_model(on(Sepal.Length, Sepal.Width)) |>
+            prepare_test(TTEST) |>
+            conclude(),
         "requires exactly 1 variable"
     )
 })
@@ -251,7 +254,10 @@ test_that("TTEST multi variant works with unequal-length variables via on()", {
 test_that("TTEST multi variant .mu recycling still matches n_vars via length(), not ncol()", {
     data_list = list(x1 = c(1, 2, 3), x2 = c(4, 5, 6, 7))
 
-    out = define_model(on(x1, x2), data_list) |> prepare_test(TTEST) |> via("multi", .mu = c(1, 2)) |> conclude()
+    out = define_model(on(x1, x2), data_list) |>
+        prepare_test(TTEST) |>
+        via("multi", .mu = c(1, 2)) |>
+        conclude()
     expect_length(out@data@true_mu, 2)
 })
 
