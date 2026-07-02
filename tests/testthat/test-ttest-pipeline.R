@@ -203,6 +203,58 @@ test_that("multi variant works on uneven selected data under `on()`", {
     })
 })
 
+test_that("TTEST base errs cleanly when on() carries more than one variable", {
+    expect_error(
+        iris |> define_model(on(Sepal.Length, Sepal.Width)) |> prepare_test(TTEST) |> conclude(),
+        "requires exactly 1 variable"
+    )
+})
+
+test_that("TTEST base works with on() against a data.frame", {
+    out = TTEST(on(Sepal.Length), .mu = 5.8, iris)
+
+    expect_s7_class(out@data, class_ttest_one)
+    expect_equal(out@data@term, "Sepal.Length")
+})
+
+test_that("TTEST base works with on() against a plain list", {
+    data_list = list(x = c(5.1, 4.9, 4.7, 4.6, 5.0))
+    out = TTEST(on(x), .mu = 5.0, data_list)
+
+    expect_s7_class(out@data, class_ttest_one)
+    expect_equal(out@data@term, "x")
+})
+
+test_that("TTEST multi variant works with unequal-length variables via on()", {
+    data_list = list(
+        x1 = c(83, 91, 94, 89, 89, 96, 91, 92, 90),
+        x2 = c(91, 90, 81, 83, 84, 83, 88, 91, 89, 84),
+        x3 = c(101, 100, 91, 93, 96, 95, 94)
+    )
+    out = iris |>
+        define_model(on(where(is.numeric))) |>
+        prepare_test(TTEST) |>
+        via("multi") |>
+        conclude()
+
+    expect_length(out@data@term, 4)
+
+    out_list = define_model(on(x1, x2, x3), data_list) |>
+        prepare_test(TTEST) |>
+        via("multi") |>
+        conclude()
+
+    expect_length(out_list@data@term, 3)
+    expect_equal(out_list@data@term, c("x1", "x2", "x3"))
+})
+
+test_that("TTEST multi variant .mu recycling still matches n_vars via length(), not ncol()", {
+    data_list = list(x1 = c(1, 2, 3), x2 = c(4, 5, 6, 7))
+
+    out = define_model(on(x1, x2), data_list) |> prepare_test(TTEST) |> via("multi", .mu = c(1, 2)) |> conclude()
+    expect_length(out@data@true_mu, 2)
+})
+
 test_that("contrast variant returns cld_exec", {
     result = sleep |>
         define_model(x_by(extra, group)) |>
