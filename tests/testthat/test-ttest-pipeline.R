@@ -189,6 +189,20 @@ test_that("boot variant is reproducible with seed", {
     expect_equal(run()@data$ci, run()@data$ci)
 })
 
+test_that("multi variant works on uneven selected data under `on()`", {
+    set.seed(123)
+    x1 = rnorm(29, 1, 1.5)
+    x2 = rnorm(30, 1, 1.5)
+    x3 = rnorm(31, 1, 1.5)
+
+    expect_no_error({
+        define_model(on(x1, x2, x3)) |>
+            prepare(TTEST) |>
+            via("multi") |>
+            conclude()
+    })
+})
+
 test_that("contrast variant returns cld_exec", {
     result = sleep |>
         define_model(x_by(extra, group)) |>
