@@ -100,40 +100,49 @@ resolve_quo = function(quo, data = NULL, role = "x", idx = 1L) {
 
         ":symbol" = {
             nm = as.character(cl$expr)
-            if (is.null(data) || is.environment(data)) {
-                val = tryCatch(rlang::eval_tidy(quo), error = function(e) {
-                    rlang::abort(
-                        c(
-                            paste0(
-                                "Object `",
-                                nm,
-                                "` not found in the calling environment."
-                            ),
-                            "i" = "Supply a data frame as `data`:",
-                            "i" = paste0(
-                                "define_model(x_by(",
-                                nm,
-                                ", ...), data)"
-                            )
-                        ),
-                        class = "check_missing_data",
-                        parent = e
-                    )
-                })
-                vctrs::new_data_frame(rlang::set_names(list(val), nm))
-            } else {
+            if (is.data.frame(data)) {
                 data[, nm, drop = FALSE]
-                # dplyr::select(data, dplyr::all_of(nm))
+            } else {
+                mask = if (is.list(data)) data else NULL
+                val = tryCatch(
+                    rlang::eval_tidy(quo, data = mask),
+                    error = function(e) {
+                        rlang::abort(
+                            c(
+                                paste0(
+                                    "Object `",
+                                    nm,
+                                    "` not found in the calling environment."
+                                ),
+                                "i" = "Supply a data frame as `data`:",
+                                "i" = paste0(
+                                    "define_model(x_by(",
+                                    nm,
+                                    ", ...), data)"
+                                )
+                            ),
+                            class = "check_missing_data",
+                            parent = e
+                        )
+                    }
+                )
+                vctrs::new_data_frame(rlang::set_names(list(val), nm))
             }
         },
 
         ":c_call" = {
             syms = as.list(cl$expr[-1])
             nms = vapply(syms, as.character, character(1))
-            if (is.null(data) || is.environment(data)) {
+            if (is.data.frame(data)) {
+                data[, nms, drop = FALSE]
+            } else {
+                mask = if (is.list(data)) data else NULL
                 vals = lapply(seq_along(syms), function(i) {
                     tryCatch(
-                        rlang::eval_tidy(rlang::new_quosure(syms[[i]], cl$env)),
+                        rlang::eval_tidy(
+                            rlang::new_quosure(syms[[i]], cl$env),
+                            data = mask
+                        ),
                         error = function(e) {
                             rlang::abort(
                                 c(
@@ -156,9 +165,6 @@ resolve_quo = function(quo, data = NULL, role = "x", idx = 1L) {
                     )
                 })
                 vctrs::new_data_frame(rlang::set_names(vals, nms))
-            } else {
-                data[, nms, drop = FALSE]
-                # dplyr::select(data, dplyr::all_of(nms))
             }
         },
 
@@ -240,9 +246,18 @@ multiple_vars_extract = function(args, data = NULL) {
         })
     }
 
-    extracted = rlang::exec(vctrs::vec_cbind, !!!dots_resolved)
-
+    extracted = unlist(lapply(dots_resolved, as.list), recursive = FALSE)
+    lens = vapply(extracted, length, integer(1))
     has_block = !rlang::quo_is_null(block_quo)
+
+    if (has_block && length(unique(lens)) > 1L) {
+        cli::cli_abort(c(
+            "Variables supplied to {.fn on} must be the same length when `.block` is used.",
+            "i" = "Blocked designs require variables to be aligned row-by-row.",
+            "x" = "Lengths were: {paste(names(extracted), lens, sep = ' = ', collapse = ', ')}."
+        ))
+    }
+
     block_data = if (has_block) {
         if (!is.null(data) && is.data.frame(data)) {
             cols = tidyselect::eval_select(expr = block_quo, data = data)
@@ -252,6 +267,17 @@ multiple_vars_extract = function(args, data = NULL) {
         }
     } else {
         NULL
+    }
+
+    if (has_block) {
+        block_len = length(block_data[[1]])
+        var_len = lens[[1]]
+        if (block_len != var_len) {
+            cli::cli_abort(c(
+                "`.block` must be the same length as the variables supplied to {.fn on}.",
+                "x" = "Variables have length {var_len}, `.block` has length {block_len}."
+            ))
+        }
     }
 
     list(data = extracted, block_data = block_data)
