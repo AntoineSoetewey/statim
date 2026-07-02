@@ -87,10 +87,10 @@ ttest_def_on = test_define(
             ) {
                 data = .proc$data
 
-                if (ncol(data) != 1L) {
+                if (length(data) != 1L) {
                     cli::cli_abort(c(
                         "One-sample t-test (base) requires exactly 1 variable.",
-                        "i" = "Found {ncol(data)} variable{cli::qty(ncol(data))}{?s}.",
+                        "i" = "Found {length(data)} variable{cli::qty(length(data))}{?s}.",
                         "i" = "Use {.code via(\"multi\")} to test multiple variables."
                     ))
                 }
@@ -144,7 +144,7 @@ ttest_def_on = test_define(
             .ci = 0.95
         ) {
             data = .proc$data
-            n_vars = ncol(data)
+            n_vars = length(data)
 
             if (length(.mu) == 1L) {
                 .mu = rep(.mu, n_vars)

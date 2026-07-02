@@ -377,7 +377,7 @@ test_that("multiple_vars_extract() multiple variables extracts all columns", {
     df = data.frame(a = 1:10, b = 11:20, c = 21:30)
     proc = multiple_vars_extract(on(a, b, c), df)
 
-    expect_equal(ncol(proc$data), 3)
+    expect_equal(length(proc$data), 3)
     expect_named(proc$data, c("a", "b", "c"))
     expect_null(proc$block_data)
 })
@@ -390,7 +390,7 @@ test_that("multiple_vars_extract() with .block extracts block_data separately", 
     )
     proc = multiple_vars_extract(on(pre, post, .block = subject), df)
 
-    expect_equal(ncol(proc$data), 2)
+    expect_equal(length(proc$data), 2)
     expect_named(proc$data, c("pre", "post"))
     expect_equal(proc$block_data$subject, df$subject)
 })

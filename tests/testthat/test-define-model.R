@@ -234,7 +234,7 @@ test_that("define_model() with on() and c() selects multiple columns", {
     df = data.frame(x1 = 1:10, x2 = 11:20, x3 = 21:30)
     dm = define_model(on(c(x1, x2)), df)
 
-    expect_equal(ncol(dm@processed$data), 2)
+    expect_equal(length(dm@processed$data), 2)
     expect_named(dm@processed$data, c("x1", "x2"))
 })
 
@@ -242,7 +242,7 @@ test_that("define_model() with on() and tidyselect helper", {
     df = data.frame(score_a = 1:5, score_b = 6:10, group = letters[1:5])
     dm = define_model(on(starts_with("score")), df)
 
-    expect_equal(ncol(dm@processed$data), 2)
+    expect_equal(length(dm@processed$data), 2)
     expect_named(dm@processed$data, c("score_a", "score_b"))
 })
 
@@ -254,7 +254,7 @@ test_that("define_model() with on() and .block populates block_data", {
     )
     dm = define_model(on(pre, post, .block = subject), df)
 
-    expect_equal(ncol(dm@processed$data), 2)
+    expect_equal(length(dm@processed$data), 2)
     expect_named(dm@processed$data, c("pre", "post"))
     expect_equal(dm@processed$block_data$subject, df$subject)
 })
