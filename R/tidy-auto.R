@@ -97,6 +97,28 @@ S7::method(auto_tidy, class_ttest_two) = function(x, ...) {
     )
 }
 
+S7::method(auto_tidy, class_ttest_pairwise) = function(x, ...) {
+    ci_level = x@ci_level * 100
+    lo_name = paste0("lower_", ci_level)
+    up_name = paste0("upper_", ci_level)
+
+    tibble::tibble(
+        var1 = x@var1,
+        var2 = x@var2,
+        test_type = vctrs::vec_if_else(
+            var1 == var2,
+            "One-Sample",
+            "Two-Sample"
+        ),
+        estimate = x@est,
+        t_stat = x@t_stat,
+        df = x@df,
+        p_val = x@p_value,
+        !!lo_name := x@lower_ci,
+        !!up_name := x@upper_ci
+    )
+}
+
 S7::method(auto_tidy, class_p_test) = function(x, ...) {
     ci_level = x@ci_level * 100
     has_true_p = length(x@true_p) > 0L
