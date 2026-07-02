@@ -57,6 +57,31 @@ test_that("tidy() on `contrast` variant returns tibble with expected columns", {
     )
 })
 
+test_that("tidy() on t-test pairwise returns tibble with expected columns", {
+    result = iris |>
+        define_model(pairwise(1:4)) |>
+        prepare(TTEST) |>
+        conclude() |>
+        tidy()
+
+    expect_s3_class(result, "tbl_df")
+    expect_named(
+        result,
+        c("var1", "var2", "test_type", "estimate", "t_stat", "df", "p_val", "lower_95", "upper_95"),
+        ignore.order = TRUE
+    )
+})
+
+test_that("tidy() on t-test pairwise has 'One-Sample' and 'Two Sample' when referring equal columns", {
+    result = iris |>
+        define_model(pairwise(1:4, direction = "lteq")) |>
+        prepare(TTEST) |>
+        conclude() |>
+        tidy()
+
+    expect_all_true(grepl("One-Sample|Two-Sample", result$test_type))
+})
+
 test_that("tidy() errors when no method registered for variant", {
     simple_variant = variant(fn = function(.proc) list(diff = 1))
     add_variant(TTEST, x_by, "test_no_tidy") %<-% simple_variant
