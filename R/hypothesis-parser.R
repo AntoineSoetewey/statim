@@ -113,6 +113,10 @@ parse_param_node = function(expr, env, side = "expression") {
         return(as.numeric(expr))
     }
 
+    if (rlang::is_call(expr, "(")) {
+        return(parse_param_node(expr[[2]], env, side))
+    }
+
     if (rlang::is_call(expr)) {
         fn_name = as.character(expr[[1]])
         args = as.list(expr[-1])
