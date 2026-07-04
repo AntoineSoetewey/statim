@@ -195,16 +195,27 @@ There are two ways to make this done using this package:
             ) |> 
             conclude()
         ```
+
+    b.  Using `on()` 
+
+        ```{r}
+        female = heart$thalach[heart$sex == "Female"]
+        male = heart$thalach[heart$sex == "Male"]
+        define_model(on(female, male)) |> 
+            prepare(TTEST) |> 
+            state_null(
+                MU(female) == MU(male)
+            ) |> 
+            via("two_sample") |> 
+            conclude()
+        ```
     
-    b.  `<formula>`
+    c.  `<formula>`
     
         ```{r}
         heart |> 
-            define_model(x_by(thalach, sex)) |> 
+            define_model(thalach ~ sex) |> 
             prepare(TTEST) |> 
-            state_null(
-                MU(thalach, sex == "Female") == MU(thalach, sex == "Male")
-            ) |> 
             conclude()
         ```
     
@@ -247,7 +258,7 @@ Two approaches:
 
 ### Interpretation of the codes
 
-`<formula>` object is such a good convenient tool that makes statistical modelling much easier. Except `{statim}` has another way to shape the pipeline into different layout which also be able call the columns: a `<var_id>` mapper called `x_by()`. This mapper is another good function that declares the column `x` being compared by the grouping column `group`. The categorical groups under `group` column are used as a reference on population parameter `<param_obj>` objects, i.e. `MU()` in this case. 
+`<formula>` object is such a good convenient tool that makes statistical modelling much easier. Except `{statim}` has another way to shape the pipeline into different layout which also be able call the columns: a `<var_id>` mapper called `x_by()`. This mapper is another good function that declares the column `x` being compared by the grouping column `group`. The categorical groups under `group` column are used as a reference on population parameter `<param_obj>` objects, i.e. `MU()` in this case. `on()` layout, on the other hand, is different: Especially its eager form, i.e. the default, requires `via("two_sample")` to switch into two-sample mode.
 
 As for the declaration of null hypothesis part: Both base R and `{rstatix}` do not have an ability to declare the null hypothesis in algebraic form, rather they use `alternative = ` and `mu = `. `{statim}` brings this feature — declaration of null hypothesis in algebraic form. This is implemented so that the intent of the null hypothesis we test is more transparent. This is the newest feature of a declaration of the null hypothesis in R, only in `{statim}` package. 
 
