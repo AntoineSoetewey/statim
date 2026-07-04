@@ -384,3 +384,67 @@ test_that("tidy() on contrast variant returns a tibble with expected columns", {
     expect_s3_class(result, "tbl_df")
     expect_true(all(c("t_stat", "p_val") %in% names(result)))
 })
+
+test_that("classical pipeline with via two_sample runs without error", {
+    expect_no_error(
+        ToothGrowth |>
+            with(define_model(on(I(oj = len[supp == "OJ"]), I(vc = len[supp == "VC"])))) |>
+            prepare_test(TTEST) |>
+            via("two_sample") |>
+            conclude()
+    )
+})
+
+test_that("tidy() on two_sample variant returns a tibble with expected columns", {
+    tidy_two_sample = ToothGrowth |>
+        with(define_model(on(I(oj = len[supp == "OJ"]), I(vc = len[supp == "VC"])))) |>
+        prepare_test(TTEST) |>
+        via("two_sample") |>
+        conclude() |>
+        tidy()
+
+    expect_s3_class(tidy_two_sample, "tbl_df")
+    expect_true(all(c("group", "estimate", "t_stat", "p_val") %in% names(tidy_two_sample)))
+})
+
+test_that("two_sample on() and default x_by() agree on the un-weighted two-sample case", {
+    on_two_sample = ToothGrowth |>
+        with(define_model(on(I(oj = len[supp == "VC"]), I(vc = len[supp == "OJ"])))) |>
+        prepare_test(TTEST) |>
+        via("two_sample") |>
+        conclude()
+
+    xby_default = ToothGrowth |>
+        define_model(x_by(len, supp)) |>
+        prepare_test(TTEST) |>
+        conclude()
+
+    expect_equal(on_two_sample@data@t_stat, xby_default@data@t_stat, tolerance = 1e-8)
+    expect_equal(on_two_sample@data@df, xby_default@data@df, tolerance = 1e-8)
+    expect_equal(on_two_sample@data@p_val, xby_default@data@p_val, tolerance = 1e-8)
+})
+
+test_that("two_sample on() and contrast x_by() agree on an equivalent weighted hypothesis", {
+    on_two_sample = ToothGrowth |>
+        with(define_model(on(I(oj = len[supp == "OJ"]), I(vc = len[supp == "VC"])))) |>
+        prepare_test(TTEST) |>
+        via("two_sample") |>
+        state_null(MU(oj) - 1 == 2 * MU(vc) - 3) |>
+        conclude() |>
+        tidy()
+
+    xby_contrast = ToothGrowth |>
+        define_model(x_by(len, supp)) |>
+        prepare_test(TTEST) |>
+        via("contrast") |>
+        state_null(MU(len, supp == "OJ") - 1 == 2 * MU(len, supp == "VC") - 3) |>
+        conclude() |>
+        tidy()
+
+    expect_equal(on_two_sample$estimate, xby_contrast$estimate, tolerance = 1e-8)
+    expect_equal(on_two_sample$t_stat, xby_contrast$t_stat, tolerance = 1e-8)
+    expect_equal(on_two_sample$df, xby_contrast$df, tolerance = 1e-8)
+    expect_equal(on_two_sample$p_val, xby_contrast$p_val, tolerance = 1e-8)
+    expect_equal(on_two_sample$lower_95, xby_contrast$lower_95, tolerance = 1e-8)
+    expect_equal(on_two_sample$upper_95, xby_contrast$upper_95, tolerance = 1e-8)
+})
