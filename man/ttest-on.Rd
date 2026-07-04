@@ -2,23 +2,28 @@
 % Please edit documentation in R/htest-ttest-defs-on.R
 \name{ttest-on}
 \alias{ttest-on}
-\title{T-Test: One-Sample (\code{on})}
+\title{T-Test: One-Sample and Two-Sample (\code{on})}
 \description{
 The \code{on} implementation performs a one-sample t-test for one or more
-variables via \code{\link[=on]{on()}}. Each variable is tested independently against a
-hypothesized mean.
+variables via \code{\link[=on]{on()}}, or a two-sample t-test (independent or paired)
+when exactly two variables are supplied and \code{via("two_sample")} is used.
+The one-sample default tests each variable independently against a
+hypothesized mean. The \code{two_sample} variant instead compares the two
+variables to each other, without requiring the value/group layout
+\code{\link[=x_by]{x_by()}} expects.
 }
 \section{Arguments}{
 
 The following arguments are passed via \code{...} in \code{\link[=TTEST]{TTEST()}} or \code{\link[=via]{via()}}:
 
 \describe{
-\item{\code{.mu}}{Numeric. Hypothesized mean under H\eqn{_0}. Default \code{0}.}
+\item{\code{.mu}}{Numeric. Hypothesized mean (one-sample) or mean
+difference/contrast (\code{two_sample}). Default \code{0}.}
 \item{\code{.alt}}{Direction: \code{"two.sided"}, \code{"greater"}, or \code{"less"}. Default \code{"two.sided"}.}
 \item{\code{.ci}}{Confidence level. Default \code{0.95}.}
-\item{\code{.true_mu}}{Only meaningful via \code{\link[=state_null]{state_null()}}. Carries the scalar as
-written in the claim, purely for display in \code{true_mu}. Default \code{NULL},
-falling back to \code{.mu}. Not intended to be set directly.}
+\item{\code{.true_mu}}{One-sample only. Only meaningful via \code{\link[=state_null]{state_null()}}. Carries
+the scalar as written in the claim, purely for display in \code{true_mu}.
+Default \code{NULL}, falling back to \code{.mu}. Not intended to be set directly.}
 }
 }
 
@@ -28,6 +33,11 @@ falling back to \code{.mu}. Not intended to be set directly.}
 \item{\code{"multi"}}{Tests multiple variables supplied via \code{\link[=on]{on()}}. Accepts the
 same \code{.mu}, \code{.alt}, \code{.ci} arguments as the default. \code{.mu} is recycled
 across all variables or must match their count.}
+\item{\code{"two_sample"}}{Compares exactly two variables supplied via \code{\link[=on]{on()}}.
+Accepts \code{.paired} (logical, default \code{FALSE}), \code{.var_equal} (logical,
+default \code{FALSE}, ignored when \code{.paired = TRUE}), and \code{.w} (a named
+numeric vector of contrast weights, one per variable, default \code{NULL}
+falling back to \code{c(1, -1)} in the order the variables were supplied).}
 }
 }
 
@@ -40,6 +50,14 @@ to process outputs:
 \item \code{print()}: Write it down through \code{print} from \code{\link[=variant]{variant()}}.
 \item \code{tidy()}: Use \code{\link[=making_tidy]{making_tidy()}} to register a tidy method if needed.
 }
+}
+
+\section{Two-sample t-test class}{
+
+\code{via("two_sample")} returns a \link{class_ttest_two} object — the same class
+produced by \link{ttest-xby}'s implementation. \code{group} holds a synthesized label
+(e.g. \code{"1*oj + -1*vc"}) rather than a grouping variable name, since \code{on()}
+has no grouping column to name.
 }
 
 \section{Hypothesis claims}{
@@ -55,6 +73,33 @@ Supports \code{\link[=MU]{MU()}} via \code{\link[=state_null]{state_null()}}:
 Scaled claims are supported: \code{2 * MU(extra) == 4} tests \code{MU(extra) == 2}.
 \code{true_mu} in the output shows the right-hand scalar as written (\code{4}), while
 the test runs on the solved value (\code{2}).
+
+For \code{two_sample}, both variables from \code{\link[=on]{on()}} must appear in the claim, and
+referenced by the same names given to (or auto-generated for) each
+variable:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{define_model(on(oj, vc), <data>) |>
+    prepare_test(TTEST) |>
+    via("two_sample") |>
+    state_null(MU(oj) - MU(vc) == 0) |>
+    conclude()
+}\if{html}{\out{</div>}}
+
+Arbitrary linear contrasts are supported, including scaled terms and
+constants on either side:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{state_null(2 * MU(oj) + 1 == MU(vc) - 3)
+}\if{html}{\out{</div>}}
+
+\code{estimate} always reflects the sample contrast (\code{a * mean(oj) + b * mean(vc)})
+and does not change when only the hypothesized scalar changes — only
+\code{t_stat}, \code{p_val}, and where the CI sits relative to the hypothesis shift
+with it. This matches \code{\link[stats:t.test]{stats::t.test()}}'s own convention of reporting the
+same \code{estimate} regardless of \code{mu}.
+
+A variable omitted from a \code{two_sample} claim, or a zero coefficient on
+either variable, is an error rather than a silent one-sample reduction —
+use \verb{on(<single variable>)} with the default variant instead.
 }
 
 \examples{
@@ -78,8 +123,41 @@ iris |>
     via("multi") |>
     conclude()
 
+# two-sample, wide-format columns, unpaired (Welch by default)
+vc = ToothGrowth$len[ToothGrowth$supp == "VC"]
+oj = ToothGrowth$len[ToothGrowth$supp == "OJ"]
+
+define_model(on(vc, oj)) |>
+    prepare_test(TTEST) |>
+    via("two_sample") |>
+    conclude()
+
+# two-sample, paired
+# You can use the `I()` and `with()` call
+# To refer the columns as a local environment
+# Containing the data
+ToothGrowth |>
+    with(define_model(on(
+        I(d1 = len[supp == "OJ" & dose == 1]),
+        I(d2 = len[supp == "VC" & dose == 1])
+    ))) |>
+    prepare_test(TTEST) |>
+    via("two_sample", .paired = TRUE) |>
+    conclude()
+
+# two-sample with a weighted contrast hypothesis
+ToothGrowth |>
+    with(define_model(on(I(oj = len[supp == "OJ"]), I(vc = len[supp == "VC"])))) |>
+    prepare_test(TTEST) |>
+    via("two_sample") |>
+    state_null(2 * MU(oj) - MU(vc) == 5) |>
+    conclude()
+
 }
 \seealso{
+\link{ttest-xby} for the value/group layout, \link{class_ttest_two},
+\code{\link[=state_null]{state_null()}}
+
 Other ttest-implementations: 
 \code{\link{ttest-formula}},
 \code{\link{ttest-pairwise}},

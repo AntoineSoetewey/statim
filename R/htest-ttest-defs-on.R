@@ -1,20 +1,25 @@
-#' @title T-Test: One-Sample (`on`)
+#' @title T-Test: One-Sample and Two-Sample (`on`)
 #'
 #' @description
 #' The `on` implementation performs a one-sample t-test for one or more
-#' variables via [on()]. Each variable is tested independently against a
-#' hypothesized mean.
+#' variables via [on()], or a two-sample t-test (independent or paired)
+#' when exactly two variables are supplied and `via("two_sample")` is used.
+#' The one-sample default tests each variable independently against a
+#' hypothesized mean. The `two_sample` variant instead compares the two
+#' variables to each other, without requiring the value/group layout
+#' [x_by()] expects.
 #'
 #' @section Arguments:
 #' The following arguments are passed via `...` in [TTEST()] or [via()]:
 #'
 #' \describe{
-#'   \item{`.mu`}{Numeric. Hypothesized mean under H\eqn{_0}. Default `0`.}
+#'   \item{`.mu`}{Numeric. Hypothesized mean (one-sample) or mean
+#'     difference/contrast (`two_sample`). Default `0`.}
 #'   \item{`.alt`}{Direction: `"two.sided"`, `"greater"`, or `"less"`. Default `"two.sided"`.}
 #'   \item{`.ci`}{Confidence level. Default `0.95`.}
-#'   \item{`.true_mu`}{Only meaningful via [state_null()]. Carries the scalar as
-#'     written in the claim, purely for display in `true_mu`. Default `NULL`,
-#'     falling back to `.mu`. Not intended to be set directly.}
+#'   \item{`.true_mu`}{One-sample only. Only meaningful via [state_null()]. Carries
+#'     the scalar as written in the claim, purely for display in `true_mu`.
+#'     Default `NULL`, falling back to `.mu`. Not intended to be set directly.}
 #' }
 #'
 #' @section Variants:
@@ -22,6 +27,11 @@
 #'   \item{`"multi"`}{Tests multiple variables supplied via [on()]. Accepts the
 #'     same `.mu`, `.alt`, `.ci` arguments as the default. `.mu` is recycled
 #'     across all variables or must match their count.}
+#'   \item{`"two_sample"`}{Compares exactly two variables supplied via [on()].
+#'     Accepts `.paired` (logical, default `FALSE`), `.var_equal` (logical,
+#'     default `FALSE`, ignored when `.paired = TRUE`), and `.w` (a named
+#'     numeric vector of contrast weights, one per variable, default `NULL`
+#'     falling back to `c(1, -1)` in the order the variables were supplied).}
 #' }
 #'
 #' @section One-sample t-test default class:
@@ -31,6 +41,12 @@
 #'
 #' -  `print()`: Write it down through `print` from [variant()].
 #' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
+#'
+#' @section Two-sample t-test class:
+#' `via("two_sample")` returns a [class_ttest_two] object — the same class
+#' produced by [ttest-xby]'s implementation. `group` holds a synthesized label
+#' (e.g. `"1*oj + -1*vc"`) rather than a grouping variable name, since `on()`
+#' has no grouping column to name.
 #'
 #' @section Hypothesis claims:
 #' Supports [MU()] via [state_null()]:
@@ -46,7 +62,34 @@
 #' `true_mu` in the output shows the right-hand scalar as written (`4`), while
 #' the test runs on the solved value (`2`).
 #'
+#' For `two_sample`, both variables from [on()] must appear in the claim, and
+#' referenced by the same names given to (or auto-generated for) each
+#' variable:
 #'
+#' ``` r
+#' define_model(on(oj, vc), <data>) |>
+#'     prepare_test(TTEST) |>
+#'     via("two_sample") |>
+#'     state_null(MU(oj) - MU(vc) == 0) |>
+#'     conclude()
+#' ```
+#'
+#' Arbitrary linear contrasts are supported, including scaled terms and
+#' constants on either side:
+#'
+#' ``` r
+#' state_null(2 * MU(oj) + 1 == MU(vc) - 3)
+#' ```
+#'
+#' `estimate` always reflects the sample contrast (`a * mean(oj) + b * mean(vc)`)
+#' and does not change when only the hypothesized scalar changes — only
+#' `t_stat`, `p_val`, and where the CI sits relative to the hypothesis shift
+#' with it. This matches [stats::t.test()]'s own convention of reporting the
+#' same `estimate` regardless of `mu`.
+#'
+#' A variable omitted from a `two_sample` claim, or a zero coefficient on
+#' either variable, is an error rather than a silent one-sample reduction —
+#' use `on(<single variable>)` with the default variant instead.
 #'
 #' @examples
 #' # single variable
@@ -69,6 +112,38 @@
 #'     via("multi") |>
 #'     conclude()
 #'
+#' # two-sample, wide-format columns, unpaired (Welch by default)
+#' vc = ToothGrowth$len[ToothGrowth$supp == "VC"]
+#' oj = ToothGrowth$len[ToothGrowth$supp == "OJ"]
+#'
+#' define_model(on(vc, oj)) |>
+#'     prepare_test(TTEST) |>
+#'     via("two_sample") |>
+#'     conclude()
+#'
+#' # two-sample, paired
+#' # You can use the `I()` and `with()` call
+#' # To refer the columns as a local environment
+#' # Containing the data
+#' ToothGrowth |>
+#'     with(define_model(on(
+#'         I(d1 = len[supp == "OJ" & dose == 1]),
+#'         I(d2 = len[supp == "VC" & dose == 1])
+#'     ))) |>
+#'     prepare_test(TTEST) |>
+#'     via("two_sample", .paired = TRUE) |>
+#'     conclude()
+#'
+#' # two-sample with a weighted contrast hypothesis
+#' ToothGrowth |>
+#'     with(define_model(on(I(oj = len[supp == "OJ"]), I(vc = len[supp == "VC"])))) |>
+#'     prepare_test(TTEST) |>
+#'     via("two_sample") |>
+#'     state_null(2 * MU(oj) - MU(vc) == 5) |>
+#'     conclude()
+#'
+#' @seealso [ttest-xby] for the value/group layout, [class_ttest_two],
+#'     [state_null()]
 #' @keywords internal
 #' @name ttest-on
 #' @family ttest-implementations
