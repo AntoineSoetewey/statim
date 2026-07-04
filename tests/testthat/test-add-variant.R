@@ -110,7 +110,7 @@ test_that("remove_variant errors on package-scoped variant", {
         impl = simple_variant,
         origin = "package"
     )
-    on.exit(variant_registry[[key]][["pkg_variant"]] <- NULL)
+    on.exit({ variant_registry[[key]][["pkg_variant"]] = NULL })
 
     expect_error(
         remove_variant(TTEST, x_by, "pkg_variant"),

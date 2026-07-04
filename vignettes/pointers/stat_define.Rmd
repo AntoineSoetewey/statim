@@ -32,7 +32,7 @@ model_infer_define  # alias, conventionally used for MODEL_FN()-fed defs
 
 The alias is purely a readability convention, not a different type. `ptest_def`, which feeds `P_TEST()`, is written with `test_define()`; `linear_reg_def_rel`, which feeds `LINEAR_REG()`, is written with `model_infer_define()`. Both are `stat_define` objects with identical properties:
 
-```{r, eval = FALSE}
+``` r
 ptest_def = test_define(
     model_type = <var_id>,                 # Which is `prop`
     impl = agendas(
@@ -89,7 +89,7 @@ This is also why `compatible_params` lives on `stat_define` while `claim_parser`
 
 Each argument is explain by each section. 
 
-```{r, eval = FALSE}
+``` r
 stat_define(
     model_type = <var_id>,
     impl = agendas(...),
