@@ -189,7 +189,186 @@ ttest_def_on = test_define(
                 upper_ci = vapply(tests, \(t) t$upper_ci, numeric(1)),
                 ci_level = .ci
             )
-        })
+        }),
+        two_sample = variant(
+            fn = function(
+                .proc,
+                .mu = 0,
+                .paired = FALSE,
+                .var_equal = FALSE,
+                .alt = "two.sided",
+                .ci = 0.95,
+                .w = NULL
+            ) {
+                data = .proc$data
+
+                if (length(data) != 2L) {
+                    cli::cli_abort(c(
+                        "Two-sample t-test (on) requires exactly 2 variables.",
+                        "i" = "Found {length(data)} variable{cli::qty(length(data))}{?s}.",
+                        "i" = "Use {.fn x_by} for a value/group layout instead."
+                    ))
+                }
+
+                term1 = names(data)[[1]]
+                term2 = names(data)[[2]]
+                x1 = data[[1]]
+                x2 = data[[2]]
+
+                w = resolve_two_sample_weights(.w, term1, term2)
+                a = w[[term1]]
+                b = w[[term2]]
+                label = paste0(a, "*", term1, " + ", b, "*", term2)
+
+                if (.paired) {
+                    if (length(x1) != length(x2)) {
+                        cli::cli_abort(c(
+                            "Paired t-test requires both variables to be the same length.",
+                            "x" = "{.arg {term1}} has length {length(x1)}, {.arg {term2}} has length {length(x2)}."
+                        ))
+                    }
+
+                    combined = a * x1 + b * x2
+                    res = stats::t.test(
+                        x = combined,
+                        mu = .mu,
+                        alternative = .alt,
+                        conf.level = .ci
+                    )
+
+                    return(class_ttest_two(
+                        group = label,
+                        estimate = unname(res$estimate),
+                        t_stat = unname(res$statistic),
+                        df = unname(res$parameter),
+                        p_val = res$p.value,
+                        lower_ci = res$conf.int[[1]],
+                        upper_ci = res$conf.int[[2]],
+                        ci_level = .ci
+                    ))
+                }
+
+                n1 = length(x1)
+                n2 = length(x2)
+                xbar1 = mean(x1)
+                xbar2 = mean(x2)
+                s1 = stats::var(x1)
+                s2 = stats::var(x2)
+                est_val = a * xbar1 + b * xbar2
+
+                if (.var_equal) {
+                    df = n1 + n2 - 2
+                    pooled_var = ((n1 - 1) * s1 + (n2 - 1) * s2) / df
+                    se = sqrt(pooled_var * (a^2 / n1 + b^2 / n2))
+                } else {
+                    se = sqrt(a^2 * s1 / n1 + b^2 * s2 / n2)
+                    df = se^4 /
+                        ((a^2 * s1 / n1)^2 /
+                            (n1 - 1) +
+                            (b^2 * s2 / n2)^2 / (n2 - 1))
+                }
+
+                tstat = (est_val - .mu) / se
+
+                p_val = switch(
+                    .alt,
+                    "two.sided" = 2 * stats::pt(-abs(tstat), df = df),
+                    "greater" = stats::pt(tstat, df = df, lower.tail = FALSE),
+                    "less" = stats::pt(tstat, df = df)
+                )
+
+                alpha = 1 - .ci
+                ci = switch(
+                    .alt,
+                    "two.sided" = {
+                        t_crit = stats::qt(1 - alpha / 2, df = df)
+                        c(est_val - t_crit * se, est_val + t_crit * se)
+                    },
+                    "greater" = {
+                        t_crit = stats::qt(1 - alpha, df = df)
+                        c(est_val - t_crit * se, Inf)
+                    },
+                    "less" = {
+                        t_crit = stats::qt(1 - alpha, df = df)
+                        c(-Inf, est_val + t_crit * se)
+                    }
+                )
+
+                class_ttest_two(
+                    group = label,
+                    estimate = est_val,
+                    t_stat = tstat,
+                    df = df,
+                    p_val = p_val,
+                    lower_ci = ci[[1]],
+                    upper_ci = ci[[2]],
+                    ci_level = .ci
+                )
+            },
+            claim_parser = map_claim(
+                .mu = function(claim, processed) {
+                    claim_contrast_coefs(claim)$scalar
+                },
+                .alt = function(claim, processed) {
+                    switch(
+                        claim_contrast_coefs(claim)$op,
+                        "==" = ,
+                        "!=" = "two.sided",
+                        ">=" = ,
+                        ">" = "less",
+                        "<=" = ,
+                        "<" = "greater"
+                    )
+                },
+                .w = function(claim, processed) {
+                    claim_contrast_coefs(claim)$coefs
+                }
+            )
+        )
     ),
     compatible_params = list(MU)
 )
+
+resolve_two_sample_weights = function(w, term1, term2) {
+    if (is.null(w)) {
+        w = c(1, -1)
+        names(w) = c(term1, term2)
+        return(w)
+    }
+
+    nms = names(w)
+    if (is.null(nms) || any(!nzchar(nms))) {
+        cli::cli_abort(c(
+            "Contrast weights must be named to match {.fn on}'s variables.",
+            "i" = "Expected names {.val {c(term1, term2)}}."
+        ))
+    }
+
+    missing_terms = setdiff(c(term1, term2), nms)
+    if (length(missing_terms) > 0L) {
+        cli::cli_abort(c(
+            "Hypothesis omits a variable supplied to {.fn on}.",
+            "x" = "No coefficient found for {.val {missing_terms}}.",
+            "i" = "Variables in {.fn on} are {.val {c(term1, term2)}}."
+        ))
+    }
+
+    extra_terms = setdiff(nms, c(term1, term2))
+    if (length(extra_terms) > 0L) {
+        cli::cli_abort(c(
+            "Hypothesis references variable{cli::qty(length(extra_terms))}{?s} not in {.fn on}: {.val {extra_terms}}.",
+            "i" = "Variables in {.fn on} are {.val {c(term1, term2)}}."
+        ))
+    }
+
+    w = w[c(term1, term2)]
+    if (any(w == 0)) {
+        cli::cli_abort(c(
+            "Both coefficients on {.fn on}'s variables must be non-zero.",
+            "i" = "A zero coefficient reduces this to a one-sample test.",
+            "i" = "Use {.code on({term1})} or {.code on({term2})} alone instead."
+        ))
+    }
+
+    w
+}
