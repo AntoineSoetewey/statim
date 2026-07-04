@@ -67,7 +67,17 @@ test_that("tidy() on t-test pairwise returns tibble with expected columns", {
     expect_s3_class(result, "tbl_df")
     expect_named(
         result,
-        c("var1", "var2", "test_type", "estimate", "t_stat", "df", "p_val", "lower_95", "upper_95"),
+        c(
+            "var1",
+            "var2",
+            "test_type",
+            "estimate",
+            "t_stat",
+            "df",
+            "p_val",
+            "lower_95",
+            "upper_95"
+        ),
         ignore.order = TRUE
     )
 })
