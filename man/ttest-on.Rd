@@ -30,9 +30,9 @@ Default \code{NULL}, falling back to \code{.mu}. Not intended to be set directly
 \section{Variants}{
 
 \describe{
-\item{\code{"multi"}}{Tests multiple variables supplied via \code{\link[=on]{on()}}. Accepts the
-same \code{.mu}, \code{.alt}, \code{.ci} arguments as the default. \code{.mu} is recycled
-across all variables or must match their count.}
+\item{\code{"multi"}}{Performs independent one-sample t-tests across selected variables supplied via \code{\link[=on]{on()}}.
+Accepts the same \code{.mu}, \code{.alt}, \code{.ci} arguments as the default. However, \code{.mu} is
+recycled across all variables or must match their count.}
 \item{\code{"two_sample"}}{Compares exactly two variables supplied via \code{\link[=on]{on()}}.
 Accepts \code{.paired} (logical, default \code{FALSE}), \code{.var_equal} (logical,
 default \code{FALSE}, ignored when \code{.paired = TRUE}), and \code{.w} (a named
@@ -43,8 +43,8 @@ falling back to \code{c(1, -1)} in the order the variables were supplied).}
 
 \section{One-sample t-test default class}{
 
-By default, returns a \link{class_ttest_one} object. All variants that also return
-\link{class_ttest_one} inherit \code{\link[=auto_tidy]{auto_tidy()}} and \code{\link[=print]{print()}} automatically. Otherwise,
+Applied on the default \code{ttest-on} and its variant \code{"multi"}. By default, returns a \link{class_ttest_one} object.
+All variants that also return \link{class_ttest_one} inherit \code{\link[=auto_tidy]{auto_tidy()}} and \code{\link[=print]{print()}} automatically. Otherwise,
 to process outputs:
 \itemize{
 \item \code{print()}: Write it down through \code{print} from \code{\link[=variant]{variant()}}.
@@ -54,9 +54,9 @@ to process outputs:
 
 \section{Two-sample t-test class}{
 
-\code{via("two_sample")} returns a \link{class_ttest_two} object — the same class
+Only applied on \code{via("two_sample")}. By default, it returns a \link{class_ttest_two} object — the same class
 produced by \link{ttest-xby}'s implementation. \code{group} holds a synthesized label
-(e.g. \code{"1*oj + -1*vc"}) rather than a grouping variable name, since \code{on()}
+(e.g. \code{"1*x1 + -1*x2"}) rather than a grouping variable name, since \code{on()}
 has no grouping column to name.
 }
 
@@ -70,7 +70,7 @@ Supports \code{\link[=MU]{MU()}} via \code{\link[=state_null]{state_null()}}:
     conclude()
 }\if{html}{\out{</div>}}
 
-Scaled claims are supported: \code{2 * MU(extra) == 4} tests \code{MU(extra) == 2}.
+Scaled claims are supported: \code{2 * MU(x) == 4} tests \code{MU(x) == 2}.
 \code{true_mu} in the output shows the right-hand scalar as written (\code{4}), while
 the test runs on the solved value (\code{2}).
 
@@ -78,10 +78,10 @@ For \code{two_sample}, both variables from \code{\link[=on]{on()}} must appear i
 referenced by the same names given to (or auto-generated for) each
 variable:
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{define_model(on(oj, vc), <data>) |>
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{define_model(on(x1, x2), <data>) |>
     prepare_test(TTEST) |>
     via("two_sample") |>
-    state_null(MU(oj) - MU(vc) == 0) |>
+    state_null(MU(x1) - MU(x2) == 0) |>
     conclude()
 }\if{html}{\out{</div>}}
 
@@ -91,8 +91,8 @@ constants on either side:
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{state_null(2 * MU(oj) + 1 == MU(vc) - 3)
 }\if{html}{\out{</div>}}
 
-\code{estimate} always reflects the sample contrast (\code{a * mean(oj) + b * mean(vc)})
-and does not change when only the hypothesized scalar changes — only
+\code{estimate} always reflects the sample contrast (\code{a * mean(x1) + b * mean(x2)})
+and does not change when only the hypothesized scalar changes, only
 \code{t_stat}, \code{p_val}, and where the CI sits relative to the hypothesis shift
 with it. This matches \code{\link[stats:t.test]{stats::t.test()}}'s own convention of reporting the
 same \code{estimate} regardless of \code{mu}.

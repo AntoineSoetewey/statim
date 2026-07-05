@@ -24,9 +24,9 @@
 #'
 #' @section Variants:
 #' \describe{
-#'   \item{`"multi"`}{Tests multiple variables supplied via [on()]. Accepts the
-#'     same `.mu`, `.alt`, `.ci` arguments as the default. `.mu` is recycled
-#'     across all variables or must match their count.}
+#'   \item{`"multi"`}{Performs independent one-sample t-tests across selected variables supplied via [on()].
+#'     Accepts the same `.mu`, `.alt`, `.ci` arguments as the default. However, `.mu` is
+#'     recycled across all variables or must match their count.}
 #'   \item{`"two_sample"`}{Compares exactly two variables supplied via [on()].
 #'     Accepts `.paired` (logical, default `FALSE`), `.var_equal` (logical,
 #'     default `FALSE`, ignored when `.paired = TRUE`), and `.w` (a named
@@ -35,17 +35,17 @@
 #' }
 #'
 #' @section One-sample t-test default class:
-#' By default, returns a [class_ttest_one] object. All variants that also return
-#' [class_ttest_one] inherit [auto_tidy()] and [print()] automatically. Otherwise,
+#' Applied on the default `ttest-on` and its variant `"multi"`. By default, returns a [class_ttest_one] object.
+#' All variants that also return [class_ttest_one] inherit [auto_tidy()] and [print()] automatically. Otherwise,
 #' to process outputs:
 #'
 #' -  `print()`: Write it down through `print` from [variant()].
 #' -  `tidy()`: Use [making_tidy()] to register a tidy method if needed.
 #'
 #' @section Two-sample t-test class:
-#' `via("two_sample")` returns a [class_ttest_two] object — the same class
+#' Only applied on `via("two_sample")`. By default, it returns a [class_ttest_two] object — the same class
 #' produced by [ttest-xby]'s implementation. `group` holds a synthesized label
-#' (e.g. `"1*oj + -1*vc"`) rather than a grouping variable name, since `on()`
+#' (e.g. `"1*x1 + -1*x2"`) rather than a grouping variable name, since `on()`
 #' has no grouping column to name.
 #'
 #' @section Hypothesis claims:
@@ -58,7 +58,7 @@
 #'     conclude()
 #' ```
 #'
-#' Scaled claims are supported: `2 * MU(extra) == 4` tests `MU(extra) == 2`.
+#' Scaled claims are supported: `2 * MU(x) == 4` tests `MU(x) == 2`.
 #' `true_mu` in the output shows the right-hand scalar as written (`4`), while
 #' the test runs on the solved value (`2`).
 #'
@@ -67,10 +67,10 @@
 #' variable:
 #'
 #' ``` r
-#' define_model(on(oj, vc), <data>) |>
+#' define_model(on(x1, x2), <data>) |>
 #'     prepare_test(TTEST) |>
 #'     via("two_sample") |>
-#'     state_null(MU(oj) - MU(vc) == 0) |>
+#'     state_null(MU(x1) - MU(x2) == 0) |>
 #'     conclude()
 #' ```
 #'
@@ -81,8 +81,8 @@
 #' state_null(2 * MU(oj) + 1 == MU(vc) - 3)
 #' ```
 #'
-#' `estimate` always reflects the sample contrast (`a * mean(oj) + b * mean(vc)`)
-#' and does not change when only the hypothesized scalar changes — only
+#' `estimate` always reflects the sample contrast (`a * mean(x1) + b * mean(x2)`)
+#' and does not change when only the hypothesized scalar changes, only
 #' `t_stat`, `p_val`, and where the CI sits relative to the hypothesis shift
 #' with it. This matches [stats::t.test()]'s own convention of reporting the
 #' same `estimate` regardless of `mu`.
