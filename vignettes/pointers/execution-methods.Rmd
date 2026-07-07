@@ -1,6 +1,7 @@
 ---
 title: "Execution and Retrieval of Outputs"
 subtitle: "Explanation"
+description: "Pointers of statim execution stage for developers"
 output:
     rmarkdown::html_vignette:
         toc: true
@@ -15,7 +16,6 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
-
 fansi::set_knit_hooks(knitr::knit_hooks)
 library(statim)
 ```

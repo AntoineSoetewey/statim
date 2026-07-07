@@ -1,6 +1,7 @@
 ---
 title: "via(): Switching to different mode"
 subtitle: "Explanation"
+description: "Pointers of statim's art of switching for developers"
 output: 
     rmarkdown::html_vignette:
         toc: true

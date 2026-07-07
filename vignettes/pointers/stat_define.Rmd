@@ -1,6 +1,7 @@
 ---
 title: "stat_define objects"
 subtitle: "Explanation"
+description: "Pointers of statim's core estimation method for developers"
 output: 
     rmarkdown::html_vignette:
         toc: true

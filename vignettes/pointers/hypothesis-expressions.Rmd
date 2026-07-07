@@ -1,6 +1,7 @@
 ---
 title: "What are {statim}'s Null Hypothesis Expressions? "
 subtitle: "A New Feature and Explanation"
+description: "Pointers of statim's null hypothesis expressions for developers"
 output: 
     rmarkdown::html_vignette:
         toc: true
