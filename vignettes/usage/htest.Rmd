@@ -65,7 +65,7 @@ box::use(
 )
 
 box::use(
-    dplyr[keep_when = filter, mutate],
+    dplyr[keep_when = filter, mutate, glimpse],
     readr[read_csv]
 )
 ```
@@ -76,6 +76,8 @@ heart = read_csv(system.file("extdata", "heart-disease.csv", package = "statim")
         sex = factor(sex, levels = c(0, 1), labels = c("Female", "Male")),
         fbs = factor(fbs, levels = c(0, 1), labels = c("Normal", "High"))
     )
+
+glimpse(heart)
 ```
 
 Here's an overview for the columns to be used:
