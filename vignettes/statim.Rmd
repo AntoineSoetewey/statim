@@ -62,7 +62,25 @@ Each step has one job. The pipeline reads like a sentence: define the model, cho
 
 ![](workflow.jpg)
 
-### i. Define the model
+All you need to know is that the most usual usage of `{statim}` comes with three steps. Here's the general anatomy of the main `{statim}` semantics: 
+
+``` r 
+# Data can be piped in or passed as argument to `define_model()`
+... |>                                   # Possible extensions  
+    define_model(
+        <var_id>(var1, var2, ...), 
+        data, ...
+    ) |>                                 # 1. Model definition
+    # ... |>                             # Possible extensions  
+    prepare(<STAT_FN>) |>                # 2. Prepare method (lazy)
+    via(...) |>                          # Optional: method variant  (*)
+    state_null(<expr>) |>                # Optional: null hypothesis (*)
+    # ... |>                             # Possible extensions  
+    conclude() |>                        # 3. Execute
+    <output_handler>()                   # e.g. tidy(), display()    
+```
+
+### i. Layout Model Definition 
 
 Every pipeline starts with `define_model()`, which binds a variable description to data. The variable description is a `<var_id>` object — `{statim}`'s equivalent of `ggplot2::aes()`. It captures bare variable names lazily, exactly as `~` does, but resolves them in a consistent, pipeline-aware way.
 
