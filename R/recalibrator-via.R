@@ -17,13 +17,13 @@
 #' @examples
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     via("boot", n = 2000) |>
 #'     conclude()
 #'
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     via("permute", n = 999L) |>
 #'     conclude()
 #'

@@ -94,7 +94,7 @@ S7::method(tidy, cld_exec) = function(.x, ...) {
 #' registration needed.
 #'
 #' @param obj A stat function built with [HTEST_FN()] or [MODEL_FN()]
-#'   (e.g. `TTEST`).
+#'   (e.g. `T_TEST`).
 #' @param model_type An S7 variable mapper `<var_id>` class (e.g. `x_by`, `S7::class_formula`).
 #'
 #' @return A `making_tidy_call` object, consumed by `%<-%`.
@@ -104,7 +104,7 @@ S7::method(tidy, cld_exec) = function(.x, ...) {
 #' @examples
 #' # Only needed when fn returns a non-class_stat_infer object.
 #' # Prefer implementing auto_tidy() on your result class instead.
-#' making_tidy(TTEST, x_by) %<-% method_tidy(
+#' making_tidy(T_TEST, x_by) %<-% method_tidy(
 #'     default = function(.x, ...) { ... },
 #'     boot = function(.x, ...) { ... }
 #' )

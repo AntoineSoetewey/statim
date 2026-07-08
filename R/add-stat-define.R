@@ -14,7 +14,7 @@
 #' called in the registering package's `.onUnload()`.
 #'
 #' @param stat_fn A test or model function built with [HTEST_FN()] or [MODEL_FN()]
-#'   (e.g. `TTEST`, `P_TEST`).
+#'   (e.g. `T_TEST`, `P_TEST`).
 #' @param model_type An S7 `<var_id>` class (e.g. `x_by`, `S7::class_formula`).
 #' @param impl An [agendas()] object.
 #' @param compatible_params A list of param S7 classes (e.g. `list(MU)`).

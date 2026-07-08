@@ -13,7 +13,7 @@
 #' duration the registering package is loaded and vanish when it is unloaded.
 #'
 #' @param obj A test or model function built with [HTEST_FN()] or [MODEL_FN()]
-#'   (e.g. `TTEST`). Used to scope the registry key.
+#'   (e.g. `T_TEST`). Used to scope the registry key.
 #' @param model_type An S7 `<var_id>` class (e.g. `x_by`, `S7::class_formula`).
 #' @param name A string naming the variant to add.
 #' @param origin One of `"user"` (default, session-scoped) or `"package"`
@@ -27,7 +27,7 @@
 #' # Add a bootstrap variant for x_by (user level).
 #' # .proc$x_data[[1]] is the response vector; .proc$group_data is the
 #' # grouping data frame. See ?model_processor for all available keys.
-#' add_variant(TTEST, x_by, "another_boot") %<-% variant(
+#' add_variant(T_TEST, x_by, "another_boot") %<-% variant(
 #'     fn = function(.proc, .n = 1000L) {
 #'         x = .proc$x_data[[1]]
 #'         grp = as.character(.proc$group_data[[1]])
@@ -41,10 +41,10 @@
 #' )
 #'
 #' # Remove it, returning to the original slate
-#' remove_variant(TTEST, x_by, "another_boot")
+#' remove_variant(T_TEST, x_by, "another_boot")
 #'
 #' # Package level (inside .onLoad())
-#' add_variant(TTEST, x_by, "another_boot", origin = "package") %<-% variant(
+#' add_variant(T_TEST, x_by, "another_boot", origin = "package") %<-% variant(
 #'     fn = function(.proc, .n = 1000L) { ... }
 #' )
 #'

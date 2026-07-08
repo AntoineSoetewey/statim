@@ -11,7 +11,7 @@
 #'   \describe{
 #'     \item{`@data`}{The raw return value of the `fn` defined in [baseline()]
 #'       or [variant()]. Its structure depends on the implementation — see the
-#'       documentation of the stat function (e.g. `?TTEST`) for what to expect.}
+#'       documentation of the stat function (e.g. `?T_TEST`) for what to expect.}
 #'     \item{`@cld_meta`}{A list of pipeline metadata:
 #'       \describe{
 #'         \item{`$var_id`}{The Variable Mapper object passed to [define_model()].}
@@ -51,7 +51,7 @@
 #' For example:
 #'
 #' ```r
-#' making_tidy(TTEST, x_by) %<-% method_tidy(
+#' making_tidy(T_TEST, x_by) %<-% method_tidy(
 #'     default = function(.x, ...) {
 #'         dat = .x@data
 #'         # return a tibble
@@ -65,12 +65,12 @@
 #' @examples
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     conclude()
 #'
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     via("boot", n = 2000) |>
 #'     conclude()
 #'
