@@ -1,7 +1,7 @@
 #' Structured result container for one-sample t-tests
 #'
 #' @description
-#' An S7 class produced by [TTEST] pipelines using [on()] as the variable
+#' An S7 class produced by [T_TEST] pipelines using [on()] as the variable
 #' mapper `<var_id>`. Not constructed manually — use the pipeline instead.
 #'
 #' Inherits from [class_stat_infer], so [auto_tidy()] dispatches on it
@@ -11,7 +11,7 @@
 #' @usage NULL
 #'
 #' @details
-#' Slots (populated automatically by [TTEST]):
+#' Slots (populated automatically by [T_TEST]):
 #'
 #' - `term`: name of the tested variable.
 #' - `estimate`: sample mean.
@@ -27,7 +27,7 @@
 #' Both `base` and `multi` return a `class_ttest_one`, so [auto_tidy()] and
 #' [print()] are inherited by `multi` for free.
 #'
-#' @seealso [TTEST], [ttest-on], [auto_tidy()], [class_stat_infer]
+#' @seealso [T_TEST], [ttest-on], [auto_tidy()], [class_stat_infer]
 #'
 #' @export
 class_ttest_one = S7::new_class(

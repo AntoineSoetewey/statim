@@ -4,7 +4,7 @@
 \alias{class_ttest_one}
 \title{Structured result container for one-sample t-tests}
 \description{
-An S7 class produced by \link{TTEST} pipelines using \code{\link[=on]{on()}} as the variable
+An S7 class produced by \link{T_TEST} pipelines using \code{\link[=on]{on()}} as the variable
 mapper \verb{<var_id>}. Not constructed manually — use the pipeline instead.
 
 Inherits from \link{class_stat_infer}, so \code{\link[=auto_tidy]{auto_tidy()}} dispatches on it
@@ -12,7 +12,7 @@ automatically. Downstream packages can use it as a \code{parent} in
 \code{S7::new_class()}.
 }
 \details{
-Slots (populated automatically by \link{TTEST}):
+Slots (populated automatically by \link{T_TEST}):
 \itemize{
 \item \code{term}: name of the tested variable.
 \item \code{estimate}: sample mean.
@@ -32,5 +32,5 @@ Both \code{base} and \code{multi} return a \code{class_ttest_one}, so \code{\lin
 }
 
 \seealso{
-\link{TTEST}, \link{ttest-on}, \code{\link[=auto_tidy]{auto_tidy()}}, \link{class_stat_infer}
+\link{T_TEST}, \link{ttest-on}, \code{\link[=auto_tidy]{auto_tidy()}}, \link{class_stat_infer}
 }

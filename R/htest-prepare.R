@@ -20,7 +20,7 @@ test_lazy = S7::new_class(
 #'
 #' @param .x An S7 object extension yielded by, e.g. `<def_var>` object from [define_model()],
 #'   or an `<expanded_model>` object from [write_models()].
-#' @param .test A test function such as [TTEST] that carries `<test_spec>` objects when called.
+#' @param .test A test function such as [T_TEST] that carries `<test_spec>` objects when called.
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return A `<test_lazy>` S7 object.
@@ -30,7 +30,7 @@ test_lazy = S7::new_class(
 #' @examples
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     conclude()
 #'
 #' @name prepare-test
@@ -93,7 +93,7 @@ S7::method(print, test_lazy) = function(x, ...) {
 #' @examples
 #' sleep |>
 #'     define_model(extra ~ group) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     update(.ci = 0.9) |>
 #'     conclude()
 #'

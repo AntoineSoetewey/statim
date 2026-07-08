@@ -18,7 +18,7 @@ changing the method variant or engine.
 \examples{
 sleep |>
     define_model(extra ~ group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     update(.ci = 0.9) |>
     conclude()
 

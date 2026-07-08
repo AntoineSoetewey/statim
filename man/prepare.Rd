@@ -11,7 +11,7 @@ prepare(.x, .fn, ...)
 \verb{<expanded_model>} object from \code{\link[=write_models]{write_models()}}.}
 
 \item{.fn}{A stat function built with \code{\link[=STAT_CONSTRUCTOR]{STAT_CONSTRUCTOR()}} that returns
-a \verb{<test_spec>} (e.g. \link{TTEST}) or a \verb{<model_spec>} (e.g. \link{LINEAR_REG}).}
+a \verb{<test_spec>} (e.g. \link{T_TEST}) or a \verb{<model_spec>} (e.g. \link{LINEAR_REG}).}
 
 \item{...}{Additional arguments passed to the dispatched \verb{prepare_*()} function.}
 }
@@ -29,7 +29,7 @@ with \code{\link[=via]{via()}} before execution with \code{\link[=conclude]{conc
 \examples{
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare(TTEST) |>
+    prepare(T_TEST) |>
     conclude()
 
 mtcars |>

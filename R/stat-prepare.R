@@ -9,7 +9,7 @@
 #' @param .x A `<def_var>` object from [define_model()], or an
 #'   `<expanded_model>` object from [write_models()].
 #' @param .fn A stat function built with [STAT_CONSTRUCTOR()] that returns
-#'   a `<test_spec>` (e.g. [TTEST]) or a `<model_spec>` (e.g. [LINEAR_REG]).
+#'   a `<test_spec>` (e.g. [T_TEST]) or a `<model_spec>` (e.g. [LINEAR_REG]).
 #' @param ... Additional arguments passed to the dispatched `prepare_*()` function.
 #'
 #' @return A `<test_lazy>` object if `.fn` returns a `<test_spec>`, or a
@@ -20,7 +20,7 @@
 #' @examples
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare(TTEST) |>
+#'     prepare(T_TEST) |>
 #'     conclude()
 #'
 #' mtcars |>

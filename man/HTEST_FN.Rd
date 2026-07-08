@@ -18,7 +18,7 @@ A function with signature \verb{function(.var_id, .data, ...)}.
 }
 \description{
 \code{HTEST_FN()} is a developer-interface constructor for user-facing test
-functions like \code{\link[=TTEST]{TTEST()}}. It returns a function with a consistent
+functions like \code{\link[=T_TEST]{T_TEST()}}. It returns a function with a consistent
 signature that routes to the correct implementation based on the variable mapper \verb{<var_id>}
 and method variant.
 }

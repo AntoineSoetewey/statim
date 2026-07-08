@@ -1,7 +1,7 @@
 #' Build a hypothesis test function
 #'
 #' `HTEST_FN()` is a developer-interface constructor for user-facing test
-#' functions like [TTEST()]. It returns a function with a consistent
+#' functions like [T_TEST()]. It returns a function with a consistent
 #' signature that routes to the correct implementation based on the variable mapper `<var_id>`
 #' and method variant.
 #'

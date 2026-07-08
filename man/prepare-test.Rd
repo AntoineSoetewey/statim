@@ -11,7 +11,7 @@ prepare_test(.x, .test, ...)
 \item{.x}{An S7 object extension yielded by, e.g. \verb{<def_var>} object from \code{\link[=define_model]{define_model()}},
 or an \verb{<expanded_model>} object from \code{\link[=write_models]{write_models()}}.}
 
-\item{.test}{A test function such as \link{TTEST} that carries \verb{<test_spec>} objects when called.}
+\item{.test}{A test function such as \link{T_TEST} that carries \verb{<test_spec>} objects when called.}
 
 \item{...}{Additional arguments passed to methods.}
 }
@@ -26,7 +26,7 @@ before being executed with \code{\link[=conclude]{conclude()}}.
 \examples{
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     conclude()
 
 }
