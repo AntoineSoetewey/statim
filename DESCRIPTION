@@ -29,7 +29,7 @@ Imports:
     tidyselect,
     stats,
     utils,
-    tabstats,
+    tabstats (>= 0.2.0),
     pillar
 Suggests:
     testthat (>= 3.0.0),
