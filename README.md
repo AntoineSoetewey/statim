@@ -16,16 +16,9 @@ coverage](https://codecov.io/gh/s7-stats/statim/graph/badge.svg)](https://app.co
 
 What does `{statim}` mean?
 
-`{statim}` is a Latin word for “immediately, at once”. The name carries
-a double meaning:
-
-- *stat*: as in statistics, the domain this package lives in
-
-- *im* (*statim*): as in “immediate”, signalling that inference should
-  be expressible as a direct declaration, not somewhat a sequence of
-  mechanical steps
-
-This simply means: you declare *what* statistical inference you want to
+*statim* is a Latin word for “immediately, at once”. It’s prefix *stat*,
+as in statistics, is where the domain this package lives in. This can be
+interpreted as: you declare *what* statistical inference you want to
 perform, then `{statim}` immediately delivers *how*.
 
 ## Why statim?
@@ -39,7 +32,7 @@ manipulation (`{dplyr}`). And then there’s `{statim}`, an attempt to
 re-imagine the “grammar of statistical inference” from the ground up.
 The core idea of `{statim}` in general is it’s fully declarative, and
 that any inferential procedure can be described in [three
-steps](#general-usage).
+steps](https://s7-stats.github.io/statim/articles/statim.html).
 
 What makes `{statim}` *composable* for statistical workflows is the
 *verbs* and the *accessibility* of the methods you’re looking for. For
@@ -62,98 +55,24 @@ sleep |>
 sleep |> 
     define_model(x_by(extra, group)) |> 
     prepare_test(TTEST) |> 
-    # Here, one line added, nothing else changes
+    # Here, one line added
+    # Nothing else changed
     via("permute", n = 1000L) |>         
     conclude()
 ```
 
-For a quick result, the eager form skips the piped syntax entirely:
+For a quick result, a one-liner or an eager form skips the piped syntax
+entirely:
 
 ``` r
-# Only works for `stat_fn` functions
+# Only works for `<stat_fn>` functions
 TTEST(x_by(extra, group), sleep)
 ```
 
-The trade-off: eager forms cannot be recalibrated / switch off into
-different methods with `via()` and do not support post-execution output
-manipulation ([see for more details](#core-semantics)).
-
-## Installation
-
-The package is yet to be submitted into CRAN.
-
-``` r
-# Stable version (not yet released)
-install.packages("statim")
-```
-
-For the time being, you can install the current implementation on
-GitHub:
-
-``` r
-# Development version from GitHub
-# install.packages("pak")
-pak::pak("s7-stats/statim")
-```
-
-## General Usage
-
-Let us start by loading `{statim}` first:
-
-``` r
-library(statim)
-```
-
-All you need to know is that the most usual usage of `{statim}` comes
-with three steps. Here’s the general anatomy of the main `{statim}`
-semantics:
-
-``` r
-# Data can be piped in or passed as argument to `define_model()`
-... |>                                   # Possible extensions  
-    define_model(
-        <var_id>(var1, var2, ...), 
-        data, ...
-    ) |>                                 # 1. Model definition
-    # ... |>                             # Possible extensions  
-    prepare(<STAT_FN>) |>                # 2. Prepare method (lazy)
-    via(...) |>                          # Optional: method variant  (*)
-    state_null(<expr>) |>                # Optional: null hypothesis (*)
-    # ... |>                             # Possible extensions  
-    conclude() |>                        # 3. Execute
-    <output_handler>()                   # e.g. tidy(), display()    
-```
-
-Explanation of the code above:
-
-1.  *Model processor and definition*, where defining the shape of model
-    *to be analyzed* happens at the beginning during statistical
-    inference. Typically, this step where supplying either a data frame
-    or a `<var_id>` objects into `define_model()` occurs, and then some
-    functions to be appended in the future updates.
-
-2.  *Parameterization*, where the estimation process of the statistical
-    inference pipeline is defined lazily. Our usual statistical
-    inference application can be a model-based inference (e.g. linear
-    regression through `prepare_model()`), H-test inference (e.g. t-test
-    through `prepare_test()`), or both with just `prepare()`. With that
-    said, the execution is lazy-loaded, and only executed if needed.
-    (The `(*)` mark means they are interchangeable. )
-
-    > `state_null()` is one of the reasons why `{statim}` — it’s
-    > astronomical way of writing null hypothesis expressed
-    > mathematically. Learn more about it on
-    > `vignette("hypothesis-expressions", package = "statim")`.
-
-3.  *Execution and retrieval*, where the first 2 steps is (re-)executed
-    and then retrieve the output. The most common function is
-    `conclude()`. There are several techniques to retrieve the output,
-    e.g. through `tidy()`. This is functional if there are available
-    methods are registered, automatically or from a manual step.
-
-The `...` before the pipe above means the possible future extensions for
-this package. For more information, see through `vignette("statim")`,
-and learn more about how `{statim}` works.
+The nuanced downside of eager forms is that they are not supported with
+its main semantics that is, for example, (1) recalibrating / switching
+off into different methods from the same estimation method with `via()`
+and (2) do not support post-execution output manipulation.
 
 ## Core Semantics
 
@@ -186,6 +105,24 @@ The package is designed around three ideas:
     `<STAT_FN>` form (only be accessed with `via()` only). With these,
     you can bring your own engine, your own method, your own
     implementation, or use them to extend the current ones.
+
+## Installation
+
+The package is yet to be submitted into CRAN.
+
+``` r
+# Stable version (not yet released)
+install.packages("statim")
+```
+
+For the time being, you can install the current implementation on
+GitHub:
+
+``` r
+# Development version from GitHub
+# install.packages("pak")
+pak::pak("s7-stats/statim")
+```
 
 ## License
 
