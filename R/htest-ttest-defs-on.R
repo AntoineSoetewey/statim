@@ -10,7 +10,7 @@
 #' [x_by()] expects.
 #'
 #' @section Arguments:
-#' The following arguments are passed via `...` in [TTEST()] or [via()]:
+#' The following arguments are passed via `...` in [T_TEST()] or [via()]:
 #'
 #' \describe{
 #'   \item{`.mu`}{Numeric. Hypothesized mean (one-sample) or mean
@@ -53,7 +53,7 @@
 #'
 #' ``` r
 #' define_model(on(x), <data>) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     state_null(MU(x) >= 1) |>
 #'     conclude()
 #' ```
@@ -68,7 +68,7 @@
 #'
 #' ``` r
 #' define_model(on(x1, x2), <data>) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     via("two_sample") |>
 #'     state_null(MU(x1) - MU(x2) == 0) |>
 #'     conclude()
@@ -95,20 +95,20 @@
 #' # single variable
 #' sleep |>
 #'     define_model(on(extra)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     conclude()
 #'
 #' # null hypothesis expression
 #' sleep |>
 #'     define_model(on(extra)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     state_null(MU(extra) >= 1) |>
 #'     conclude()
 #'
 #' # multiple variables
 #' iris |>
 #'     define_model(on(where(is.numeric))) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     via("multi") |>
 #'     conclude()
 #'
@@ -117,7 +117,7 @@
 #' oj = ToothGrowth$len[ToothGrowth$supp == "OJ"]
 #'
 #' define_model(on(vc, oj)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     via("two_sample") |>
 #'     conclude()
 #'
@@ -130,14 +130,14 @@
 #'         I(d1 = len[supp == "OJ" & dose == 1]),
 #'         I(d2 = len[supp == "VC" & dose == 1])
 #'     ))) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     via("two_sample", .paired = TRUE) |>
 #'     conclude()
 #'
 #' # two-sample with a weighted contrast hypothesis
 #' ToothGrowth |>
 #'     with(define_model(on(I(oj = len[supp == "OJ"]), I(vc = len[supp == "VC"])))) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     via("two_sample") |>
 #'     state_null(2 * MU(oj) - MU(vc) == 5) |>
 #'     conclude()

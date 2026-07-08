@@ -12,7 +12,7 @@ Use \code{\link[=pairwise]{pairwise()}} as the variable mapper \verb{<var_id>} t
 }
 \section{Arguments}{
 
-The following arguments are passed via \code{...} in \code{\link[=TTEST]{TTEST()}}:
+The following arguments are passed via \code{...} in \code{\link[=T_TEST]{T_TEST()}}:
 
 \describe{
 \item{\code{.paired}}{Logical. Whether to perform paired comparisons.
@@ -54,7 +54,7 @@ diagonal entries only.
 \examples{
 iris |>
     define_model(pairwise(Sepal.Length, Sepal.Width, Petal.Length)) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     conclude()
 
 }

@@ -4,7 +4,7 @@
 \alias{class_ttest_pairwise}
 \title{Structured result container for pairwise t-tests}
 \description{
-An S7 class produced by \link{TTEST} pipelines using \code{\link[=pairwise]{pairwise()}} as the
+An S7 class produced by \link{T_TEST} pipelines using \code{\link[=pairwise]{pairwise()}} as the
 variable mapper \verb{<var_id>}. Not constructed manually — use the pipeline instead.
 
 Inherits from \link{class_stat_infer}, so \code{\link[=auto_tidy]{auto_tidy()}} dispatches on it
@@ -12,7 +12,7 @@ automatically. Downstream packages can use it as a \code{parent} in
 \code{S7::new_class()}.
 }
 \details{
-Slots (populated automatically by \link{TTEST}):
+Slots (populated automatically by \link{T_TEST}):
 \itemize{
 \item \code{var1}: first variable in each pair.
 \item \code{var2}: second variable in each pair.
@@ -33,5 +33,5 @@ and renders a diagonal-only matrix.
 }
 
 \seealso{
-\link{TTEST}, \link{ttest-pairwise}, \code{\link[=auto_tidy]{auto_tidy()}}, \link{class_stat_infer}
+\link{T_TEST}, \link{ttest-pairwise}, \code{\link[=auto_tidy]{auto_tidy()}}, \link{class_stat_infer}
 }

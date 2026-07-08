@@ -17,7 +17,7 @@ Use a formula directly as the variable mapper \verb{<var_id>} to select this imp
 }
 \section{Arguments}{
 
-The following arguments are passed via \code{...} in \code{\link[=TTEST]{TTEST()}}:
+The following arguments are passed via \code{...} in \code{\link[=T_TEST]{T_TEST()}}:
 
 \describe{
 \item{\code{.mu}}{Numeric. Hypothesized mean or mean difference. Default \code{0}.}
@@ -47,19 +47,19 @@ of \code{\link[stats:t.test]{stats::t.test()}} objects). This path does not curr
 \examples{
 sleep |>
     define_model(extra ~ group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     conclude()
 
 # one-sample
 sleep |>
     define_model(extra ~ 1) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     conclude()
 
 # both in one call
 sleep |>
     define_model(extra ~ group + 1) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     conclude()
 
 }

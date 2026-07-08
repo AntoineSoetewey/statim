@@ -1,8 +1,8 @@
 #' T-Test
 #'
-#' `TTEST()` performs a t-test for one-sample, two-sample, paired, pairwise, or
-#' formula-based comparisons. If `TTEST` is supplied within the lazy-loaded pipeline,
-#' supply `TTEST` as a function within i.e. `prepare_test(.test = TTEST)` call.
+#' `T_TEST()` performs a t-test for one-sample, two-sample, paired, pairwise, or
+#' formula-based comparisons. If `T_TEST` is supplied within the lazy-loaded pipeline,
+#' supply `T_TEST` as a function within i.e. `prepare_test(.test = T_TEST)` call.
 #'
 #' @param .var_id A variable mapper `<var_id>` from `x_by()`, `pairwise()`, or a formula.
 #'   When supplied, the test executes immediately.
@@ -28,25 +28,25 @@
 #'
 #' @examples
 #' # eager
-#' TTEST(x_by(extra, group), sleep)
+#' T_TEST(x_by(extra, group), sleep)
 #'
 #' # pipeline
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     conclude()
 #'
 #' # bootstrap
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     via("boot", n = 2000) |>
 #'     conclude()
 #'
 #' # permutation
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     via("permute", n = 2000) |>
 #'     conclude()
 #'
@@ -55,7 +55,7 @@
 #' # This performs Welch-Satterthwaite linear contrast test for t-test
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     state_null(
 #'         2 * MU(extra, group == "1") <= MU(extra, group == "2")
 #'     ) |>
@@ -66,7 +66,7 @@
 #' # pairwise
 #' iris |>
 #'     define_model(pairwise(Sepal.Length, Sepal.Width, Petal.Length)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     conclude()
 #'
 #' @inheritSection ttest-xby References
@@ -77,7 +77,7 @@
 #' slots. [via()], [state_null()], [conclude()], [auto_tidy()].
 #'
 #' @export
-TTEST = HTEST_FN(
+T_TEST = HTEST_FN(
     cls = "ttest",
     defs = list(
         ttest_def_on,
@@ -91,7 +91,7 @@ TTEST = HTEST_FN(
 #' Structured result container for two-sample t-tests
 #'
 #' @description
-#' An S7 class produced by [TTEST] pipelines using [x_by()] as the variable mapper `<var_id>`.
+#' An S7 class produced by [T_TEST] pipelines using [x_by()] as the variable mapper `<var_id>`.
 #' Not constructed manually — use the pipeline instead.
 #'
 #' Inherits from [class_stat_infer], so [auto_tidy()] dispatches on it
@@ -101,7 +101,7 @@ TTEST = HTEST_FN(
 #' @usage NULL
 #'
 #' @details
-#' Slots (populated automatically by [TTEST]):
+#' Slots (populated automatically by [T_TEST]):
 #'
 #' - `group`: name of the grouping variable.
 #' - `estimate`: mean difference (or linear contrast estimate).
@@ -116,7 +116,7 @@ TTEST = HTEST_FN(
 #' Both the default (`base`) and `contrast` return a `class_ttest_two`, so
 #' [auto_tidy()] and [print()] are inherited by `contrast` for free.
 #'
-#' @seealso [TTEST], [auto_tidy()], [class_stat_infer]
+#' @seealso [T_TEST], [auto_tidy()], [class_stat_infer]
 #'
 #' @export
 class_ttest_two = S7::new_class(
@@ -200,7 +200,7 @@ S7::method(print, class_ttest_two) = function(x, ...) {
 #' Structured result container for pairwise t-tests
 #'
 #' @description
-#' An S7 class produced by [TTEST] pipelines using [pairwise()] as the
+#' An S7 class produced by [T_TEST] pipelines using [pairwise()] as the
 #' variable mapper `<var_id>`. Not constructed manually — use the pipeline instead.
 #'
 #' Inherits from [class_stat_infer], so [auto_tidy()] dispatches on it
@@ -210,7 +210,7 @@ S7::method(print, class_ttest_two) = function(x, ...) {
 #' @usage NULL
 #'
 #' @details
-#' Slots (populated automatically by [TTEST]):
+#' Slots (populated automatically by [T_TEST]):
 #'
 #' - `var1`: first variable in each pair.
 #' - `var2`: second variable in each pair.
@@ -227,7 +227,7 @@ S7::method(print, class_ttest_two) = function(x, ...) {
 #' identical (each variable tested against itself). [print()] detects this
 #' and renders a diagonal-only matrix.
 #'
-#' @seealso [TTEST], [ttest-pairwise], [auto_tidy()], [class_stat_infer]
+#' @seealso [T_TEST], [ttest-pairwise], [auto_tidy()], [class_stat_infer]
 #'
 #' @export
 class_ttest_pairwise = S7::new_class(

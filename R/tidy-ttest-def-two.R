@@ -1,4 +1,4 @@
-making_tidy(TTEST, x_by) %<-%
+making_tidy(T_TEST, x_by) %<-%
     method_tidy(
         # default = function(.x, ...) {
         #     dat = .x@data

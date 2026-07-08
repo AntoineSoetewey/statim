@@ -8,7 +8,7 @@
 #' Use [pairwise()] as the variable mapper `<var_id>` to select this implementation.
 #'
 #' @section Arguments:
-#' The following arguments are passed via `...` in [TTEST()]:
+#' The following arguments are passed via `...` in [T_TEST()]:
 #'
 #' \describe{
 #'   \item{`.paired`}{Logical. Whether to perform paired comparisons.
@@ -42,7 +42,7 @@
 #' @examples
 #' iris |>
 #'     define_model(pairwise(Sepal.Length, Sepal.Width, Petal.Length)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     conclude()
 #'
 #' @keywords internal

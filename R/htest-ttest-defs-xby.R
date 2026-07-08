@@ -5,7 +5,7 @@
 #' t-test. It accepts one or more grouping variables via [x_by()].
 #'
 #' @section Arguments:
-#' The following arguments are passed via `...` in [TTEST()] or [via()]:
+#' The following arguments are passed via `...` in [T_TEST()] or [via()]:
 #'
 #' \describe{
 #'   \item{`.paired`}{Logical. Whether to perform a paired t-test. Default `FALSE`.}
@@ -49,12 +49,12 @@
 #' @examples
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     conclude()
 #'
 #' sleep |>
 #'     define_model(x_by(extra, group)) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     via("boot", n = 2000) |>
 #'     conclude()
 #'
@@ -63,7 +63,7 @@
 #' # Also `%by%` is just the infixed form of `x_by()`
 #' sleep |>
 #'     define_model(extra %by% group) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     state_null(
 #'         2 * MU(extra, group == "1") - MU(extra, group == "2") <= 0
 #'     ) |>
@@ -107,7 +107,7 @@ ttest_def_two = test_define(
                     cli::cli_abort(c(
                         "Two-sample t-test requires exactly 1 grouping variable.",
                         "i" = "Found {length(group_data)} grouping variable{cli::qty(length(group_data))}{?s}.",
-                        "i" = "Use {.code via(\"multi\")} (e.g. {.code ... |> prepare(TTEST) |> via(\"multi\")}) to test multiple grouping variables."
+                        "i" = "Use {.code via(\"multi\")} (e.g. {.code ... |> prepare(T_TEST) |> via(\"multi\")}) to test multiple grouping variables."
                     ))
                 }
 

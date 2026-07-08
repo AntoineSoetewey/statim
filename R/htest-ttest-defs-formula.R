@@ -12,7 +12,7 @@
 #' Use a formula directly as the variable mapper `<var_id>` to select this implementation.
 #'
 #' @section Arguments:
-#' The following arguments are passed via `...` in [TTEST()]:
+#' The following arguments are passed via `...` in [T_TEST()]:
 #'
 #' \describe{
 #'   \item{`.mu`}{Numeric. Hypothesized mean or mean difference. Default `0`.}
@@ -36,19 +36,19 @@
 #' @examples
 #' sleep |>
 #'     define_model(extra ~ group) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     conclude()
 #'
 #' # one-sample
 #' sleep |>
 #'     define_model(extra ~ 1) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     conclude()
 #'
 #' # both in one call
 #' sleep |>
 #'     define_model(extra ~ group + 1) |>
-#'     prepare_test(TTEST) |>
+#'     prepare_test(T_TEST) |>
 #'     conclude()
 #'
 #' @keywords internal

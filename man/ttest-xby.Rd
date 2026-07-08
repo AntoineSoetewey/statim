@@ -9,7 +9,7 @@ t-test. It accepts one or more grouping variables via \code{\link[=x_by]{x_by()}
 }
 \section{Arguments}{
 
-The following arguments are passed via \code{...} in \code{\link[=TTEST]{TTEST()}} or \code{\link[=via]{via()}}:
+The following arguments are passed via \code{...} in \code{\link[=T_TEST]{T_TEST()}} or \code{\link[=via]{via()}}:
 
 \describe{
 \item{\code{.paired}}{Logical. Whether to perform a paired t-test. Default \code{FALSE}.}
@@ -75,12 +75,12 @@ Kutner, M. H., Nachtsheim, C. J., Neter, J., & Li, W. (2004).
 \examples{
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     conclude()
 
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     via("boot", n = 2000) |>
     conclude()
 
@@ -89,7 +89,7 @@ sleep |>
 # Also `\%by\%` is just the infixed form of `x_by()`
 sleep |>
     define_model(extra \%by\% group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     state_null(
         2 * MU(extra, group == "1") - MU(extra, group == "2") <= 0
     ) |>
