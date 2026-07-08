@@ -201,7 +201,7 @@ test_that("write_models() mixed var_id types each result is a cld_exec", {
 test_that("write_models() feeds correctly into prepare_test()", {
     ml = mtcars |>
         write_models(by_am = x_by(mpg, am), by_vs = x_by(mpg, vs)) |>
-        prepare_test(TTEST)
+        prepare_test(T_TEST)
 
     expect_s7_class(ml, multi_lazy)
     expect_length(ml@models, 2L)
@@ -211,7 +211,7 @@ test_that("write_models() feeds correctly into prepare_test()", {
 test_that("write_models() with prepare_test() conclude() returns multi_exec", {
     me = mtcars |>
         write_models(by_am = x_by(mpg, am), by_vs = x_by(mpg, vs)) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         conclude()
 
     expect_s7_class(me, multi_exec)
@@ -222,7 +222,7 @@ test_that("write_models() with prepare_test() conclude() returns multi_exec", {
 test_that("write_models() with prepare_test() each result is a cld_exec", {
     me = mtcars |>
         write_models(by_am = x_by(mpg, am), by_vs = x_by(mpg, vs)) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         conclude()
 
     expect_true(S7::S7_inherits(me@results[[1L]], cld_exec))

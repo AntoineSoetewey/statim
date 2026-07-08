@@ -45,7 +45,7 @@ test_that("print.null_claim: displays RHO with both variables", {
 test_that("print.stated_null: displays test name, default method, and claim", {
     lazy = sleep |>
         define_model(x_by(extra, group)) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         state_null(MU(extra) == 0)
 
     output = capture.output(print(lazy))
@@ -58,7 +58,7 @@ test_that("print.stated_null: displays test name, default method, and claim", {
 test_that("print.stated_null: displays recalibrated method and args", {
     lazy = sleep |>
         define_model(x_by(extra, group)) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         state_null(MU(extra) == 0) |>
         via("boot", n = 2000)
 

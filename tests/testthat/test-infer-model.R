@@ -22,7 +22,7 @@ test_that("prepare_model() with formula dispatches correctly", {
 test_that("prepare_model() with a test function errors", {
     dm = define_model(x_by(extra, group), sleep)
 
-    expect_error(prepare_model(dm, TTEST), class = "rlang_error")
+    expect_error(prepare_model(dm, T_TEST), class = "rlang_error")
 })
 
 test_that("prepare_model() with a non-function errors", {
@@ -32,7 +32,7 @@ test_that("prepare_model() with a non-function errors", {
 })
 
 test_that("as_model_spec() rejects a test function", {
-    expect_error(statim:::as_model_spec(TTEST), class = "rlang_error")
+    expect_error(statim:::as_model_spec(T_TEST), class = "rlang_error")
 })
 
 test_that("model_lazy recalibrate_spec is NULL by default", {

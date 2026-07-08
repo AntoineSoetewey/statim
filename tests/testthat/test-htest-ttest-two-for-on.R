@@ -4,7 +4,7 @@ test_that("two_sample variant returns class_ttest_two", {
             I(oj = len[supp == "OJ"]),
             I(vc = len[supp == "VC"])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample") |>
         conclude()
 
@@ -20,7 +20,7 @@ test_that("two_sample variant default weights match Welch two-sample t.test()", 
             I(oj = len[supp == "OJ"]),
             I(vc = len[supp == "VC"])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample") |>
         conclude()
 
@@ -57,7 +57,7 @@ test_that("two_sample variant .var_equal = TRUE matches pooled-variance t.test()
             I(oj = len[supp == "OJ"]),
             I(vc = len[supp == "VC"])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample", .var_equal = TRUE) |>
         conclude()
 
@@ -80,7 +80,7 @@ test_that("two_sample variant errs when on() carries more than 2 variables", {
     expect_error(
         iris |>
             define_model(on(Sepal.Length, Sepal.Width, Petal.Length)) |>
-            prepare_test(TTEST) |>
+            prepare_test(T_TEST) |>
             via("two_sample") |>
             conclude(),
         "requires exactly 2 variables"
@@ -96,7 +96,7 @@ test_that("two_sample variant with .paired = TRUE matches paired t.test()", {
             I(d1 = len[supp == "OJ" & dose == 1]),
             I(d2 = len[supp == "VC" & dose == 1])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample", .paired = TRUE) |>
         conclude()
 
@@ -127,7 +127,7 @@ test_that("two_sample variant with .paired = TRUE errs on unequal-length variabl
                 I(d1 = len[supp == "OJ" & dose == 0.5]),
                 I(d2 = len[supp == "VC"])
             ))) |>
-            prepare_test(TTEST) |>
+            prepare_test(T_TEST) |>
             via("two_sample", .paired = TRUE) |>
             conclude(),
         "same length"
@@ -143,7 +143,7 @@ test_that("two_sample variant .w lets custom contrast weights override defaults"
             I(oj = len[supp == "OJ"]),
             I(vc = len[supp == "VC"])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample", .w = c(oj = 1, vc = -2)) |>
         conclude()
 
@@ -160,7 +160,7 @@ test_that("state_null() on two_sample flips sign consistently when sides of == a
             I(oj = len[supp == "OJ"]),
             I(vc = len[supp == "VC"])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample") |>
         state_null(MU(oj) + 1 == 2 * MU(vc)) |>
         conclude()
@@ -170,7 +170,7 @@ test_that("state_null() on two_sample flips sign consistently when sides of == a
             I(oj = len[supp == "OJ"]),
             I(vc = len[supp == "VC"])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample") |>
         state_null(2 * MU(vc) == MU(oj) + 1) |>
         conclude()
@@ -198,7 +198,7 @@ test_that("state_null() on two_sample leaves estimate unchanged when only the sc
             I(oj = len[supp == "OJ"]),
             I(vc = len[supp == "VC"])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample") |>
         state_null(MU(oj) + 1 == 2 * MU(vc)) |>
         conclude()
@@ -208,7 +208,7 @@ test_that("state_null() on two_sample leaves estimate unchanged when only the sc
             I(oj = len[supp == "OJ"]),
             I(vc = len[supp == "VC"])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample") |>
         state_null(MU(oj) + 5 == 2 * MU(vc)) |>
         conclude()
@@ -230,7 +230,7 @@ test_that("state_null() on two_sample handles subtraction-form intercepts identi
             I(oj = len[supp == "OJ"]),
             I(vc = len[supp == "VC"])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample") |>
         state_null(MU(oj) + 2 == 2 * MU(vc)) |>
         conclude()
@@ -240,7 +240,7 @@ test_that("state_null() on two_sample handles subtraction-form intercepts identi
             I(oj = len[supp == "OJ"]),
             I(vc = len[supp == "VC"])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample") |>
         state_null(MU(oj) - (-2) == 2 * MU(vc)) |>
         conclude()
@@ -266,7 +266,7 @@ test_that("state_null() on two_sample correctly distributes a constant through p
             I(oj = len[supp == "OJ"]),
             I(vc = len[supp == "VC"])
         ))) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("two_sample") |>
         state_null(2 * (MU(oj) + 1) == MU(vc)) |>
         conclude()

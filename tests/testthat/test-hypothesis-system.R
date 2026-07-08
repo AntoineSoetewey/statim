@@ -248,7 +248,7 @@ test_that("parse_null_claim: parses unary minus arithmetic", {
 test_that("state_null: attaches claim to test_lazy", {
     lazy = sleep |>
         define_model(x_by(extra, group)) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         state_null(MU(extra) == 0)
 
     expect_true(S7::S7_inherits(lazy, stated_null))
@@ -258,7 +258,7 @@ test_that("state_null: attaches claim to test_lazy", {
 test_that("state_null: returns stated_null subclass", {
     lazy = sleep |>
         define_model(x_by(extra, group)) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         state_null(MU(extra) == 0)
     expect_true(S7::S7_inherits(lazy, stated_null))
     expect_true(S7::S7_inherits(lazy, test_lazy))
@@ -267,7 +267,7 @@ test_that("state_null: returns stated_null subclass", {
 # test_that("state_null: accepts more_h0 block", {
 #     lazy = sleep |>
 #         define_model(x_by(extra, group)) |>
-#         prepare_test(TTEST) |>
+#         prepare_test(T_TEST) |>
 #         state_null(more_h0(
 #             h01 = MU(extra) == 0,
 #             h02 = MU(extra) == 1
@@ -280,7 +280,7 @@ test_that("state_null: returns stated_null subclass", {
 #     expect_error(
 #         sleep |>
 #             define_model(x_by(extra, group)) |>
-#             prepare_test(TTEST) |>
+#             prepare_test(T_TEST) |>
 #             state_null(more_h0(MU(extra) == 0)),
 #         class = "rlang_error"
 #     )
@@ -296,7 +296,7 @@ test_that("attach_claim_to_lazy: rejects incompatible param type", {
     expect_error(
         sleep |>
             define_model(x_by(extra, group)) |>
-            prepare_test(TTEST) |>
+            prepare_test(T_TEST) |>
             state_null(PI() == 0.5),
         class = "rlang_error"
     )
@@ -306,7 +306,7 @@ test_that("attach_claim_to_lazy: rejects incompatible param type", {
 #     expect_error(
 #         sleep |>
 #             define_model(x_by(extra, group)) |>
-#             prepare_test(TTEST) |>
+#             prepare_test(T_TEST) |>
 #             state_null(more_h0(
 #                 h01 = PI() == 0.5
 #             )),
@@ -321,7 +321,7 @@ test_that("validate_claim_vars x_by: rejects wrong x variable", {
     expect_error(
         sleep |>
             define_model(x_by(extra, group)) |>
-            prepare_test(TTEST) |>
+            prepare_test(T_TEST) |>
             state_null(MU(wrong) == 0),
         regexp = "Unknown variable",
         class = "rlang_error"
@@ -332,7 +332,7 @@ test_that("validate_claim_vars x_by: rejects wrong grouping variable", {
     expect_error(
         sleep |>
             define_model(x_by(extra, group)) |>
-            prepare_test(TTEST) |>
+            prepare_test(T_TEST) |>
             state_null(MU(extra, wrong == "1") == 0),
         regexp = "Unknown grouping variable",
         class = "rlang_error"
@@ -343,7 +343,7 @@ test_that("validate_claim_vars x_by: rejects both wrong x and given together", {
     err = expect_error(
         sleep |>
             define_model(x_by(extra, group)) |>
-            prepare_test(TTEST) |>
+            prepare_test(T_TEST) |>
             state_null(2 * MU(x, g == "1") >= MU(x, g == "2")),
         class = "rlang_error"
     )
@@ -355,7 +355,7 @@ test_that("validate_claim_vars x_by: accepts correct variable references", {
     expect_no_error(
         sleep |>
             define_model(x_by(extra, group)) |>
-            prepare_test(TTEST) |>
+            prepare_test(T_TEST) |>
             state_null(MU(extra) == 0)
     )
 })
@@ -364,7 +364,7 @@ test_that("validate_claim_vars x_by: accepts correct given reference", {
     expect_no_error(
         sleep |>
             define_model(x_by(extra, group)) |>
-            prepare_test(TTEST) |>
+            prepare_test(T_TEST) |>
             state_null(2 * MU(extra, group == "1") >= MU(extra, group == "2"))
     )
 })

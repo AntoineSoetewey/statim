@@ -1,7 +1,7 @@
 test_that("tidy() on default x_by result returns a tibble", {
     result = sleep |>
         define_model(extra %by% group) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         conclude() |>
         tidy()
 
@@ -11,7 +11,7 @@ test_that("tidy() on default x_by result returns a tibble", {
 test_that("tidy() on default x_by result has group column", {
     result = sleep |>
         define_model(extra %by% group) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         conclude() |>
         tidy()
 
@@ -21,7 +21,7 @@ test_that("tidy() on default x_by result has group column", {
 test_that("tidy() on boot variant returns tibble with lower, upper, n_reps", {
     result = sleep |>
         define_model(extra %by% group) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("boot", n = 200L, seed = 1L) |>
         conclude() |>
         tidy()
@@ -33,7 +33,7 @@ test_that("tidy() on boot variant returns tibble with lower, upper, n_reps", {
 test_that("tidy() on boot variant lower is less than upper", {
     result = sleep |>
         define_model(extra %by% group) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("boot", n = 500L, seed = 1L) |>
         conclude() |>
         tidy()
@@ -44,7 +44,7 @@ test_that("tidy() on boot variant lower is less than upper", {
 test_that("tidy() on `contrast` variant returns tibble with expected columns", {
     result = sleep |>
         define_model(extra %by% group) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("contrast") |>
         conclude() |>
         tidy()
@@ -60,7 +60,7 @@ test_that("tidy() on `contrast` variant returns tibble with expected columns", {
 test_that("tidy() on t-test pairwise returns tibble with expected columns", {
     result = iris |>
         define_model(pairwise(1:4)) |>
-        prepare(TTEST) |>
+        prepare(T_TEST) |>
         conclude() |>
         tidy()
 
@@ -85,7 +85,7 @@ test_that("tidy() on t-test pairwise returns tibble with expected columns", {
 test_that("tidy() on t-test pairwise has 'One-Sample' and 'Two Sample' when referring equal columns", {
     result = iris |>
         define_model(pairwise(1:4, direction = "lteq")) |>
-        prepare(TTEST) |>
+        prepare(T_TEST) |>
         conclude() |>
         tidy()
 
@@ -94,12 +94,12 @@ test_that("tidy() on t-test pairwise has 'One-Sample' and 'Two Sample' when refe
 
 test_that("tidy() errors when no method registered for variant", {
     simple_variant = variant(fn = function(.proc) list(diff = 1))
-    add_variant(TTEST, x_by, "test_no_tidy") %<-% simple_variant
-    on.exit(remove_variant(TTEST, x_by, "test_no_tidy"))
+    add_variant(T_TEST, x_by, "test_no_tidy") %<-% simple_variant
+    on.exit(remove_variant(T_TEST, x_by, "test_no_tidy"))
 
     result = sleep |>
         define_model(extra %by% group) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("test_no_tidy") |>
         conclude()
 
@@ -110,17 +110,17 @@ test_that("making_tidy %<-% registers tidy method for new variant", {
     simple_variant = variant(fn = function(.proc) {
         list(diff = mean(.proc$x_data[[1]], na.rm = TRUE))
     })
-    add_variant(TTEST, x_by, "test_tidy_reg") %<-% simple_variant
-    on.exit(remove_variant(TTEST, x_by, "test_tidy_reg"))
+    add_variant(T_TEST, x_by, "test_tidy_reg") %<-% simple_variant
+    on.exit(remove_variant(T_TEST, x_by, "test_tidy_reg"))
 
-    making_tidy(TTEST, x_by) %<-%
+    making_tidy(T_TEST, x_by) %<-%
         method_tidy(test_tidy_reg = function(.x, ...) {
             tibble::tibble(diff = .x@data$diff)
         })
 
     result = sleep |>
         define_model(extra %by% group) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         via("test_tidy_reg") |>
         conclude() |>
         tidy()
@@ -136,7 +136,7 @@ test_that("making_tidy %<-% merges variants without overwriting existing ones", 
         register_tidy[[key]] = existing
     })
 
-    making_tidy(TTEST, x_by) %<-%
+    making_tidy(T_TEST, x_by) %<-%
         method_tidy(
             default = function(.x, ...) tibble::tibble(merged = TRUE),
             test_merge = function(.x, ...) tibble::tibble(merged = TRUE)

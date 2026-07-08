@@ -1,5 +1,5 @@
 test_that("prepare() dispatches to prepare_test() for test functions", {
-    out = sleep |> define_model(x_by(extra, group)) |> prepare(TTEST)
+    out = sleep |> define_model(x_by(extra, group)) |> prepare(T_TEST)
 
     expect_true(S7::S7_inherits(out, test_lazy))
 })
@@ -13,8 +13,8 @@ test_that("prepare() dispatches to prepare_model() for model functions", {
 test_that("prepare() and prepare_test() produce identical output", {
     dm = sleep |> define_model(x_by(extra, group))
 
-    via_prepare = dm |> prepare(TTEST)
-    via_alias = dm |> prepare_test(TTEST)
+    via_prepare = dm |> prepare(T_TEST)
+    via_alias = dm |> prepare_test(T_TEST)
 
     expect_identical(via_prepare@test_spec, via_alias@test_spec)
     expect_identical(via_prepare@processed, via_alias@processed)
@@ -56,7 +56,7 @@ test_that("prepare() errors when .fn returns a non-spec object", {
 test_that("prepare() works with via() after dispatch", {
     out = sleep |>
         define_model(x_by(extra, group)) |>
-        prepare(TTEST) |>
+        prepare(T_TEST) |>
         via("permute", n = 99L) |>
         conclude()
 
@@ -66,7 +66,7 @@ test_that("prepare() works with via() after dispatch", {
 test_that("prepare() on expanded_model with test function returns multi_lazy", {
     out = mtcars |>
         write_models(by_am = x_by(mpg, am), by_vs = x_by(mpg, vs)) |>
-        prepare(TTEST)
+        prepare(T_TEST)
 
     expect_true(S7::S7_inherits(out, multi_lazy))
     expect_equal(out@labels, c("by_am", "by_vs"))
@@ -91,8 +91,8 @@ test_that("prepare() on expanded_model with model function returns multi_lazy", 
 test_that("prepare() and prepare_test() on expanded_model produce identical multi_lazy", {
     em = mtcars |> write_models(by_am = x_by(mpg, am), by_vs = x_by(mpg, vs))
 
-    via_prepare = em |> prepare(TTEST)
-    via_alias = em |> prepare_test(TTEST)
+    via_prepare = em |> prepare(T_TEST)
+    via_alias = em |> prepare_test(T_TEST)
 
     expect_equal(via_prepare@labels, via_alias@labels)
     for (i in seq_along(via_prepare@models)) {
@@ -128,7 +128,7 @@ test_that("prepare() errors when .fn returns a non-spec object", {
 test_that("prepare() on expanded_model composes with conclude()", {
     out = mtcars |>
         write_models(by_am = x_by(mpg, am), by_vs = x_by(mpg, vs)) |>
-        prepare(TTEST) |>
+        prepare(T_TEST) |>
         conclude()
 
     expect_true(S7::S7_inherits(out, multi_exec))
@@ -138,7 +138,7 @@ test_that("prepare() on expanded_model composes with conclude()", {
 test_that("prepare() for multi_lazy class works with via() after dispatch", {
     out = mtcars |>
         write_models(by_am = x_by(mpg, am), by_vs = x_by(mpg, vs)) |>
-        prepare(TTEST) |>
+        prepare(T_TEST) |>
         via("permute") |>
         update(n = 99L) |>
         conclude()

@@ -159,7 +159,7 @@ test_that("stat_infer_spec() stores data and metadata", {
 test_that("cld_exec inherits from stat_infer_spec", {
     result = sleep |>
         define_model(x_by(extra, group)) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         conclude()
 
     expect_s7_class(result, cld_exec)
@@ -169,7 +169,7 @@ test_that("cld_exec inherits from stat_infer_spec", {
 test_that("cld_exec@cld_meta contains required fields", {
     result = sleep |>
         define_model(x_by(extra, group)) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         conclude()
 
     expect_named(
@@ -184,7 +184,7 @@ test_that("cld_exec@cld_meta contains required fields", {
 test_that("print.cld_exec() returns invisibly", {
     result = sleep |>
         define_model(x_by(extra, group)) |>
-        prepare_test(TTEST) |>
+        prepare_test(T_TEST) |>
         conclude()
 
     expect_invisible(print(result))
@@ -193,7 +193,7 @@ test_that("print.cld_exec() returns invisibly", {
 # ---- test_spec / model_spec ----
 
 test_that("HTEST_FN() with NULL .model returns a test_spec", {
-    spec = TTEST(.model = NULL)
+    spec = T_TEST(.model = NULL)
 
     expect_s7_class(spec, test_spec)
     expect_equal(spec@cls, "ttest")
@@ -208,6 +208,6 @@ test_that("MODEL_FN() with NULL .model returns a model_spec", {
 })
 
 test_that("test_spec and model_spec are not interchangeable", {
-    expect_false(S7::S7_inherits(TTEST(.model = NULL), model_spec))
+    expect_false(S7::S7_inherits(T_TEST(.model = NULL), model_spec))
     expect_false(S7::S7_inherits(LINEAR_REG(.model = NULL), test_spec))
 })
