@@ -18,6 +18,7 @@ test_that("prop() errors when x > n", {
 
 test_that("prop() errors when x is negative", {
     expect_error(prop(-1, 100))
+    expect_error(prop(-100, -1))
 })
 
 test_that("prop() errors when n is zero", {

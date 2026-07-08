@@ -1,4 +1,4 @@
-# T_TEST formula — two-sample -----------------------------------------------
+# ---- T_TEST formula (two-sample) ----
 
 test_that("T_TEST formula pipeline returns cld_exec", {
     result = sleep |>
