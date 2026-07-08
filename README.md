@@ -16,9 +16,9 @@ coverage](https://codecov.io/gh/s7-stats/statim/graph/badge.svg)](https://app.co
 
 What does `{statim}` mean?
 
-*statim* is a Latin word for “immediately, at once”. It’s prefix *stat*,
-as in statistics, is where the domain this package lives in. This can be
-interpreted as: you declare *what* statistical inference you want to
+*statim* is a Latin word for “immediately, at once”. Its prefix, *stat*
+(as in statistics), is where the domain this package lives in. This can
+be interpreted as: you declare *what* statistical inference you want to
 perform, then `{statim}` immediately delivers *how*.
 
 ## Why statim?
@@ -73,6 +73,8 @@ The nuanced downside of eager forms is that they are not supported with
 its main semantics that is, for example, (1) recalibrating / switching
 off into different methods from the same estimation method with `via()`
 and (2) do not support post-execution output manipulation.
+
+Visit `vignette("statim")` to get started.
 
 ## Core Semantics
 
