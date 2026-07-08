@@ -65,17 +65,21 @@ box::use(
 )
 
 box::use(
-    dplyr[keep_when = filter, mutate],
+    dplyr[keep_when = filter, mutate, glimpse],
     readr[read_csv]
 )
 ```
 
-```{r data}
+Then import the CSV file from this package: 
+
+```{r}
 heart = read_csv(system.file("extdata", "heart-disease.csv", package = "statim")) |>
     mutate(
         sex = factor(sex, levels = c(0, 1), labels = c("Female", "Male")),
         fbs = factor(fbs, levels = c(0, 1), labels = c("Normal", "High"))
     )
+
+glimpse(heart)
 ```
 
 Here's an overview for the columns to be used:
@@ -244,7 +248,7 @@ t.test(thalach ~ sex, data = heart)
 
 ### Verdict
 
-This is where the two designs actually diverge, not just in syntax. Empirically, `{statim}`, `{rstatix}`, and base R treat "compare two groups" as something the `<formula>` already encodes, `thalach ~ sex` says everything. However, `{statim}` goes beyond that with `on()` and `x_by()`. `x_by()` says the same thing, but then lets you go further: this layout has `state_null()` translation, and you can write out `MU(thalach, sex == "Female") == MU(thalach, sex == "Male)` as an actual algebraic expression, group filters and all. `on()`, on the other hand, has the same logic as `x_by()` one except it treats the variables to be independent to each other, and its null hypothesis expression doesn't use the `<sex == "Male>` `given` argument.
+This is where the two designs actually diverge, not just in syntax. Empirically, `{statim}`, `{rstatix}`, and base R treat "compare two groups" as something the `<formula>` already encodes, `thalach ~ sex` says everything. However, `{statim}` goes beyond that with `x_by()` and `on()`. `x_by()` says the same thing, but then lets you go further: this layout has `state_null()` translation, and you can write out `MU(thalach, sex == "Female") == MU(thalach, sex == "Male)` as an actual algebraic expression, group filters and all. `on()`, on the other hand, has the same logic as `x_by()` one except it treats the variables to be independent to each other, and its null hypothesis expression doesn't use the `<sex == "Male>` `given` argument.
 
 That's more typing for a question this simple. It stops being "more typing" and starts being "the only way to say what you mean" the moment the hypothesis isn't a straight group comparison anymore.
 
