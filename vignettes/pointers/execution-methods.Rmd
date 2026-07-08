@@ -224,7 +224,7 @@ class_stat_infer
     │       └── class_glm_object      (GLM)
     ├── class_ttest_two               (T_TEST · x_by)
     ├── class_ttest_pairwise          (T_TEST · pairwise)
-    ├── class_corr_two                (CORTEST · rel)
+    ├── class_corr_two                (COR_TEST · rel)
     └── class_p_test                  (P_TEST)
 ```
 

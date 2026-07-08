@@ -10,7 +10,7 @@
 #' Use a formula directly as the model ID to select this implementation.
 #'
 #' @section Arguments:
-#' The following arguments are passed via `...` in [CORTEST()]:
+#' The following arguments are passed via `...` in [COR_TEST()]:
 #'
 #' \describe{
 #'   \item{`.cor_type`}{String. One of `"pearson"`, `"spearman"`, or
@@ -37,13 +37,13 @@
 #' @examples
 #' cars |>
 #'     define_model(dist ~ speed) |>
-#'     prepare_test(CORTEST) |>
+#'     prepare_test(COR_TEST) |>
 #'     conclude()
 #'
 #' # multiple independent variables
 #' mtcars |>
 #'     define_model(mpg ~ wt + hp) |>
-#'     prepare_test(CORTEST) |>
+#'     prepare_test(COR_TEST) |>
 #'     conclude()
 #'
 #' @keywords internal

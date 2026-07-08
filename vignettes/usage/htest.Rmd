@@ -54,7 +54,7 @@ One-sample t-test, two-sample t-test, correlation test, one-sample proportion te
 box::use(
     stats[t.test, cor.test, binom.test],
     statim[
-        T_TEST, CORTEST, P_TEST,
+        T_TEST, COR_TEST, P_TEST,
         # Current grammars
         define_model, prepare, via, state_null, conclude,
         # Mappers
@@ -270,13 +270,13 @@ There are two layouts to perform correlation test:
 ```{r}
 heart |>
     define_model(rel(thalach, age)) |>
-    prepare(CORTEST) |>
+    prepare(COR_TEST) |>
     state_null(
         RHO(thalach, age) == 0
     ) |>
     conclude()
 
-CORTEST(rel(thalach, age), heart)
+COR_TEST(rel(thalach, age), heart)
 ```
 
 *Note: Using `state_null()` is optional, unless the full null hypothesis expression is required. *
@@ -289,9 +289,9 @@ CORTEST(rel(thalach, age), heart)
 ```{r}
 heart |>
     define_model(age ~ thalach) |>
-    prepare(CORTEST) |> 
+    prepare(COR_TEST) |> 
     conclude()
-CORTEST(rel(thalach, age), heart)
+COR_TEST(rel(thalach, age), heart)
 ```
 
 </details>

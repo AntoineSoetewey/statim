@@ -2,7 +2,7 @@
 
 export("%<-%")
 export("%by%")
-export(CORTEST)
+export(COR_TEST)
 export(GLM)
 export(HTEST_FN)
 export(LINEAR_REG)

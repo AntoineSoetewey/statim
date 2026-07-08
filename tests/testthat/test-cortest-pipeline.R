@@ -1,17 +1,17 @@
-test_that("CORTEST() eager form returns stat_infer_spec", {
-    result = CORTEST(rel(speed, dist), cars)
+test_that("COR_TEST() eager form returns stat_infer_spec", {
+    result = COR_TEST(rel(speed, dist), cars)
 
     expect_s7_class(result, stat_infer_spec)
 })
 
-test_that("CORTEST() eager result data is a class_corr_two", {
-    result = CORTEST(rel(speed, dist), cars)
+test_that("COR_TEST() eager result data is a class_corr_two", {
+    result = COR_TEST(rel(speed, dist), cars)
 
     expect_s7_class(result@data, class_corr_two)
 })
 
-test_that("CORTEST() eager result has expected slots populated", {
-    result = CORTEST(rel(speed, dist), cars)
+test_that("COR_TEST() eager result has expected slots populated", {
+    result = COR_TEST(rel(speed, dist), cars)
 
     expect_true(length(result@data@ind_vars) > 0L)
     expect_true(length(result@data@resp_vars) > 0L)
@@ -20,8 +20,8 @@ test_that("CORTEST() eager result has expected slots populated", {
     expect_true(length(result@data@p_val) > 0L)
 })
 
-test_that("CORTEST() eager result matches base R cor.test()", {
-    result = CORTEST(rel(speed, dist), cars)
+test_that("COR_TEST() eager result matches base R cor.test()", {
+    result = COR_TEST(rel(speed, dist), cars)
     base = cor.test(cars$speed, cars$dist, method = "pearson")
 
     expect_equal(
@@ -47,8 +47,8 @@ test_that("CORTEST() eager result matches base R cor.test()", {
     )
 })
 
-test_that("CORTEST() eager print returns invisibly", {
-    result = CORTEST(rel(speed, dist), cars)
+test_that("COR_TEST() eager print returns invisibly", {
+    result = COR_TEST(rel(speed, dist), cars)
 
     expect_invisible(print(result))
 })
@@ -56,17 +56,17 @@ test_that("CORTEST() eager print returns invisibly", {
 test_that("classical pipeline returns cld_exec", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         conclude()
 
     expect_s7_class(result, cld_exec)
 })
 
 test_that("classical pipeline result matches eager result numerically", {
-    eager = CORTEST(rel(speed, dist), cars)
+    eager = COR_TEST(rel(speed, dist), cars)
     pipeline = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         conclude()
 
     expect_equal(
@@ -84,7 +84,7 @@ test_that("classical pipeline result matches eager result numerically", {
 test_that("base variant CI slots are populated for Pearson", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         conclude()
 
     expect_true(length(result@data@lower_ci) > 0L)
@@ -95,7 +95,7 @@ test_that("base variant CI slots are populated for Pearson", {
 test_that("base variant df slot is populated for Pearson", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         conclude()
 
     expect_true(length(result@data@df) > 0L)
@@ -106,7 +106,7 @@ test_that("spearman variant returns cld_exec with method = 'spearman'", {
     result = suppressWarnings(
         iris |>
             define_model(rel(Sepal.Length, Petal.Length)) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             via("spearman") |>
             conclude()
     )
@@ -119,7 +119,7 @@ test_that("spearman variant result is a class_corr_two", {
     result = suppressWarnings(
         iris |>
             define_model(rel(Sepal.Length, Petal.Length)) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             via("spearman") |>
             conclude()
     )
@@ -131,7 +131,7 @@ test_that("spearman variant matches base R cor.test()", {
     result = suppressWarnings(
         iris |>
             define_model(rel(Sepal.Length, Petal.Length)) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             via("spearman") |>
             conclude()
     )
@@ -154,7 +154,7 @@ test_that("spearman variant has no CI or df slots", {
     result = suppressWarnings(
         iris |>
             define_model(rel(Sepal.Length, Petal.Length)) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             via("spearman") |>
             conclude()
     )
@@ -167,7 +167,7 @@ test_that("spearman variant has no CI or df slots", {
 test_that("kendall variant returns cld_exec with method = 'kendall'", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         via("kendall") |>
         conclude()
 
@@ -178,7 +178,7 @@ test_that("kendall variant returns cld_exec with method = 'kendall'", {
 test_that("kendall variant matches base R cor.test()", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         via("kendall") |>
         conclude()
 
@@ -195,7 +195,7 @@ test_that("kendall variant matches base R cor.test()", {
 test_that("kendall variant has no CI or df slots", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         via("kendall") |>
         conclude()
 
@@ -207,13 +207,13 @@ test_that("kendall variant has no CI or df slots", {
 test_that("non-zero .rho triggers Fisher-z path", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         update(.rho = 0.5) |>
         conclude()
 
     base_result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         conclude()
 
     expect_false(isTRUE(all.equal(
@@ -225,7 +225,7 @@ test_that("non-zero .rho triggers Fisher-z path", {
 test_that("Fisher-z result p_val is in [0, 1]", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         update(.rho = 0.5) |>
         conclude()
 
@@ -236,7 +236,7 @@ test_that("Fisher-z result p_val is in [0, 1]", {
 test_that("Fisher-z result CI lower is less than upper", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         update(.rho = 0.5) |>
         conclude()
 
@@ -247,7 +247,7 @@ test_that("Fisher-z errors on |.rho| >= 1", {
     expect_error(
         cars |>
             define_model(rel(speed, dist)) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             update(.rho = 1) |>
             conclude(),
         class = "rlang_error"
@@ -255,13 +255,13 @@ test_that("Fisher-z errors on |.rho| >= 1", {
 })
 
 test_that("Fisher-z errors on n < 4", {
-    expect_error(CORTEST(rel(speed, dist), cars[1:3, ]), class = "rlang_error")
+    expect_error(COR_TEST(rel(speed, dist), cars[1:3, ]), class = "rlang_error")
 })
 
 test_that("state_null() with RHO == 0 runs through to conclude()", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         state_null(RHO(speed, dist) == 0) |>
         conclude()
 
@@ -271,7 +271,7 @@ test_that("state_null() with RHO == 0 runs through to conclude()", {
 test_that("state_null() with non-zero scalar runs through to conclude()", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         state_null(RHO(speed, dist) >= 0.5) |>
         conclude()
 
@@ -281,13 +281,13 @@ test_that("state_null() with non-zero scalar runs through to conclude()", {
 test_that("state_null() result matches manual .rho injection numerically", {
     via_state_null = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         state_null(RHO(speed, dist) >= 0.5) |>
         conclude()
 
     via_arg = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         update(.rho = 0.5, .alt = "less") |>
         conclude()
 
@@ -306,7 +306,7 @@ test_that("state_null() result matches manual .rho injection numerically", {
 test_that("state_null() with scaled RHO solves through to conclude()", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         state_null(2 * RHO(speed, dist) >= 0.8) |>
         conclude()
 
@@ -317,7 +317,7 @@ test_that("state_null() with invalid scalar errors", {
     expect_error(
         cars |>
             define_model(rel(speed, dist)) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             state_null(2 + RHO(speed, dist) >= 0.8) |>
             conclude(),
         class = "rlang_error"
@@ -328,7 +328,7 @@ test_that("state_null() with unsupported param type errors", {
     expect_error(
         cars |>
             define_model(rel(speed, dist)) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             state_null(MU(speed) == 0) |>
             conclude(),
         class = "rlang_error"
@@ -339,7 +339,7 @@ test_that("state_null() on spearman variant errors", {
     expect_error(
         cars |>
             define_model(rel(speed, dist)) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             via("spearman") |>
             state_null(RHO(speed, dist) == 0) |>
             conclude(),
@@ -350,7 +350,7 @@ test_that("state_null() on spearman variant errors", {
 test_that("multi variant returns cld_exec with method = 'multi'", {
     result = mtcars |>
         define_model(rel(c(wt, hp), mpg)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         via("multi") |>
         conclude()
 
@@ -361,7 +361,7 @@ test_that("multi variant returns cld_exec with method = 'multi'", {
 test_that("multi variant result is a class_corr_two with multiple rows", {
     result = mtcars |>
         define_model(rel(c(wt, hp), mpg)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         via("multi") |>
         conclude()
 
@@ -374,7 +374,7 @@ test_that("multi variant result is a class_corr_two with multiple rows", {
 test_that("multi variant matches base R cor.test() per variable", {
     result = mtcars |>
         define_model(rel(c(wt, hp), mpg)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         via("multi") |>
         conclude()
 
@@ -399,7 +399,7 @@ test_that("multi variant respects .cor_type for all variables", {
     result = suppressWarnings(
         mtcars |>
             define_model(rel(c(wt, hp), mpg)) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             via("multi") |>
             update(.cor_type = "spearman") |>
             conclude()
@@ -433,7 +433,7 @@ test_that("multi variant respects .cor_type for all variables", {
 test_that("multi variant has CI and df populated for pearson", {
     result = mtcars |>
         define_model(rel(c(wt, hp), mpg)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         via("multi") |>
         conclude()
 
@@ -446,7 +446,7 @@ test_that("multi variant rejects multi-variable resp", {
     expect_error(
         mtcars |>
             define_model(rel(wt, c(mpg, hp))) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             via("multi") |>
             conclude(),
         class = "rlang_error"
@@ -457,7 +457,7 @@ test_that("state_null() on multi variant errors", {
     expect_error(
         mtcars |>
             define_model(rel(c(wt, hp), mpg)) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             via("multi") |>
             state_null(RHO(wt, mpg) == 0) |>
             conclude(),
@@ -467,7 +467,7 @@ test_that("state_null() on multi variant errors", {
 
 test_that("multi-x errors on rel()", {
     expect_error(
-        CORTEST(rel(c(speed, dist), dist), cars),
+        COR_TEST(rel(c(speed, dist), dist), cars),
         class = "rlang_error"
     )
 })
@@ -475,7 +475,7 @@ test_that("multi-x errors on rel()", {
 test_that("tidy() on classical pipeline result returns a tibble", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         conclude() |>
         tidy()
 
@@ -485,7 +485,7 @@ test_that("tidy() on classical pipeline result returns a tibble", {
 test_that("tidy() on classical pipeline result has expected columns", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         conclude() |>
         tidy()
 
@@ -497,7 +497,7 @@ test_that("tidy() on classical pipeline result has expected columns", {
 test_that("tidy() includes CI columns for Pearson", {
     result = cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         conclude() |>
         tidy()
 
@@ -509,7 +509,7 @@ test_that("tidy() omits CI columns for spearman", {
     result = suppressWarnings(
         iris |>
             define_model(rel(Sepal.Length, Petal.Length)) |>
-            prepare_test(CORTEST) |>
+            prepare_test(COR_TEST) |>
             via("spearman") |>
             conclude() |>
             tidy()

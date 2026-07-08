@@ -1,10 +1,10 @@
 #' Correlation Test
 #'
-#' `CORTEST()` performs a correlation test for one-to-one variable
-#' relationships. If `CORTEST` is supplied within the lazy-loaded pipeline,
-#' supply `CORTEST` as a function i.e. `prepare_test(.test = CORTEST)` call.
+#' `COR_TEST()` performs a correlation test for one-to-one variable
+#' relationships. If `COR_TEST` is supplied within the lazy-loaded pipeline,
+#' supply `COR_TEST` as a function i.e. `prepare_test(.test = COR_TEST)` call.
 #'
-#' @param .var_id A variable mapper `<var_id>` for `CORTEST()`, e.g. [rel()].
+#' @param .var_id A variable mapper `<var_id>` for `COR_TEST()`, e.g. [rel()].
 #'   When supplied, the test executes immediately.
 #' @param .data A data frame. Only used on the standalone path.
 #' @param ... Additional arguments passed to the implementation.
@@ -23,24 +23,24 @@
 #'
 #' @examples
 #' # eager
-#' CORTEST(rel(speed, dist), cars)
+#' COR_TEST(rel(speed, dist), cars)
 #'
 #' # grammatical syntax
 #' cars |>
 #'     define_model(rel(speed, dist)) |>
-#'     prepare_test(CORTEST) |>
+#'     prepare_test(COR_TEST) |>
 #'     conclude()
 #'
 #' cars |>
 #'     define_model(speed ~ dist) |>
-#'     prepare_test(CORTEST) |>
+#'     prepare_test(COR_TEST) |>
 #'     conclude()
 #'
 #' # Spearman
 #' suppressWarnings({
 #'     cars |>
 #'         define_model(rel(speed, dist)) |>
-#'         prepare_test(CORTEST) |>
+#'         prepare_test(COR_TEST) |>
 #'         via("spearman") |>
 #'         conclude()
 #' })
@@ -48,7 +48,7 @@
 #' # Custom Hypothesis Expression
 #' cars |>
 #'     define_model(rel(speed, dist)) |>
-#'     prepare_test(CORTEST) |>
+#'     prepare_test(COR_TEST) |>
 #'     state_null(RHO(speed, dist) >= 0.8) |>
 #'     conclude()
 #'
@@ -58,7 +58,7 @@
 #' [via()], [state_null()], [conclude()], [auto_tidy()].
 #'
 #' @export
-CORTEST = HTEST_FN(
+COR_TEST = HTEST_FN(
     cls = "cortest",
     defs = list(
         cor_test_rel,
@@ -71,7 +71,7 @@ CORTEST = HTEST_FN(
 #' Structured result container for two-sample t-tests
 #'
 #' @description
-#' An S7 class produced by [CORTEST] using [rel()] and `<formula>` as the variable mapper `<var_id>`.
+#' An S7 class produced by [COR_TEST] using [rel()] and `<formula>` as the variable mapper `<var_id>`.
 #' Not constructed manually, use the "grammar interface" instead.
 #'
 #' Inherits from [class_stat_infer], so [auto_tidy()] dispatches on it
@@ -81,7 +81,7 @@ CORTEST = HTEST_FN(
 #' @usage NULL
 #'
 #' @details
-#' Slots (populated automatically by [CORTEST]):
+#' Slots (populated automatically by [COR_TEST]):
 #'
 #' - `ind_vars`: name of the independent variables.
 #' - `resp_vars`: name of the response / dependent variables.
@@ -97,7 +97,7 @@ CORTEST = HTEST_FN(
 #' Both [rel()] and `<formula>`'s default (`base`) return a `class_corr_two`, so different
 #' models shares both [auto_tidy()] and [print()] for free.
 #'
-#' @seealso [CORTEST], [auto_tidy()], [class_stat_infer]
+#' @seealso [COR_TEST], [auto_tidy()], [class_stat_infer]
 #'
 #' @export
 class_corr_two = S7::new_class(

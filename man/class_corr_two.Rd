@@ -4,7 +4,7 @@
 \alias{class_corr_two}
 \title{Structured result container for two-sample t-tests}
 \description{
-An S7 class produced by \link{CORTEST} using \code{\link[=rel]{rel()}} and \verb{<formula>} as the variable mapper \verb{<var_id>}.
+An S7 class produced by \link{COR_TEST} using \code{\link[=rel]{rel()}} and \verb{<formula>} as the variable mapper \verb{<var_id>}.
 Not constructed manually, use the "grammar interface" instead.
 
 Inherits from \link{class_stat_infer}, so \code{\link[=auto_tidy]{auto_tidy()}} dispatches on it
@@ -12,7 +12,7 @@ automatically. Downstream packages can use it as a \code{parent} in
 \code{S7::new_class()}.
 }
 \details{
-Slots (populated automatically by \link{CORTEST}):
+Slots (populated automatically by \link{COR_TEST}):
 \itemize{
 \item \code{ind_vars}: name of the independent variables.
 \item \code{resp_vars}: name of the response / dependent variables.
@@ -32,5 +32,5 @@ models shares both \code{\link[=auto_tidy]{auto_tidy()}} and \code{\link[=print]
 }
 
 \seealso{
-\link{CORTEST}, \code{\link[=auto_tidy]{auto_tidy()}}, \link{class_stat_infer}
+\link{COR_TEST}, \code{\link[=auto_tidy]{auto_tidy()}}, \link{class_stat_infer}
 }

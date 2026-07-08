@@ -15,7 +15,7 @@ Use a formula directly as the model ID to select this implementation.
 }
 \section{Arguments}{
 
-The following arguments are passed via \code{...} in \code{\link[=CORTEST]{CORTEST()}}:
+The following arguments are passed via \code{...} in \code{\link[=COR_TEST]{COR_TEST()}}:
 
 \describe{
 \item{\code{.cor_type}}{String. One of \code{"pearson"}, \code{"spearman"}, or
@@ -48,13 +48,13 @@ with \code{\link[=RHO]{RHO()}}.
 \examples{
 cars |>
     define_model(dist ~ speed) |>
-    prepare_test(CORTEST) |>
+    prepare_test(COR_TEST) |>
     conclude()
 
 # multiple independent variables
 mtcars |>
     define_model(mpg ~ wt + hp) |>
-    prepare_test(CORTEST) |>
+    prepare_test(COR_TEST) |>
     conclude()
 
 }

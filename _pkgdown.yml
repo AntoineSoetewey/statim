@@ -90,7 +90,7 @@ reference:
     desc: Container and an eager executioner of a prepared H-test function
     contents:
     - T_TEST
-    - CORTEST
+    - COR_TEST
     # - ANOVA
     - P_TEST
 

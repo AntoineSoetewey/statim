@@ -92,7 +92,7 @@ The package is designed around three ideas:
     `<var_id>` objects (`x_by`, `rel`, `pairwise`, …) describe the
     statistical structure of the problem; the verbs stay constant.
 
-    > Eager forms (`T_TEST()`, `CORTEST()`, …) provide a shortcut when
+    > Eager forms (`T_TEST()`, `COR_TEST()`, …) provide a shortcut when
     > the full pipeline (in a form of piped syntax that reads like a
     > sentence) is not needed.
 

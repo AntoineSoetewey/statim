@@ -7,7 +7,7 @@ main_cortest_rel = function(.cor_type) {
             cli::cli_abort(c(
                 "{.arg x} must be a single variable for {.fn rel}.",
                 "i" = "Got {length(x_data)} variable{?s}: {.val {names(x_data)}}.",
-                "i" = "Use {.code via(\"multi\")} (e.g. {.code ... |> prepare(CORTEST) |> via(\"multi\")}) to test multiple grouping variables."
+                "i" = "Use {.code via(\"multi\")} (e.g. {.code ... |> prepare(COR_TEST) |> via(\"multi\")}) to test multiple grouping variables."
             ))
         }
 
@@ -141,7 +141,7 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
 #' Use [rel()] as the variable mapper `<var_id>` to select this implementation.
 #'
 #' @section Arguments:
-#' The following arguments are passed via `...` in [CORTEST()]:
+#' The following arguments are passed via `...` in [COR_TEST()]:
 #'
 #' \describe{
 #'   \item{`.alt`}{String. One of `"two.sided"`, `"greater"`, or `"less"`.
@@ -189,14 +189,14 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
 #' # base (Pearson)
 #' cars |>
 #'     define_model(rel(speed, dist)) |>
-#'     prepare_test(CORTEST) |>
+#'     prepare_test(COR_TEST) |>
 #'     conclude()
 #'
 #' # Spearman
 #' suppressWarnings({
 #'     cars |>
 #'         define_model(rel(speed, dist)) |>
-#'         prepare_test(CORTEST) |>
+#'         prepare_test(COR_TEST) |>
 #'         via("spearman") |>
 #'         conclude()
 #' })
@@ -205,7 +205,7 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
 #' suppressWarnings({
 #'     cars |>
 #'         define_model(rel(speed, dist)) |>
-#'         prepare_test(CORTEST) |>
+#'         prepare_test(COR_TEST) |>
 #'         via("kendall") |>
 #'         conclude()
 #' })
@@ -213,14 +213,14 @@ pearson_fisher_z = function(x, y, ind_vars, resp_vars, rho, alt, ci) {
 #' # hypothesis claim: two-sided against zero
 #' cars |>
 #'     define_model(rel(speed, dist)) |>
-#'     prepare_test(CORTEST) |>
+#'     prepare_test(COR_TEST) |>
 #'     state_null(RHO(speed, dist) == 0) |>
 #'     conclude()
 #'
 #' # hypothesis claim: non-zero null, one-sided
 #' cars |>
 #'     define_model(rel(speed, dist)) |>
-#'     prepare_test(CORTEST) |>
+#'     prepare_test(COR_TEST) |>
 #'     state_null(RHO(speed, dist) >= 0.8) |>
 #'     conclude()
 #'
@@ -253,7 +253,7 @@ cor_test_rel = test_define(
                     cli::cli_abort(c(
                         "{.arg x} must be a single variable for {.fn rel}.",
                         "i" = "Got {length(x_data)} variable{?s}: {.val {names(x_data)}}.",
-                        "i" = "Use {.code via(\"multi\")} (e.g. {.code ... |> prepare(CORTEST) |> via(\"multi\")}) to test multiple grouping variables."
+                        "i" = "Use {.code via(\"multi\")} (e.g. {.code ... |> prepare(COR_TEST) |> via(\"multi\")}) to test multiple grouping variables."
                     ))
                 }
 

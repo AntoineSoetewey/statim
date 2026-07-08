@@ -74,7 +74,7 @@ The package is designed around three ideas:
 
 2.  **A shared grammar**: Only applied on the main `{statim}` semantics: piped/grammar syntax. `define_model()` =\> `prepare()` =\> `conclude()` is the same shape for every inferential procedure. The `<var_id>` objects (`x_by`, `rel`, `pairwise`, ...) describe the statistical structure of the problem; the verbs stay constant.
 
-    > Eager forms (`T_TEST()`, `CORTEST()`, ...) provide a shortcut when the full pipeline (in a form of piped syntax that reads like a sentence) is not needed.
+    > Eager forms (`T_TEST()`, `COR_TEST()`, ...) provide a shortcut when the full pipeline (in a form of piped syntax that reads like a sentence) is not needed.
 
 3.  **Extensible by design**: the `{statim}` pipeline is extensible. For instance, if you want to write new estimation method, an implementation is through filling up the `stat_define()` object (then store it within list of `defs` from `STAT_CONSTRUCTOR()` functions, saved as `<STAT_FN>`), then `baseline()` to write the default form of `<STAT_FN>` and `variant()` to extend the current `<STAT_FN>` form (only be accessed with `via()` only). With these, you can bring your own engine, your own method, your own implementation, or use them to extend the current ones.
 

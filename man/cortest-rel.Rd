@@ -11,7 +11,7 @@ Use \code{\link[=rel]{rel()}} as the variable mapper \verb{<var_id>} to select t
 }
 \section{Arguments}{
 
-The following arguments are passed via \code{...} in \code{\link[=CORTEST]{CORTEST()}}:
+The following arguments are passed via \code{...} in \code{\link[=COR_TEST]{COR_TEST()}}:
 
 \describe{
 \item{\code{.alt}}{String. One of \code{"two.sided"}, \code{"greater"}, or \code{"less"}.
@@ -68,14 +68,14 @@ is handled correctly via \code{\link[=claim_scalar]{claim_scalar()}}.
 # base (Pearson)
 cars |>
     define_model(rel(speed, dist)) |>
-    prepare_test(CORTEST) |>
+    prepare_test(COR_TEST) |>
     conclude()
 
 # Spearman
 suppressWarnings({
     cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         via("spearman") |>
         conclude()
 })
@@ -84,7 +84,7 @@ suppressWarnings({
 suppressWarnings({
     cars |>
         define_model(rel(speed, dist)) |>
-        prepare_test(CORTEST) |>
+        prepare_test(COR_TEST) |>
         via("kendall") |>
         conclude()
 })
@@ -92,14 +92,14 @@ suppressWarnings({
 # hypothesis claim: two-sided against zero
 cars |>
     define_model(rel(speed, dist)) |>
-    prepare_test(CORTEST) |>
+    prepare_test(COR_TEST) |>
     state_null(RHO(speed, dist) == 0) |>
     conclude()
 
 # hypothesis claim: non-zero null, one-sided
 cars |>
     define_model(rel(speed, dist)) |>
-    prepare_test(CORTEST) |>
+    prepare_test(COR_TEST) |>
     state_null(RHO(speed, dist) >= 0.8) |>
     conclude()
 

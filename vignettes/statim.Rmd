@@ -110,7 +110,7 @@ sleep |>
     update(.ci = 0.9)                  
 ```
 
-`prepare()` accepts any `STAT_FN` — `T_TEST`, `LINEAR_REG`, `CORTEST`, `P_TEST`, and so on. If you prefer to be explicit, `prepare_test()` and `prepare_model()` are available as typed alternatives.
+`prepare()` accepts any `STAT_FN` — `T_TEST`, `LINEAR_REG`, `COR_TEST`, `P_TEST`, and so on. If you prefer to be explicit, `prepare_test()` and `prepare_model()` are available as typed alternatives.
 
 ### iii. Execute and read the output
 
