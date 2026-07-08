@@ -5,10 +5,10 @@
 \alias{model_processor}
 \title{Model evaluator}
 \usage{
-model_processor(x, data = NULL, ...)
+model_processor(var_id, data = NULL, ...)
 }
 \arguments{
-\item{x}{The Variable Mappers to be extracted.}
+\item{var_id}{The Variable Mappers to be extracted.}
 
 \item{data}{Optional. Only passed when a certain data structure (normally it's data frame)
 is required.}
