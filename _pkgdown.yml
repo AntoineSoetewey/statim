@@ -89,7 +89,7 @@ reference:
   - subtitle: H-test container and executioner
     desc: Container and an eager executioner of a prepared H-test function
     contents:
-    - TTEST
+    - T_TEST
     - CORTEST
     # - ANOVA
     - P_TEST

@@ -8,7 +8,7 @@ making_tidy(obj, model_type)
 }
 \arguments{
 \item{obj}{A stat function built with \code{\link[=HTEST_FN]{HTEST_FN()}} or \code{\link[=MODEL_FN]{MODEL_FN()}}
-(e.g. \code{TTEST}).}
+(e.g. \code{T_TEST}).}
 
 \item{model_type}{An S7 variable mapper \verb{<var_id>} class (e.g. \code{x_by}, \code{S7::class_formula}).}
 }
@@ -25,7 +25,7 @@ registration needed.
 \examples{
 # Only needed when fn returns a non-class_stat_infer object.
 # Prefer implementing auto_tidy() on your result class instead.
-making_tidy(TTEST, x_by) \%<-\% method_tidy(
+making_tidy(T_TEST, x_by) \%<-\% method_tidy(
     default = function(.x, ...) { ... },
     boot = function(.x, ...) { ... }
 )

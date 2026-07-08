@@ -19,7 +19,7 @@ remove_stat_define(stat_fn, model_type)
 }
 \arguments{
 \item{stat_fn}{A test or model function built with \code{\link[=HTEST_FN]{HTEST_FN()}} or \code{\link[=MODEL_FN]{MODEL_FN()}}
-(e.g. \code{TTEST}, \code{P_TEST}).}
+(e.g. \code{T_TEST}, \code{P_TEST}).}
 
 \item{model_type}{An S7 \verb{<var_id>} class (e.g. \code{x_by}, \code{S7::class_formula}).}
 

@@ -12,7 +12,7 @@ remove_variant(obj, model_type, name)
 }
 \arguments{
 \item{obj}{A test or model function built with \code{\link[=HTEST_FN]{HTEST_FN()}} or \code{\link[=MODEL_FN]{MODEL_FN()}}
-(e.g. \code{TTEST}). Used to scope the registry key.}
+(e.g. \code{T_TEST}). Used to scope the registry key.}
 
 \item{model_type}{An S7 \verb{<var_id>} class (e.g. \code{x_by}, \code{S7::class_formula}).}
 
@@ -40,7 +40,7 @@ duration the registering package is loaded and vanish when it is unloaded.
 # Add a bootstrap variant for x_by (user level).
 # .proc$x_data[[1]] is the response vector; .proc$group_data is the
 # grouping data frame. See ?model_processor for all available keys.
-add_variant(TTEST, x_by, "another_boot") \%<-\% variant(
+add_variant(T_TEST, x_by, "another_boot") \%<-\% variant(
     fn = function(.proc, .n = 1000L) {
         x = .proc$x_data[[1]]
         grp = as.character(.proc$group_data[[1]])
@@ -54,10 +54,10 @@ add_variant(TTEST, x_by, "another_boot") \%<-\% variant(
 )
 
 # Remove it, returning to the original slate
-remove_variant(TTEST, x_by, "another_boot")
+remove_variant(T_TEST, x_by, "another_boot")
 
 # Package level (inside .onLoad())
-add_variant(TTEST, x_by, "another_boot", origin = "package") \%<-\% variant(
+add_variant(T_TEST, x_by, "another_boot", origin = "package") \%<-\% variant(
     fn = function(.proc, .n = 1000L) { ... }
 )
 

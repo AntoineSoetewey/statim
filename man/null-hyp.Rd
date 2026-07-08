@@ -24,7 +24,7 @@ The modified \code{test_lazy} object.
 \describe{
 \item{\code{expr}}{A hypothesis expression. It is passed after \code{prepare_test(...)} to supply
 the hypothesis expression, e.g.
-\code{... |> prepare_test(TTEST) |> state_null(expr = MU(x) == 0)}}
+\code{... |> prepare_test(T_TEST) |> state_null(expr = MU(x) == 0)}}
 }}
 
 \examples{

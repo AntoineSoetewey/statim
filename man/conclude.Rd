@@ -17,7 +17,7 @@ A \code{cld_exec} S7 object with the following slots:
 \describe{
 \item{\verb{@data}}{The raw return value of the \code{fn} defined in \code{\link[=baseline]{baseline()}}
 or \code{\link[=variant]{variant()}}. Its structure depends on the implementation — see the
-documentation of the stat function (e.g. \code{?TTEST}) for what to expect.}
+documentation of the stat function (e.g. \code{?T_TEST}) for what to expect.}
 \item{\verb{@cld_meta}}{A list of pipeline metadata:
 \describe{
 \item{\verb{$var_id}}{The Variable Mapper object passed to \code{\link[=define_model]{define_model()}}.}
@@ -62,7 +62,7 @@ intentionally returns a non-\link{class_stat_infer} object.
 
 For example:
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{making_tidy(TTEST, x_by) \%<-\% method_tidy(
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{making_tidy(T_TEST, x_by) \%<-\% method_tidy(
     default = function(.x, ...) \{
         dat = .x@data
         # return a tibble
@@ -74,12 +74,12 @@ For example:
 \examples{
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     conclude()
 
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     via("boot", n = 2000) |>
     conclude()
 

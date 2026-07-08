@@ -20,7 +20,7 @@ lhs \%<-\% rhs
 left-hand side must be a \code{\link[=making_tidy]{making_tidy()}} call.
 }
 \examples{
-making_tidy(TTEST, x_by) \%<-\% method_tidy(
+making_tidy(T_TEST, x_by) \%<-\% method_tidy(
     default = function(.x, ...) { ... },
     boot = function(.x, ...) { ... }
 )
