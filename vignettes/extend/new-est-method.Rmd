@@ -22,15 +22,15 @@ library(statim)
 
 ## Rationale
 
-`{statim}` is designed so that writing a new estimation method never means forking the function the user calls. `TTEST()`, `P_TEST()`, `LINEAR_REG()`, every one of them is built from the same primitives: a `stat_define` per supported model shape, an `agendas()` of `baseline()` plus named `variant()` implementations inside it, and a shared dispatcher (`STAT_CONSTRUCTOR()`, `conclude()`) that neither knows nor cares what the implementation actually computes.
+`{statim}` is designed so that writing a new estimation method never means forking the function the user calls. `T_TEST()`, `P_TEST()`, `LINEAR_REG()`, every one of them is built from the same primitives: a `stat_define` per supported model shape, an `agendas()` of `baseline()` plus named `variant()` implementations inside it, and a shared dispatcher (`STAT_CONSTRUCTOR()`, `conclude()`) that neither knows nor cares what the implementation actually computes.
 
-Whether you're adding a robust-regression option to `LINEAR_REG()` or a trimmed-mean option to `TTEST()`, the mechanism is identical, because a model-based inference function and a hypothesis-test function are the same kind of object underneath — `MODEL_FN()` and `HTEST_FN()` are both thin wrappers around `STAT_CONSTRUCTOR()`. This vignette covers that mechanism. For the full anatomy of `model_type`, `impl`, `compatible_params`, and `claim_parser`, see the [`stat_define` objects](../pointers/stat_define.html) article. This one assumes that vocabulary and focuses on extending it.
+Whether you're adding a robust-regression option to `LINEAR_REG()` or a trimmed-mean option to `T_TEST()`, the mechanism is identical, because a model-based inference function and a hypothesis-test function are the same kind of object underneath — `MODEL_FN()` and `HTEST_FN()` are both thin wrappers around `STAT_CONSTRUCTOR()`. This vignette covers that mechanism. For the full anatomy of `model_type`, `impl`, `compatible_params`, and `claim_parser`, see the [`stat_define` objects](../pointers/stat_define.html) article. This one assumes that vocabulary and focuses on extending it.
 
 ## Two ways to add a new estimation method
 
 There are two genuinely different things "adding a new estimation method" can mean, and they have different reach.
 
-1.  When you want to add another variant to a model shape that's already supported. Let's say adding a variant to a model shape `TTEST()` already supports — a trimmed-mean test for `x_by()`, say. This is the public, documented surface: `add_variant()`, no access to internals required. The rest of this vignette covers it.
+1.  When you want to add another variant to a model shape that's already supported. Let's say adding a variant to a model shape `T_TEST()` already supports — a trimmed-mean test for `x_by()`, say. This is the public, documented surface: `add_variant()`, no access to internals required. The rest of this vignette covers it.
 
 2.  Add another but independent support for a model shape that doesn't exist yet. This needs a new `stat_define` registered from outside the package via `add_stat_define()`. Unlike `add_variant()`, which extends a model shape that already exists, `add_stat_define()` teaches a stat function to handle a model shape it has never seen before. The mechanism, conflict handling, and session/package scoping are covered in the [Registering a new model type](#registering-a-new-model-type) section below.
 
@@ -98,10 +98,10 @@ Nothing here differs structurally from extending a test function. The left-hand 
 
 ## Worked example: adding a variant to a test function
 
-The canonical example in `?add_variant` does exactly the same thing for `TTEST` and `x_by()`:
+The canonical example in `?add_variant` does exactly the same thing for `T_TEST` and `x_by()`:
 
 ```{r, eval = FALSE}
-add_variant(TTEST, x_by, "another_boot") %<-%
+add_variant(T_TEST, x_by, "another_boot") %<-%
     variant(
         fn = function(.proc, .n = 1000L) {
             x = .proc$x_data[[1]]

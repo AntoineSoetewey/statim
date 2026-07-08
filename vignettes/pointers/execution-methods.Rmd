@@ -79,7 +79,7 @@ Still nothing has been computed:
 ```{r}
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare_test(TTEST)
+    prepare_test(T_TEST)
 ```
 
 ```{r}
@@ -101,7 +101,7 @@ The lazy object is returned modified; no computation has occurred. Calling `via(
 ```{r}
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     via("permute", n = 999L)
 ```
 
@@ -146,7 +146,7 @@ cld_exec(
 ```{r}
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     conclude()
 ```
 
@@ -162,7 +162,7 @@ With a `via()` recalibration, the output reflects the chosen variant:
 ```{r}
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     via("permute", n = 999L) |>
     conclude()
 ```
@@ -209,7 +209,7 @@ LifeCycleSavings |>
 
 ## Eager path vs lazy path
 
-There is also an eager path: calling `TTEST(x_by(extra, group), sleep)` or `LINEAR_REG(mpg ~ wt, mtcars)` directly skips `define_model()`, `prepare_*()`, and `via()` entirely. Internally, `run_stat()` calls `find_def()` and `inject_and_run()` directly against `base`; only the base implementation is reachable this way. Variants registered via `add_variant()` or selected via `via()` are not accessible on the eager path.
+There is also an eager path: calling `T_TEST(x_by(extra, group), sleep)` or `LINEAR_REG(mpg ~ wt, mtcars)` directly skips `define_model()`, `prepare_*()`, and `via()` entirely. Internally, `run_stat()` calls `find_def()` and `inject_and_run()` directly against `base`; only the base implementation is reachable this way. Variants registered via `add_variant()` or selected via `via()` are not accessible on the eager path.
 
 The eager path returns a `cld_exec` with the same slot structure as the lazy path, but the class hierarchy it belongs to is identical. This means `tidy()` and `print()` work identically on both outputs.
 
@@ -222,8 +222,8 @@ class_stat_infer
     ├── anova_able
     │       └── class_lm_object       (LINEAR_REG)
     │       └── class_glm_object      (GLM)
-    ├── class_ttest_two               (TTEST · x_by)
-    ├── class_ttest_pairwise          (TTEST · pairwise)
+    ├── class_ttest_two               (T_TEST · x_by)
+    ├── class_ttest_pairwise          (T_TEST · pairwise)
     ├── class_corr_two                (CORTEST · rel)
     └── class_p_test                  (P_TEST)
 ```

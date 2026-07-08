@@ -48,13 +48,13 @@ a single addition to the syntax.
 # Classical t-test
 sleep |> 
     define_model(x_by(extra, group)) |> 
-    prepare_test(TTEST) |> 
+    prepare_test(T_TEST) |> 
     conclude()
 
 # Permutation t-test
 sleep |> 
     define_model(x_by(extra, group)) |> 
-    prepare_test(TTEST) |> 
+    prepare_test(T_TEST) |> 
     # Here, one line added
     # Nothing else changed
     via("permute", n = 1000L) |>         
@@ -66,7 +66,7 @@ entirely:
 
 ``` r
 # Only works for `<stat_fn>` functions
-TTEST(x_by(extra, group), sleep)
+T_TEST(x_by(extra, group), sleep)
 ```
 
 The nuanced downside of eager forms is that they are not supported with
@@ -92,7 +92,7 @@ The package is designed around three ideas:
     `<var_id>` objects (`x_by`, `rel`, `pairwise`, …) describe the
     statistical structure of the problem; the verbs stay constant.
 
-    > Eager forms (`TTEST()`, `CORTEST()`, …) provide a shortcut when
+    > Eager forms (`T_TEST()`, `CORTEST()`, …) provide a shortcut when
     > the full pipeline (in a form of piped syntax that reads like a
     > sentence) is not needed.
 

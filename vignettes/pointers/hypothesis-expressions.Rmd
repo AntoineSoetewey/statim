@@ -48,7 +48,7 @@ This is what backs the t-test contrast variant:
 ```{r, comment="", collapse=FALSE}
 sleep |>
     define_model(extra %by% group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     state_null(
         # Internally, `<=` will be automatically flipped into `>` for the alternative hypothesis
         2 * MU(extra, group == "1") - MU(extra, group == "2") <= 0
@@ -66,7 +66,7 @@ Order matters here in a way that's easy to miss: which named term ends up with c
 ```{r, comment="", collapse=FALSE}
 sleep |>
     define_model(extra %by% group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     state_null(
         MU(extra, group == "1") - MU(extra, group == "2") <= 0
     ) |>
@@ -78,7 +78,7 @@ sleep |>
 ```{r, comment="", collapse=FALSE}
 sleep |>
     define_model(extra %by% group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     state_null(
         MU(extra, group == "2") - MU(extra, group == "1") <= 0
     ) |>
@@ -87,13 +87,13 @@ sleep |>
 
 ### Explanation
 
-`MU(extra, group == "1") - MU(extra, group == "2")` and `MU(extra, group == "2") - MU(extra, group == "1")` are the same hypothesis mathematically. One is just the negation of the other, but `TTEST()`'s `x_by()` `claim_parser` reads whichever name has coefficient `+1` as `.first_group`, and uses it to decide which group becomes `x` and which becomes `y` in the underlying `stats::t.test(x, y, ...)` call.
+`MU(extra, group == "1") - MU(extra, group == "2")` and `MU(extra, group == "2") - MU(extra, group == "1")` are the same hypothesis mathematically. One is just the negation of the other, but `T_TEST()`'s `x_by()` `claim_parser` reads whichever name has coefficient `+1` as `.first_group`, and uses it to decide which group becomes `x` and which becomes `y` in the underlying `stats::t.test(x, y, ...)` call.
 
 Run both tabs above and the asymmetry shows up immediately: `estimate` and `t_stat` flip sign, exactly as you'd expect from swapping `x` and `y`. The p-value, though, does *not* stay put — it goes from `0.960` to `0.040`, the two numbers summing to almost exactly `1`. That's the signature of a one-sided test whose tail got swapped along with the groups, not preserved. `.alt` is resolved from `claim@op` alone — `<=` always becomes `"greater"`, regardless of which side of the contrast a group landed on — so reordering the groups changes which physical quantity (`x - y` vs `y - x`) that fixed `"greater"` direction is being asked about. The hypothesis you wrote and the hypothesis `t.test()` actually evaluated end up pointing in opposite directions, even though `.alt` itself never changed.
 
 This is specific to one-sided claims. Write the same comparison with `==` instead of `<=`, and the p-value genuinely is invariant to order, because a two-sided test is symmetric around zero — swapping `x` and `y` only negates the statistic, and `"two.sided"` doesn't care which side of zero you landed on. It's only `<`, `<=`, `>`, and `>=` claims where group order silently decides which one-sided question gets asked, which makes this worth checking deliberately rather than assuming the test "just knows" which direction you meant.
 
-Nor is this specific to `TTEST()` — any `claim_parser` that reads `names(coefs)[coefs == 1]` to pick out a "first" term the same way inherits the same sensitivity, since `claim_contrast_coefs()` preserves the left-to-right order terms were written in all the way through to the `coefs` vector it returns. If you're writing a `claim_parser` for a new variant and it derives both an entity (a group, a side, a reference level) and a direction (`.alt`, a sign convention) from the same claim independently, double-check that the two stay consistent under reordering — they won't, by default.
+Nor is this specific to `T_TEST()` — any `claim_parser` that reads `names(coefs)[coefs == 1]` to pick out a "first" term the same way inherits the same sensitivity, since `claim_contrast_coefs()` preserves the left-to-right order terms were written in all the way through to the `coefs` vector it returns. If you're writing a `claim_parser` for a new variant and it derives both an entity (a group, a side, a reference level) and a direction (`.alt`, a sign convention) from the same claim independently, double-check that the two stay consistent under reordering — they won't, by default.
 
 The `assert_linear()` guard from the previous section is unrelated to this. It only rejects non-linear *structure* (a parameter times a parameter, in a denominator, raised to a power), and has nothing to say about term order, which is exactly why swapping two valid linear terms passes silently instead of erroring: there's no rule being broken, just an implicit convention (whichever term is `+1` is "first") that's easy to not notice you're relying on. `claim_scalar()` never calls `assert_linear()` at all, so the same kind of structural mistake in a single-parameter claim doesn't get the same clean diagnostic:
 

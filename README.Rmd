@@ -44,13 +44,13 @@ What makes `{statim}` *composable* for statistical workflows is the *verbs* and 
 # Classical t-test
 sleep |> 
     define_model(x_by(extra, group)) |> 
-    prepare_test(TTEST) |> 
+    prepare_test(T_TEST) |> 
     conclude()
 
 # Permutation t-test
 sleep |> 
     define_model(x_by(extra, group)) |> 
-    prepare_test(TTEST) |> 
+    prepare_test(T_TEST) |> 
     # Here, one line added
     # Nothing else changed
     via("permute", n = 1000L) |>         
@@ -61,7 +61,7 @@ For a quick result, a one-liner or an eager form skips the piped syntax entirely
 
 ``` r
 # Only works for `<stat_fn>` functions
-TTEST(x_by(extra, group), sleep)
+T_TEST(x_by(extra, group), sleep)
 ```
 
 The nuanced downside of eager forms is that they are not supported with its main semantics that is, for example, (1) recalibrating / switching off into different methods from the same estimation method with `via()` and (2) do not support post-execution output manipulation.
@@ -74,7 +74,7 @@ The package is designed around three ideas:
 
 2.  **A shared grammar**: Only applied on the main `{statim}` semantics: piped/grammar syntax. `define_model()` =\> `prepare()` =\> `conclude()` is the same shape for every inferential procedure. The `<var_id>` objects (`x_by`, `rel`, `pairwise`, ...) describe the statistical structure of the problem; the verbs stay constant.
 
-    > Eager forms (`TTEST()`, `CORTEST()`, ...) provide a shortcut when the full pipeline (in a form of piped syntax that reads like a sentence) is not needed.
+    > Eager forms (`T_TEST()`, `CORTEST()`, ...) provide a shortcut when the full pipeline (in a form of piped syntax that reads like a sentence) is not needed.
 
 3.  **Extensible by design**: the `{statim}` pipeline is extensible. For instance, if you want to write new estimation method, an implementation is through filling up the `stat_define()` object (then store it within list of `defs` from `STAT_CONSTRUCTOR()` functions, saved as `<STAT_FN>`), then `baseline()` to write the default form of `<STAT_FN>` and `variant()` to extend the current `<STAT_FN>` form (only be accessed with `via()` only). With these, you can bring your own engine, your own method, your own implementation, or use them to extend the current ones.
 

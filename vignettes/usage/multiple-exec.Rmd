@@ -38,7 +38,7 @@ Just like this [vignette](./htest.html), let us use the usual workflow of `{stat
 box::use(
     statim[
         write_models, prepare, anova, conclude, via, 
-        TTEST, CORTEST, LINEAR_REG, 
+        T_TEST, CORTEST, LINEAR_REG, 
         x_by, rel, pairwise
     ]
 )

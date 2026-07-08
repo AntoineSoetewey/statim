@@ -41,7 +41,7 @@ Before explaining each piece, here is what a `{statim}` pipeline looks like end 
     ```{r}
     sleep |>
         define_model(extra %by% group) |>
-        prepare(TTEST, .ci = 0.9) |> 
+        prepare(T_TEST, .ci = 0.9) |> 
         conclude() |>
         tidy()
     ```
@@ -105,12 +105,12 @@ to the pipeline. Nothing is executed yet — the pipeline is lazy until
 ``` r
 sleep |>
     define_model(extra %by% group) |>
-    prepare(TTEST) |>
+    prepare(T_TEST) |>
     # update() is optional
     update(.ci = 0.9)                  
 ```
 
-`prepare()` accepts any `STAT_FN` — `TTEST`, `LINEAR_REG`, `CORTEST`, `P_TEST`, and so on. If you prefer to be explicit, `prepare_test()` and `prepare_model()` are available as typed alternatives.
+`prepare()` accepts any `STAT_FN` — `T_TEST`, `LINEAR_REG`, `CORTEST`, `P_TEST`, and so on. If you prefer to be explicit, `prepare_test()` and `prepare_model()` are available as typed alternatives.
 
 ### iii. Execute and read the output
 
@@ -127,7 +127,7 @@ tidy(out)
 For a quick one-shot inference, every test exposes an eager form that collapses the pipeline into a single call:
 
 ```{r}
-TTEST(extra %by% group, sleep, .ci = 0.9)
+T_TEST(extra %by% group, sleep, .ci = 0.9)
 LINEAR_REG(mpg ~ ., mtcars)
 ```
 
@@ -141,13 +141,13 @@ The eager form is equivalent to the full pipeline for simple cases. Use the pipe
 # Classical
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     conclude()
 
 # Permutation: one line added
 sleep |>
     define_model(x_by(extra, group)) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     via("permute", n = 999L) |>
     conclude()
 ```
@@ -187,7 +187,7 @@ $$\mu_{x|\text{group}=1} \geq \mu_{x|\text{group}=2}$$
 ```{r, collapse=FALSE, comment=""}
 sleep |>
     define_model(extra %by% group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     state_null(
         MU(extra, group == "1") >= MU(extra, group == "2")
     ) |>

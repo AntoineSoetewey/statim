@@ -54,7 +54,7 @@ One-sample t-test, two-sample t-test, correlation test, one-sample proportion te
 box::use(
     stats[t.test, cor.test, binom.test],
     statim[
-        TTEST, CORTEST, P_TEST,
+        T_TEST, CORTEST, P_TEST,
         # Current grammars
         define_model, prepare, via, state_null, conclude,
         # Mappers
@@ -110,10 +110,10 @@ There are two layouts to perform one-sample t-test:
 ```{r}
 heart |>
     define_model(on(trestbps)) |>
-    prepare(TTEST, .mu = 120) |>
+    prepare(T_TEST, .mu = 120) |>
     conclude()
 
-TTEST(on(trestbps), heart, .mu = 120)
+T_TEST(on(trestbps), heart, .mu = 120)
 ```
 
 </details>
@@ -124,9 +124,9 @@ TTEST(on(trestbps), heart, .mu = 120)
 ```{r}
 heart |>
     define_model(trestbps ~ 1) |>
-    prepare(TTEST, .mu = 120) |>
+    prepare(T_TEST, .mu = 120) |>
     conclude()
-TTEST(trestbps ~ 1, heart, .mu = 120)
+T_TEST(trestbps ~ 1, heart, .mu = 120)
 ```
 
 </details>
@@ -163,7 +163,7 @@ There are three layouts to perform two-sample t-test:
 <details open>
 <summary>Using <code>on()</code></summary>
 
-This version requires `via("two_sample")` after `prepare(TTEST)` to perform two-sample t-test. Since it requires `via("two_sample")`, you can't use its eager form/one liner code.
+This version requires `via("two_sample")` after `prepare(T_TEST)` to perform two-sample t-test. Since it requires `via("two_sample")`, you can't use its eager form/one liner code.
 
 ```{r}
 female = heart$thalach[heart$sex == "Female"]
@@ -172,7 +172,7 @@ male = heart$thalach[heart$sex == "Male"]
 # Requires via("two_sample")
 # To perform two-sample t-test with `on()` layout
 define_model(on(female, male)) |>
-    prepare(TTEST) |>
+    prepare(T_TEST) |>
     via("two_sample") |>
     state_null(
         MU(female) == MU(male)
@@ -190,12 +190,12 @@ define_model(on(female, male)) |>
 ```{r}
 heart |>
     define_model(x_by(thalach, sex)) |>
-    prepare(TTEST) |>
+    prepare(T_TEST) |>
     state_null(
         MU(thalach, sex == "Female") == MU(thalach, sex == "Male")
     ) |>
     conclude()
-TTEST(x_by(thalach, sex), heart)
+T_TEST(x_by(thalach, sex), heart)
 ```
 
 *Note: Using `state_null()` is optional, unless the full null hypothesis expression is required. *
@@ -210,10 +210,10 @@ Currently, the `<formula>` layout doesn't have translation for `state_null()`.
 ```{r}
 heart |>
     define_model(thalach ~ sex) |>
-    prepare(TTEST) |>
+    prepare(T_TEST) |>
     conclude()
 
-TTEST(thalach ~ sex, heart)
+T_TEST(thalach ~ sex, heart)
 ```
 
 </details>

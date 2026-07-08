@@ -24,10 +24,10 @@ library(statim)
 
 `{statim}` is so extendable, you can extend the existing methods or write your own and make it extensive. 
 
-Here, I plan to extend `TTEST()` with another bootstrapping by simply adding another variation:
+Here, I plan to extend `T_TEST()` with another bootstrapping by simply adding another variation:
 
 ```{r}
-add_variant(TTEST, x_by, "another_boot") %<-% variant(
+add_variant(T_TEST, x_by, "another_boot") %<-% variant(
     fn = function(.proc, .n = 1000L) {
         x = .proc$x_data[[1]]
         group_data = .proc$group_data
@@ -45,7 +45,7 @@ add_variant(TTEST, x_by, "another_boot") %<-% variant(
 another_boot_tt = 
     sleep |> 
     define_model(extra %by% group) |> 
-    prepare_test(TTEST) |> 
+    prepare_test(T_TEST) |> 
     via("another_boot") |> 
     conclude()
 
@@ -57,7 +57,7 @@ another_boot_tt
 An example above doesn't register with one of built-in output S7 classes, so `tidy()` will fail. Fortunately, you can bring it down by using `making_tidy(<stat_fn>, <model_id / S7::class_formula>) %<-% method_tidy(...)`type of registry:
 
 ```{r}
-making_tidy(TTEST, x_by) %<-% method_tidy(
+making_tidy(T_TEST, x_by) %<-% method_tidy(
     another_boot = function(.x, ...) {
         dat = .x@data
         tibble::tibble(
@@ -70,8 +70,8 @@ making_tidy(TTEST, x_by) %<-% method_tidy(
 another_boot_tt |> tidy()
 ```
 
-You can clean the `TTEST()` in `x_by` model pipeline slate by simply using `remove_variant()`. 
+You can clean the `T_TEST()` in `x_by` model pipeline slate by simply using `remove_variant()`. 
 
 ```{r}
-remove_variant(TTEST, x_by, "another_boot")
+remove_variant(T_TEST, x_by, "another_boot")
 ```

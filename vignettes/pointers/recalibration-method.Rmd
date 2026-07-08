@@ -32,7 +32,7 @@ For instance, a classical t-test, a bootstrap t-test, and a permutation t-test a
 ```{r}
 sleep |>
     define_model(extra %by% group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     via("boot", n = 2000) |>
     conclude()
 ```
@@ -41,9 +41,9 @@ sleep |>
 
 ## Where variant names come from
 
-A variant name like `"boot"` or `"permute"` from `TTEST()` in `x_by` mode is not arbitrary. It has to match a name registered for that specific model type, inside the `agendas()` object passed to `stat_define()` when the test or model was built. Two sources are checked:
+A variant name like `"boot"` or `"permute"` from `T_TEST()` in `x_by` mode is not arbitrary. It has to match a name registered for that specific model type, inside the `agendas()` object passed to `stat_define()` when the test or model was built. Two sources are checked:
 
-1.  The variants declared directly inside the matched `stat_define()`'s `agendas()`, alongside its `baseline()`. This is how `TTEST` ships with `"boot"`, `"permute"`, `"contrast"`, and `"multi"` for `x_by()` pipelines, for example.
+1.  The variants declared directly inside the matched `stat_define()`'s `agendas()`, alongside its `baseline()`. This is how `T_TEST` ships with `"boot"`, `"permute"`, `"contrast"`, and `"multi"` for `x_by()` pipelines, for example.
 
 2.  Any variants registered afterwards via `add_variant()`. This is a developer-facing function, paired with the `%<-%` operator, and is meant for extending an existing `<STAT_FN>` (built with `HTEST_FN()` or `MODEL_FN()`) without touching its original definition:
 
@@ -57,14 +57,14 @@ A variant name like `"boot"` or `"permute"` from `TTEST()` in `x_by` mode is not
 
     Variants added this way carry an `origin`: `"user"` (the default) is scoped to the current session and can be removed with `remove_variant()`, while `"package"` is meant to be registered from a package's `.onLoad()` and lasts as long as that package stays loaded. Either way, the name `"default"` is frozen and cannot be added or removed through `add_variant()` / `remove_variant()`.
 
-Because matching is scoped to model type, the same variant name can mean different things (or simply do not exist) depending on which `<var_id>` you used in `define_model()`. A variant registered for `x_by()` pipelines is not automatically available to a `<formula>`-based pipeline of the same test, even if both eventually call `TTEST`.
+Because matching is scoped to model type, the same variant name can mean different things (or simply do not exist) depending on which `<var_id>` you used in `define_model()`. A variant registered for `x_by()` pipelines is not automatically available to a `<formula>`-based pipeline of the same test, even if both eventually call `T_TEST`.
 
 If you pass a method name that is not registered for the model type in play, `via()` fails immediately, before `conclude()` is even reached:
 
 ```{r, error = TRUE}
 sleep |>
     define_model(extra %by% group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     via("not_a_real_method")
 ```
 
@@ -77,7 +77,7 @@ Any named arguments supplied to `via()` are not a replacement for the arguments 
 ```{r}
 sleep |>
     define_model(extra %by% group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     update(.ci = 0.9) |>
     via("boot", n = 2000) |>
     conclude()
@@ -89,12 +89,12 @@ This merging behavior is also why `via()` does not require you to repeat argumen
 
 ## Recalibration and hypothesis claims
 
-If a hypothesis was attached with `state_null()`, recalibrating the method does not invalidate it, as long as the variant you switch to actually declares a `claim_parser` of its own. `claim_parser` is an argument to `baseline()` and to each `variant()` individually — a [`map_claim()`](../../reference/map_claim.html) object that knows how to turn a stated claim into the arguments that one `fn` expects, since different estimation methods can require the same population-parameter claim expressed differently. `TTEST`'s `x_by()` implementation, for instance, gives a `claim_parser` to its `base` and to `"contrast"`, but not to the resampling-based `"boot"` or `"permute"` variants, since those do not take a hypothesized value as an argument in the first place.
+If a hypothesis was attached with `state_null()`, recalibrating the method does not invalidate it, as long as the variant you switch to actually declares a `claim_parser` of its own. `claim_parser` is an argument to `baseline()` and to each `variant()` individually — a [`map_claim()`](../../reference/map_claim.html) object that knows how to turn a stated claim into the arguments that one `fn` expects, since different estimation methods can require the same population-parameter claim expressed differently. `T_TEST`'s `x_by()` implementation, for instance, gives a `claim_parser` to its `base` and to `"contrast"`, but not to the resampling-based `"boot"` or `"permute"` variants, since those do not take a hypothesized value as an argument in the first place.
 
 ```{r}
 sleep |>
     define_model(extra %by% group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     state_null(
         2 * MU(extra, group == "1") - MU(extra, group == "2") <= 0
     ) |>
@@ -107,7 +107,7 @@ At `conclude()`, the `"contrast"` variant's own `claim_parser` runs against the 
 ```{r, error = TRUE}
 sleep |>
     define_model(extra %by% group) |>
-    prepare_test(TTEST) |>
+    prepare_test(T_TEST) |>
     state_null(MU(extra, group == "1") == MU(extra, group == "2")) |>
     via("permute", n = 999L) |>
     conclude()
