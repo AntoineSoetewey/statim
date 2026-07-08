@@ -207,7 +207,7 @@ articles:
     - usage/htest
     - usage/model-infer
     - usage/anova-mod
-    - usage/multiple-exec
+    # - usage/multiple-exec
 
   - title: Pointers of statim you need to know
     navbar: Pointers of statim you need to know

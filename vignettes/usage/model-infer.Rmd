@@ -1,13 +1,195 @@
 ---
-title: "New approach of model-based inference with {statim}"
-subtitle: "Definitive guide"
-description: "A guide on using statim R package"
-output: 
+title: "Regression modelling with {statim}"
+subtitle: "A practical guide using real clinical data"
+description: >
+    A guide on performing regression modelling with statim R package.
+output:
     rmarkdown::html_vignette:
         toc: true
 vignette: |
-    %\VignetteIndexEntry{Model-based inference with statim}
+    %\VignetteIndexEntry{Regression modelling with statim}
     %\VignetteEngine{knitr::rmarkdown}
     \usepackage[utf8]{inputenc}
 ---
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = FALSE,
+    comment = ""
+)
+fansi::set_knit_hooks(knitr::knit_hooks)
+```
+
+## Rationale
+
+`vignette("htest", package = "statim")` covered the other half of `prepare()`: `prepare_test()`, feeding `T_TEST`, `COR_TEST`, and `P_TEST` into the same `define_model() |> prepare() |> conclude()` shape. This vignette covers the model-based half, `prepare_model()`, which takes the exact same shape and feeds it `LINEAR_REG` or `GLM` instead. Same `<var_id>` mappers, same verbs, same `conclude()` at the end. If a hypothesis question turns out to need a regression instead of a t-test, the pipeline you already wrote doesn't change shape, only the `<STAT_FN>` swapped in.
+
+Three questions from the same dataset, run as regressions instead of hypothesis tests.
+
+### Sample Problem
+
+Same dataset as the hypothesis testing vignette: 303 patients from the Cleveland Clinic, bundled with this package at `inst/extdata/heart-disease.csv`. Two columns join the ones used previously:
+
+| Column     | Type       | Description                                       |
+|------------|------------|----------------------------------------------------|
+| `chol`     | Continuous | Serum cholesterol (mg/dl)                         |
+| `target`   | Binary     | Presence of heart disease (0 = No, 1 = Yes)       |
+
+The questions:
+
+1. [Does age predict resting blood pressure?](#q1)
+2. [Do age, sex, and cholesterol together explain max heart rate?](#q2)
+3. [Do age, cholesterol, and resting blood pressure predict the presence of heart disease?](#q3)
+
+## Setup
+
+```{r}
+box::use(
+    statim[
+        define_model, prepare_model, via, conclude,
+        # Supported models
+        LINEAR_REG, GLM,
+        rel, tidy
+    ],
+    stats[update, binomial]
+)
+
+box::use(
+    dplyr[mutate, glimpse],
+    readr[read_csv]
+)
+```
+
+Then import the CSV file from this package: 
+
+```{r}
+heart = 
+    read_csv(system.file("extdata", "heart-disease.csv", package = "statim")) |>
+    mutate(
+        sex = factor(sex, levels = c(0, 1), labels = c("Female", "Male")),
+        target = factor(target, levels = c(0, 1), labels = c("No", "Yes"))
+    )
+glimpse(heart)
+```
+
+## Question 1: Does age predict resting blood pressure? {#q1}
+
+$$\text{trestbps} = \beta_0 + \beta_1 \cdot \text{age} + \varepsilon$$
+
+This is an example case for simple linear regression. There are two layouts to fit a linear model, the same two you'd reach for in the hypothesis testing vignette.
+
+<details open>
+<summary>Using <code>rel()</code></summary>
+
+```{r}
+heart |>
+    define_model(rel(age, trestbps)) |>
+    prepare_model(LINEAR_REG) |>
+    conclude()
+```
+
+You can use its one-liner version:
+
+```{r}
+LINEAR_REG(rel(age, trestbps), heart)
+```
+
+</details>
+
+<details>
+<summary>Using formula syntax</summary>
+
+```{r}
+heart |>
+    define_model(trestbps ~ age) |>
+    prepare_model(LINEAR_REG) |>
+    conclude()
+```
+
+You can use its one-liner version:
+
+```{r}
+LINEAR_REG(trestbps ~ age, heart)
+```
+
+</details>
+
+Both layouts land on the same fit. `rel(age, trestbps)` reads "the relationship between age and trestbps"; the formula reads "trestbps explained by age." Pick whichever one your eyes parse faster, `{statim}` doesn't care which you use.
+
+Interpretation: each additional year of age adds a little over half an mmHg to resting blood pressure on average, and the slope is significant ($p < 0.001$). The relationship is real, if modest.
+
+## Question 2: Do age, sex, and cholesterol explain max heart rate? {#q2}
+
+$$\text{thalach} = \beta_0 + \beta_1 \cdot \text{age} + \beta_2 \cdot \text{sex} + \beta_3 \cdot \text{chol} + \varepsilon$$
+
+This is an example case of multiple linear regression. Here's a small preview for the layout to be used: (1) `rel()`'s `x` argument takes a `c()` of bare names, so multiple predictors don't require switching to (2) formula syntax.
+
+<details open>
+<summary>Using <code>rel()</code></summary>
+
+```{r}
+mod1 = heart |>
+    define_model(
+        rel(c(age, sex, chol), thalach)
+    ) |>
+    prepare_model(LINEAR_REG) |>
+    conclude()
+
+mod1
+```
+
+You can use its one-liner version:
+
+```{r}
+LINEAR_REG(rel(c(age, sex, chol), thalach), heart)
+```
+
+</details>
+
+<details>
+<summary>Using formula syntax</summary>
+
+```{r}
+heart |>
+    define_model(thalach ~ age + sex + chol) |>
+    prepare_model(LINEAR_REG) |>
+    conclude()
+```
+
+You can use its one-liner version:
+
+```{r}
+LINEAR_REG(thalach ~ age + sex + chol, heart)
+```
+
+</details>
+
+Extract a tidy coefficient table with `tidy()` instead of reading the printed one:
+
+```{r}
+tidy(mod1)
+```
+
+Interpretation: age is still doing the heavy lifting here (negative, significant), sex and cholesterol don't add much once age is in the model. Max heart rate is mostly a function of getting older, not of these other two variables.
+
+## Question 3: Do age, cholesterol, and blood pressure predict heart disease? {#q3}
+
+$$\text{logit}(P(\text{target}=\text{Yes})) = \beta_0 + \beta_1 \cdot \text{age} + \beta_2 \cdot \text{chol} + \beta_3 \cdot \text{trestbps}$$
+
+`target` is binary, so this is an example of a logistic regression. In this case, you need `GLM` instead of `LINEAR_REG`. `GLM()` defaults to `stats::gaussian()` when no family is set, which isn't what we want here. Update the `family` parameter on the lazy loaded execution before `conclude()` runs it:
+
+```{r}
+heart |>
+    define_model(target ~ age + chol + trestbps) |>
+    prepare_model(GLM) |>             # or prepare_model(GLM, family = binomial())
+    update(family = binomial()) |>
+    conclude()
+```
+
+Or you can just use their one-liner version:
+
+```{r}
+GLM(target ~ age + chol + trestbps, heart, family = binomial())
+```
+
+Interpretation: age comes out as the one reliably associated predictor here, older patients face higher odds of a positive diagnosis in this cohort. Cholesterol and resting blood pressure don't clear significance on their own once age is accounted for, an easy fact to miss if you eyeballed `chol` and `trestbps` in isolation.
