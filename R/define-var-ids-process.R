@@ -23,7 +23,11 @@ S7::method(model_processor, var_id) = function(var_id, data = NULL, ...) {
     list()
 }
 
-S7::method(model_processor, S7::class_formula) = function(var_id, data = NULL, ...) {
+S7::method(model_processor, S7::class_formula) = function(
+    var_id,
+    data = NULL,
+    ...
+) {
     vars = all.vars(var_id)
     data = if (rlang::is_null(data)) {
         vctrs::new_data_frame(rlang::set_names(
@@ -40,7 +44,12 @@ S7::method(model_processor, S7::class_formula) = function(var_id, data = NULL, .
 }
 
 S7::method(model_processor, x_by) = function(var_id, data = NULL, ...) {
-    proc = two_vars_extract(var_id@x, var_id@group, data = data, role2 = "group")
+    proc = two_vars_extract(
+        var_id@x,
+        var_id@group,
+        data = data,
+        role2 = "group"
+    )
     list(x_data = proc$x1_data, group_data = proc$x2_data)
 }
 
