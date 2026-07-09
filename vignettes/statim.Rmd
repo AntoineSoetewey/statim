@@ -210,6 +210,14 @@ Any linear combination of parameters is valid on either side. For a full referen
 
 5.  This package is relatively easy to use and interactive, though has a bit steeper learning curve when compared to the existing packages like `{rstatix}` — this is due to `<var_id>` mappers which changes the behavior of the statistical inference in `{statim}` pipeline and S7 exist, and has tons of supporting documentations you can read. No need to read all of the contents unless you are planning to contribute. The semantics of this package is pretty similar to what you are gotten used to from the existing packages, namely the `{tidyverse}` itself. 
 
+## Learn More
+
+If you want to learn more on how to use this package, visit the following:
+
+1.  [Hypothesis Testing with {statim}](./usage/htest.html)
+2.  [Regression Modelling with {statim}](./usage/model-infer.html)
+3.  [ANOVA models from Linear Models with {statim}](./usage/anova-mod.html)
+
 <!-- ## Generalization -->
 
 <!-- If you have an inferential statistics tasks, give this package a shot — it's updated and more modernized. Besides, it's written in S7, so type annotation is the least of your worries. And that's pretty much all you need to know when you started working with this package.  -->
