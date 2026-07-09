@@ -12,8 +12,8 @@ vignette: |
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>"
+    collapse = FALSE,
+    comment = ""
 )
 
 fansi::set_knit_hooks(knitr::knit_hooks)
