@@ -224,7 +224,35 @@ class_lm_object = S7::new_class(
         x_assign = S7::new_property(
             class = S7::new_union(S7::class_integer, S7::class_missing),
             default = NULL
-        )
+        ),
+
+        # ---- For prediction purposes ----
+        x_levels = S7::new_property(
+            class = S7::new_union(S7::class_list, S7::class_missing),
+            default = NULL
+        ),
+        vcov = S7::new_property(getter = function(self) {
+            if (is.null(self@x_mat)) {
+                cli::cli_abort(c(
+                    "{.fn predict} with {.arg interval} requires {.field x_mat} to be populated.",
+                    "i" = "Set {.code x_mat = as.numeric(stats::model.matrix(fit))} when constructing {.cls class_lm_object}."
+                ))
+            }
+            n = length(self@fitted)
+            ncols = length(self@beta)
+            X = matrix(self@x_mat, nrow = n, ncol = ncols)
+            xtx = t(X) %*% X
+            inv = tryCatch(
+                solve(xtx),
+                error = function(e) {
+                    cli::cli_abort(c(
+                        "Design matrix is rank-deficient; {.field vcov} cannot be computed.",
+                        "i" = "Check for aliased coefficients ({.code alias(fit)})."
+                    ))
+                }
+            )
+            inv * self@dispersion
+        })
     )
 )
 
@@ -321,7 +349,8 @@ lm_to_lm_object = function(fit) {
         dispersion = rss / df_res,
         family = "gaussian",
         x_mat = as.numeric(mm),
-        x_assign = attr(mm, "assign")
+        x_assign = attr(mm, "assign"),
+        x_levels = stats::.getXlevels(fit$terms, stats::model.frame(fit))
     )
 }
 
