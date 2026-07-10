@@ -18,14 +18,19 @@
 #'
 #' @param x A `class_stat_infer` subclass object, typically `cld_exec@data`.
 #' @param new_data A data frame. `NULL` defaults to the training data.
-#' @param ... Currently unused. Passed to the dispatched method.
+#' @param ... Passed to the dispatched method. Methods typically accept a
+#'   `new_data` argument (a data frame; `NULL` defaults to the training
+#'   data) plus any method-specific options — see the individual result
+#'   class's documentation (e.g. `?class_lm_object`) for what it accepts.
+#'
+#' @usage auto_predict(x, new_data = NULL, ...)
 #'
 #' @return A data frame with at minimum a `.pred` column.
 #'
 #' @seealso [predict()], [making_predict()], [method_predict()], [class_stat_infer]
 #'
 #' @export
-auto_predict = S7::new_generic("auto_predict", "x", fun = function(x, ...) {
+auto_predict = S7::new_generic("auto_predict", "x", fun = function(x, new_data = NULL, ...) {
     if (!is_class_stat_infer(x)) {
         cli::cli_abort(c(
             "{.arg x} must inherit {.cls class_stat_infer}.",
@@ -35,7 +40,7 @@ auto_predict = S7::new_generic("auto_predict", "x", fun = function(x, ...) {
     S7::S7_dispatch()
 })
 
-S7::method(auto_predict, class_stat_infer) = function(x, ...) {
+S7::method(auto_predict, class_stat_infer) = function(x, new_data = NULL, ...) {
     cli::cli_abort(c(
         "No {.fn auto_predict} method for {.cls {class(x)[[1]]}}.",
         "i" = "Implement {.fn auto_predict} on your {.cls {class(x)[[1]]}} class."

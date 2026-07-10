@@ -26,6 +26,8 @@
 #'   `NULL` (the default) uses the training data.
 #' @param ... Passed to the dispatched method.
 #'
+#' @usage predict(object, new_data = NULL, ...)
+#'
 #' @return A data frame (specifically a `tibble`) with `.pred`, `truth`
 #'   when a response is available, and `.pred_lower`/`.pred_upper` when
 #'   an interval was requested. Always inherits `data.frame`, regardless

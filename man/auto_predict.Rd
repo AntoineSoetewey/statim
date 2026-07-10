@@ -4,14 +4,17 @@
 \alias{auto_predict}
 \title{Automatically predict from a statistical result}
 \usage{
-auto_predict(x, ...)
+auto_predict(x, new_data = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{class_stat_infer} subclass object, typically \code{cld_exec@data}.}
 
-\item{...}{Currently unused. Passed to the dispatched method.}
-
 \item{new_data}{A data frame. \code{NULL} defaults to the training data.}
+
+\item{...}{Passed to the dispatched method. Methods typically accept a
+\code{new_data} argument (a data frame; \code{NULL} defaults to the training
+data) plus any method-specific options — see the individual result
+class's documentation (e.g. \code{?class_lm_object}) for what it accepts.}
 }
 \value{
 A data frame with at minimum a \code{.pred} column.

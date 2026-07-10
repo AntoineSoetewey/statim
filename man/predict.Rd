@@ -8,7 +8,7 @@
 An object of class \code{S7_external_generic} of length 4.
 }
 \usage{
-predict
+predict(object, new_data = NULL, ...)
 }
 \arguments{
 \item{object}{A \code{cld_exec} object produced by \code{conclude()}.}
