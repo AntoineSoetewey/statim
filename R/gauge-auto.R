@@ -79,3 +79,13 @@ S7::method(auto_gauge, class_p_test) = function(x, ...) {
     h = 2 * asin(sqrt(x@estimate)) - 2 * asin(sqrt(x@true_p %||% 0.5))
     tibble::tibble(metric = "cohens_h", value = h)
 }
+
+S7::method(auto_gauge, class_ttest_one) = function(x, ...) {
+    n = x@df + 1
+    d = x@t_stat / sqrt(n)
+    tibble::tibble(
+        term = x@term,
+        metric = "cohens_d",
+        value = d
+    )
+}
