@@ -127,7 +127,10 @@ class_glm_object = S7::new_class(
         # ---- Required inputs ----
         beta = S7::class_numeric,
         std_beta = S7::class_numeric,
-        link = S7::new_property(class = S7::class_character, default = "identity"),
+        link = S7::new_property(
+            class = S7::class_character,
+            default = "identity"
+        ),
         null_deviance = S7::class_numeric,
         aic = S7::class_numeric,
         logLik = S7::class_numeric,
