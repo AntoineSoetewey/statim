@@ -77,6 +77,14 @@ GLM = MODEL_FN(
 #' - `null_logLik`: scalar log-likelihood of the intercept-only model.
 #' - `beta`: named numeric vector of coefficient estimates.
 #' - `std_beta`: named numeric vector of coefficient standard errors.
+#' - `fitted`: numeric vector of fitted values on the response scale.
+#' - `vcov`: variance-covariance matrix of the coefficients, e.g.
+#'   `stats::vcov(fit)`. Required for [predict()] with `interval`.
+#' - `x_mat`: model matrix stored as a flat numeric vector via
+#'   `as.numeric(stats::model.matrix(fit))`. Required for [predict()].
+#' - `x_levels`: factor levels used when fitting, via
+#'   `stats::.getXlevels(fit$terms, stats::model.frame(fit))`. Required
+#'   for [predict()] on new data with factor predictors.
 #'
 #' The following are computed automatically and do not need to be supplied:
 #'
@@ -88,6 +96,18 @@ GLM = MODEL_FN(
 #'   `statistic`, `p_value`.
 #' - `fit_summary`: tibble with columns `family`, `link`, `null_deviance`,
 #'   `deviance`, `df_residual`, `aic`, `n_obs`.
+#'
+#' @section predict() arguments:
+#' [predict()] on a `class_glm_object` accepts:
+#'
+#' - `new_data`: A data frame of new predictors. `NULL` (the default)
+#'   returns fitted values and response-based `truth` for the training data.
+#' - `type`: One of `"response"` (default, back-transformed through the
+#'   inverse link) or `"link"` (linear predictor scale).
+#' - `interval`: One of `"none"` (default) or `"confidence"`.
+#'   Prediction intervals are not available, since GLMs have no closed-form
+#'   analogue of OLS prediction error.
+#' - `level`: Confidence level for the interval. Default `0.95`.
 #'
 #' @seealso [anova_able], [GLM]
 #'
@@ -113,7 +133,11 @@ GLM = MODEL_FN(
 #'     null_deviance = fit$null.deviance,
 #'     aic = fit$aic,
 #'     beta = coef(s)[, 1],
-#'     std_beta = coef(s)[, 2]
+#'     std_beta = coef(s)[, 2],
+#'     fitted = unname(fit$fitted.values),
+#'     vcov = vcov(fit),
+#'     x_mat = as.numeric(model.matrix(fit)),
+#'     x_levels = .getXlevels(fit$terms, model.frame(fit))
 #' )
 #'
 #' obj@coefficients
@@ -135,6 +159,19 @@ class_glm_object = S7::new_class(
         aic = S7::class_numeric,
         logLik = S7::class_numeric,
         null_logLik = S7::class_numeric,
+
+        # ---- For prediction purposes ----
+        fitted = S7::class_numeric,
+        vcov = S7::class_numeric,
+        x_mat = S7::class_numeric,
+        x_assign = S7::new_property(
+            class = S7::new_union(S7::class_integer, S7::class_missing),
+            default = NULL
+        ),
+        x_levels = S7::new_property(
+            class = S7::new_union(S7::class_list, S7::class_missing),
+            default = NULL
+        ),
 
         # ---- Computed: per-coefficient stats ----
         statistic = S7::new_property(getter = function(self) {
@@ -236,6 +273,9 @@ glm_to_glm_object = function(fit) {
     null_formula = stats::update(stats::formula(fit), . ~ 1)
     null_fit = stats::glm(null_formula, data = fit$model, family = fit$family)
 
+    mm = stats::model.matrix(fit)
+    xlev = stats::.getXlevels(fit$terms, stats::model.frame(fit)) %||% list()
+
     class_glm_object(
         terms = fit$terms,
         df_residual = fit$df.residual,
@@ -248,7 +288,12 @@ glm_to_glm_object = function(fit) {
         logLik = as.numeric(stats::logLik(fit)),
         null_logLik = as.numeric(stats::logLik(null_fit)),
         beta = coef_mat[, 1],
-        std_beta = coef_mat[, 2]
+        std_beta = coef_mat[, 2],
+        fitted = unname(fit$fitted.values),
+        vcov = stats::vcov(fit),
+        x_mat = as.numeric(mm),
+        x_assign = attr(mm, "assign"),
+        x_levels = xlev
     )
 }
 

@@ -94,6 +94,59 @@ S7::method(auto_predict, class_lm_object) = function(
     out
 }
 
+S7::method(auto_predict, class_glm_object) = function(
+        x,
+        new_data = NULL,
+        type = c("response", "link"),
+        interval = c("none", "confidence"),
+        level = 0.95,
+        ...
+) {
+    type = rlang::arg_match(type)
+    interval = rlang::arg_match(interval)
+
+    fam = get(x@family, mode = "function")(link = x@link)
+
+    x_new = predict_model_matrix(x, new_data)
+    eta = as.vector(x_new %*% x@beta)
+    pred = if (type == "response") fam$linkinv(eta) else eta
+
+    out = tibble::tibble(.pred = pred)
+
+    resp_name = as.character(attr(x@terms, "variables")[[
+        attr(x@terms, "response") + 1L
+    ]])
+    truth = if (is.null(new_data)) {
+        x@fitted
+    } else if (resp_name %in% names(new_data)) {
+        new_data[[resp_name]]
+    } else {
+        NULL
+    }
+    if (!is.null(truth)) {
+        out = tibble::add_column(out, truth = truth, .before = ".pred")
+    }
+
+    if (interval == "confidence") {
+        se_eta = delta_se(gradient = x_new, vcov = x@vcov)
+        crit = if (x@family %in% c("binomial", "poisson")) {
+            stats::qnorm(1 - (1 - level) / 2)
+        } else {
+            stats::qt(1 - (1 - level) / 2, df = x@df_residual)
+        }
+
+        if (type == "response") {
+            out$.pred_lower = fam$linkinv(eta - crit * se_eta)
+            out$.pred_upper = fam$linkinv(eta + crit * se_eta)
+        } else {
+            out$.pred_lower = eta - crit * se_eta
+            out$.pred_upper = eta + crit * se_eta
+        }
+    }
+
+    out
+}
+
 predict_model_matrix = function(object, new_data) {
     if (is.null(new_data)) {
         n = length(object@fitted)
