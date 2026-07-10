@@ -518,7 +518,10 @@ test_that("gauge() with quiet = TRUE suppresses the approximation message but ke
 })
 
 test_that("gauge() on pairwise() one-sample mode emits no message even without quiet", {
-    result = T_TEST(pairwise(Sepal.Length, Sepal.Width, direction = "eq"), iris)@data
+    result = T_TEST(
+        pairwise(Sepal.Length, Sepal.Width, direction = "eq"),
+        iris
+    )@data
 
     expect_no_message({
         gauge_out = auto_gauge(result, quiet = TRUE)
@@ -527,7 +530,10 @@ test_that("gauge() on pairwise() one-sample mode emits no message even without q
 })
 
 test_that("gauge() on pairwise() two-sample mode emits a message unless quiet = TRUE", {
-    result = T_TEST(pairwise(Sepal.Length, Sepal.Width, Petal.Length), iris)@data
+    result = T_TEST(
+        pairwise(Sepal.Length, Sepal.Width, Petal.Length),
+        iris
+    )@data
 
     expect_message(auto_gauge(result, quiet = FALSE), "approximated")
     expect_no_message(auto_gauge(result, quiet = TRUE))
