@@ -18,10 +18,25 @@ Constructor arguments (populated automatically by \link{GLM}):
 \item \code{deviance}: scalar deviance.
 \item \code{dispersion}: scalar dispersion parameter.
 \item \code{family}: string naming the error family, e.g. \code{"binomial"}.
-\item \code{coefficients}: data frame with columns \code{term}, \code{estimate},
-\code{std_error}, \code{statistic}, \code{p_value}.
-\item \code{fit_summary}: data frame with columns \code{family}, \code{link},
-\code{null_deviance}, \code{deviance}, \code{df_residual}, \code{aic}, \code{n_obs}.
+\item \code{link}: string naming the link function, e.g. \code{"logit"}.
+\item \code{null_deviance}: scalar deviance of the intercept-only model.
+\item \code{aic}: scalar AIC.
+\item \code{logLik}: scalar log-likelihood of the fitted model.
+\item \code{null_logLik}: scalar log-likelihood of the intercept-only model.
+\item \code{beta}: named numeric vector of coefficient estimates.
+\item \code{std_beta}: named numeric vector of coefficient standard errors.
+}
+
+The following are computed automatically and do not need to be supplied:
+\itemize{
+\item \code{statistic}: per-coefficient test statistics (\code{beta / std_beta}).
+\item \code{p_value}: per-coefficient two-sided p-values. Uses a z-test when
+\code{family} is \code{"binomial"} or \code{"poisson"} (fixed dispersion), and a
+t-test against \code{df_residual} otherwise (estimated dispersion).
+\item \code{coefficients}: tibble with columns \code{term}, \code{estimate}, \code{std_error},
+\code{statistic}, \code{p_value}.
+\item \code{fit_summary}: tibble with columns \code{family}, \code{link}, \code{null_deviance},
+\code{deviance}, \code{df_residual}, \code{aic}, \code{n_obs}.
 }
 }
 \examples{
@@ -42,23 +57,15 @@ obj = class_glm_object(
     deviance = fit$deviance,
     dispersion = if (fam \%in\% c("binomial", "poisson")) 1 else s$dispersion,
     family = fam,
-    coefficients = tibble::tibble(
-        term = rownames(coef(s)),
-        estimate = coef(s)[, 1],
-        std_error = coef(s)[, 2],
-        statistic = coef(s)[, 3],
-        p_value = coef(s)[, 4]
-    ),
-    fit_summary = tibble::tibble(
-        family = fam,
-        link = fit$family$link,
-        null_deviance = fit$null.deviance,
-        deviance = fit$deviance,
-        df_residual = as.integer(fit$df.residual),
-        aic = fit$aic,
-        n_obs = as.integer(length(fit$residuals))
-    )
+    link = fit$family$link,
+    null_deviance = fit$null.deviance,
+    aic = fit$aic,
+    beta = coef(s)[, 1],
+    std_beta = coef(s)[, 2]
 )
+
+obj@coefficients
+obj@fit_summary
 
 }
 \seealso{

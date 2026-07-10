@@ -70,10 +70,24 @@ GLM = MODEL_FN(
 #' - `deviance`: scalar deviance.
 #' - `dispersion`: scalar dispersion parameter.
 #' - `family`: string naming the error family, e.g. `"binomial"`.
-#' - `coefficients`: data frame with columns `term`, `estimate`,
-#'   `std_error`, `statistic`, `p_value`.
-#' - `fit_summary`: data frame with columns `family`, `link`,
-#'   `null_deviance`, `deviance`, `df_residual`, `aic`, `n_obs`.
+#' - `link`: string naming the link function, e.g. `"logit"`.
+#' - `null_deviance`: scalar deviance of the intercept-only model.
+#' - `aic`: scalar AIC.
+#' - `logLik`: scalar log-likelihood of the fitted model.
+#' - `null_logLik`: scalar log-likelihood of the intercept-only model.
+#' - `beta`: named numeric vector of coefficient estimates.
+#' - `std_beta`: named numeric vector of coefficient standard errors.
+#'
+#' The following are computed automatically and do not need to be supplied:
+#'
+#' - `statistic`: per-coefficient test statistics (`beta / std_beta`).
+#' - `p_value`: per-coefficient two-sided p-values. Uses a z-test when
+#'   `family` is `"binomial"` or `"poisson"` (fixed dispersion), and a
+#'   t-test against `df_residual` otherwise (estimated dispersion).
+#' - `coefficients`: tibble with columns `term`, `estimate`, `std_error`,
+#'   `statistic`, `p_value`.
+#' - `fit_summary`: tibble with columns `family`, `link`, `null_deviance`,
+#'   `deviance`, `df_residual`, `aic`, `n_obs`.
 #'
 #' @seealso [anova_able], [GLM]
 #'
@@ -95,37 +109,70 @@ GLM = MODEL_FN(
 #'     deviance = fit$deviance,
 #'     dispersion = if (fam %in% c("binomial", "poisson")) 1 else s$dispersion,
 #'     family = fam,
-#'     coefficients = tibble::tibble(
-#'         term = rownames(coef(s)),
-#'         estimate = coef(s)[, 1],
-#'         std_error = coef(s)[, 2],
-#'         statistic = coef(s)[, 3],
-#'         p_value = coef(s)[, 4]
-#'     ),
-#'     fit_summary = tibble::tibble(
-#'         family = fam,
-#'         link = fit$family$link,
-#'         null_deviance = fit$null.deviance,
-#'         deviance = fit$deviance,
-#'         df_residual = as.integer(fit$df.residual),
-#'         aic = fit$aic,
-#'         n_obs = as.integer(length(fit$residuals))
-#'     )
+#'     link = fit$family$link,
+#'     null_deviance = fit$null.deviance,
+#'     aic = fit$aic,
+#'     beta = coef(s)[, 1],
+#'     std_beta = coef(s)[, 2]
 #' )
+#'
+#' obj@coefficients
+#' obj@fit_summary
 #'
 #' @export
 class_glm_object = S7::new_class(
     "glm_object",
     parent = anova_able,
     properties = list(
-        coefficients = S7::new_property(
-            class = S7::class_data.frame,
-            default = data.frame()
-        ),
-        fit_summary = S7::new_property(
-            class = S7::class_data.frame,
-            default = data.frame()
-        )
+        # ---- Required inputs ----
+        beta = S7::class_numeric,
+        std_beta = S7::class_numeric,
+        link = S7::new_property(class = S7::class_character, default = "identity"),
+        null_deviance = S7::class_numeric,
+        aic = S7::class_numeric,
+        logLik = S7::class_numeric,
+        null_logLik = S7::class_numeric,
+
+        # ---- Computed: per-coefficient stats ----
+        statistic = S7::new_property(getter = function(self) {
+            self@beta / self@std_beta
+        }),
+        p_value = S7::new_property(getter = function(self) {
+            if (self@family %in% c("binomial", "poisson")) {
+                2 * pnorm(abs(self@statistic), lower.tail = FALSE)
+            } else {
+                2 *
+                    pt(
+                        abs(self@statistic),
+                        df = self@df_residual,
+                        lower.tail = FALSE
+                    )
+            }
+        }),
+
+        # ---- Computed: coefficients table ----
+        coefficients = S7::new_property(getter = function(self) {
+            tibble::tibble(
+                term = names(self@beta),
+                estimate = unname(self@beta),
+                std_error = unname(self@std_beta),
+                statistic = unname(self@statistic),
+                p_value = unname(self@p_value)
+            )
+        }),
+
+        # ---- Computed: model fit summary ----
+        fit_summary = S7::new_property(getter = function(self) {
+            tibble::tibble(
+                family = self@family,
+                link = self@link,
+                null_deviance = self@null_deviance,
+                deviance = self@deviance,
+                df_residual = as.integer(self@df_residual),
+                aic = self@aic,
+                n_obs = as.integer(self@df_residual + length(self@beta))
+            )
+        })
     )
 )
 
@@ -173,31 +220,18 @@ glm_to_glm_object = function(fit) {
         ))
     }
 
-    coef_tbl = as.data.frame(summary(fit)$coefficients)
-    coef_tbl = tibble::tibble(
-        term = rownames(coef_tbl),
-        estimate = coef_tbl[[1]],
-        std_error = coef_tbl[[2]],
-        statistic = coef_tbl[[3]],
-        p_value = coef_tbl[[4]]
-    )
+    s = summary(fit)
+    coef_mat = s$coefficients
 
     fam = fit$family$family
     phi = if (fam %in% c("binomial", "poisson")) {
         1
     } else {
-        summary(fit)$dispersion
+        s$dispersion
     }
 
-    fit_tbl = tibble::tibble(
-        family = fam,
-        link = fit$family$link,
-        null_deviance = fit$null.deviance,
-        deviance = fit$deviance,
-        df_residual = as.integer(fit$df.residual),
-        aic = fit$aic,
-        n_obs = as.integer(length(fit$residuals))
-    )
+    null_formula = stats::update(stats::formula(fit), . ~ 1)
+    null_fit = stats::glm(null_formula, data = fit$model, family = fit$family)
 
     class_glm_object(
         terms = fit$terms,
@@ -205,11 +239,16 @@ glm_to_glm_object = function(fit) {
         deviance = fit$deviance,
         dispersion = phi,
         family = fam,
-        coefficients = coef_tbl,
-        fit_summary = fit_tbl
+        link = fit$family$link,
+        null_deviance = fit$null.deviance,
+        aic = fit$aic,
+        logLik = as.numeric(stats::logLik(fit)),
+        null_logLik = as.numeric(stats::logLik(null_fit)),
+        beta = coef_mat[, 1],
+        std_beta = coef_mat[, 2]
     )
 }
 
 S7::method(n_params, class_glm_object) = function(model) {
-    nrow(model@coefficients)
+    length(model@beta)
 }
