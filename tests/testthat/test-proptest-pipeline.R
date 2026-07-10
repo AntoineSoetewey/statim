@@ -277,3 +277,37 @@ test_that("`P_TEST()`'s `tidy()` method expects to be 'tibble' with expected col
     expect_s3_class(test_out, "tbl_df")
     expect_true(all(c("successes", "statistic", "p_val") %in% names(test_out)))
 })
+
+# ---- Effect Sizes ----
+
+test_that("gauge() on the P_TEST() should be functional", {
+    expect_no_error({
+        define_model(prop(45, 100)) |>
+            prepare_test(P_TEST) |>
+            conclude()
+    })
+    expect_no_error({
+        define_model(prop(45, 100)) |>
+            prepare_test(P_TEST) |>
+            state_null(2 * PI() == 0.3) |>
+            conclude()
+    })
+})
+
+test_that("gauge() on the P_TEST() from `prop` path contains the expected values (i.e. two columns and their respective values)", {
+    result =
+        define_model(prop(45, 100)) |>
+        prepare_test(P_TEST) |>
+        conclude() |>
+        gauge()
+
+    expect_named(result, c("metric", "value"))
+    expect_equal(result$metric, "cohens_h")
+    expect_equal(result$value, -0.1001, tolerance = 1e-3)
+})
+
+test_that("auto_gauge() on the P_TEST() should be functional", {
+    expect_no_error({
+        auto_gauge(P_TEST(prop(45, 100))@data)
+    })
+})
