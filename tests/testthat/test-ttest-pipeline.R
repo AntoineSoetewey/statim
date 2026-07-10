@@ -484,3 +484,51 @@ test_that("two_sample on() and contrast x_by() agree on an equivalent weighted h
         tolerance = 1e-8
     )
 })
+
+# ---- Effect sizes ----
+
+test_that("gauge() on x_by() two-sample t-test returns an approximate cohens_d with a message", {
+    result = sleep |>
+        define_model(x_by(extra, group)) |>
+        prepare_test(T_TEST) |>
+        conclude()
+
+    expect_message(
+        {
+            gauge_out = gauge(result, quiet = FALSE)
+        },
+        "approximated"
+    )
+    expect_equal(gauge_out$metric, "cohens_d_approx")
+
+    manual_d = 2 * result@data@t_stat / sqrt(result@data@df)
+    expect_equal(gauge_out$value, manual_d, tolerance = 1e-8)
+})
+
+test_that("gauge() with quiet = TRUE suppresses the approximation message but keeps cohens_d_approx", {
+    result = sleep |>
+        define_model(x_by(extra, group)) |>
+        prepare_test(T_TEST) |>
+        conclude()
+
+    expect_no_message({
+        gauge_out = gauge(result, quiet = TRUE)
+    })
+    expect_equal(gauge_out$metric, "cohens_d_approx")
+})
+
+test_that("gauge() on pairwise() one-sample mode emits no message even without quiet", {
+    result = T_TEST(pairwise(Sepal.Length, Sepal.Width, direction = "eq"), iris)@data
+
+    expect_no_message({
+        gauge_out = auto_gauge(result, quiet = TRUE)
+    })
+    expect_true(all(gauge_out$metric == "cohens_d"))
+})
+
+test_that("gauge() on pairwise() two-sample mode emits a message unless quiet = TRUE", {
+    result = T_TEST(pairwise(Sepal.Length, Sepal.Width, Petal.Length), iris)@data
+
+    expect_message(auto_gauge(result, quiet = FALSE), "approximated")
+    expect_no_message(auto_gauge(result, quiet = TRUE))
+})
