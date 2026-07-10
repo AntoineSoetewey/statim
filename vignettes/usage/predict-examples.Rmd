@@ -1,0 +1,27 @@
+---
+title: "Predicting with linear models from {statim}"
+subtitle: "A practical guide using real clinical data"
+description: >
+    A guide on performing post-hoc, featuring prediction from linear models, 
+    with statim R package.
+output:
+    rmarkdown::html_vignette:
+        toc: true
+vignette: |
+    %\VignetteIndexEntry{Predicting with linear models from {statim}}
+    %\VignetteEngine{knitr::rmarkdown}
+    \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = FALSE,
+    comment = ""
+)
+
+fansi::set_knit_hooks(knitr::knit_hooks)
+```
+
+## Rationale
+
+Pending...
