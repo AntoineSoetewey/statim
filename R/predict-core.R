@@ -4,13 +4,15 @@
 #' `cld_exec` object produced by `conclude()`.
 #'
 #' @section Dispatch:
-#' Dispatches on both `object` and `new_data`, so passing anything other
-#' than a data frame (or omitting `new_data` entirely) fails at the call
-#' boundary rather than inside the implementation. `tibble` and
-#' `data.table` both satisfy the `data.frame` dispatch, since both inherit
-#' from it.
+#' Dispatches on `object` only, consistent with how `stats::predict` itself
+#' works as a single-dispatch S3 generic. `new_data`'s shape is validated
+#' at the top of the method body rather than through a second S7 dispatch
+#' argument — an S7 method can't reliably distinguish "argument omitted
+#' entirely" from "argument explicitly NULL" when layered on top of a
+#' legacy S3 generic, so validating inside the body is both simpler and
+#' actually correct.
 #'
-#' Within a given `new_data` type, two paths are tried in order:
+#' Two paths are tried in order:
 #'
 #' **Path 1: `auto_predict()` (preferred).**
 #' Called directly when `cld_exec@data` is a `class_stat_infer` subclass.
@@ -21,35 +23,25 @@
 #'
 #' @param object A `cld_exec` object produced by `conclude()`.
 #' @param new_data A data frame (or subclass, e.g. `tibble`, `data.table`).
-#'   Defaults to the training data when omitted.
+#'   `NULL` (the default) uses the training data.
 #' @param ... Passed to the dispatched method.
 #'
 #' @return A data frame (specifically a `tibble`) with `.pred`, `truth`
 #'   when a response is available, and `.pred_lower`/`.pred_upper` when
 #'   an interval was requested. Always inherits `data.frame`, regardless
-#'   of which method produced it — enforced at the dispatch boundary, not
-#'   left to each method to honor.
+#'   of which method produced it.
 #'
 #' @seealso [conclude()], [auto_predict()], [making_predict()]
 #'
 #' @export
-predict = S7::new_external_generic("stats", "predict", c("object", "new_data"))
+predict = S7::new_external_generic("stats", "predict", "object")
 
-S7::method(predict, list(cld_exec, S7::class_missing)) = function(
-    object,
-    new_data,
-    ...
-) {
-    dispatch_predict(object, new_data = NULL, ...)
-}
-
-S7::method(predict, list(cld_exec, S7::class_missing)) = function(
-    object,
-    new_data,
-    ...
-) {
-    if (inherits(new_data, "data.table")) {
-        new_data = as.data.frame(new_data)
+S7::method(predict, cld_exec) = function(object, new_data = NULL, ...) {
+    if (!is.null(new_data) && !inherits(new_data, "data.frame")) {
+        cli::cli_abort(c(
+            "{.arg new_data} must be a data frame, or {.val NULL} to use the training data.",
+            "x" = "Got {.obj_type_friendly {new_data}}."
+        ))
     }
     dispatch_predict(object, new_data = new_data, ...)
 }

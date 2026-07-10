@@ -14,7 +14,7 @@ predict
 \item{object}{A \code{cld_exec} object produced by \code{conclude()}.}
 
 \item{new_data}{A data frame (or subclass, e.g. \code{tibble}, \code{data.table}).
-Defaults to the training data when omitted.}
+\code{NULL} (the default) uses the training data.}
 
 \item{...}{Passed to the dispatched method.}
 }
@@ -22,8 +22,7 @@ Defaults to the training data when omitted.}
 A data frame (specifically a \code{tibble}) with \code{.pred}, \code{truth}
 when a response is available, and \code{.pred_lower}/\code{.pred_upper} when
 an interval was requested. Always inherits \code{data.frame}, regardless
-of which method produced it — enforced at the dispatch boundary, not
-left to each method to honor.
+of which method produced it.
 }
 \description{
 \code{predict()} estimates the response for new or existing rows from a
@@ -31,13 +30,15 @@ left to each method to honor.
 }
 \section{Dispatch}{
 
-Dispatches on both \code{object} and \code{new_data}, so passing anything other
-than a data frame (or omitting \code{new_data} entirely) fails at the call
-boundary rather than inside the implementation. \code{tibble} and
-\code{data.table} both satisfy the \code{data.frame} dispatch, since both inherit
-from it.
+Dispatches on \code{object} only, consistent with how \code{stats::predict} itself
+works as a single-dispatch S3 generic. \code{new_data}'s shape is validated
+at the top of the method body rather than through a second S7 dispatch
+argument — an S7 method can't reliably distinguish "argument omitted
+entirely" from "argument explicitly NULL" when layered on top of a
+legacy S3 generic, so validating inside the body is both simpler and
+actually correct.
 
-Within a given \code{new_data} type, two paths are tried in order:
+Two paths are tried in order:
 
 \strong{Path 1: \code{auto_predict()} (preferred).}
 Called directly when \code{cld_exec@data} is a \code{class_stat_infer} subclass.
