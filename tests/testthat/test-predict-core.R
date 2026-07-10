@@ -1,3 +1,276 @@
+new_fake_predict_model = function(cls_name, with_variant = FALSE) {
+    slots = list(
+        base = baseline(fn = function(.proc, ...) {
+            list(coef = 1, note = "base")
+        })
+    )
+    if (with_variant) {
+        slots$alt = variant(fn = function(.proc, ...) {
+            list(coef = 2, note = "alt")
+        })
+    }
+
+    def = model_infer_define(
+        model_type = S7::class_formula,
+        impl = do.call(agendas, slots)
+    )
+
+    MODEL_FN(
+        cls = cls_name,
+        defs = list(def),
+        .name = "Predict Unit Test Model"
+    )
+}
+
+fit_default = function(model_fn) {
+    mtcars |>
+        define_model(mpg ~ wt) |>
+        prepare_model(model_fn) |>
+        conclude()
+}
+
+fit_variant = function(model_fn, method_name, ...) {
+    mtcars |>
+        define_model(mpg ~ wt) |>
+        prepare_model(model_fn) |>
+        via(method_name, ...) |>
+        conclude()
+}
+
+clear_predict_key = function(key) {
+    if (exists(key, envir = register_predict, inherits = FALSE)) {
+        rm(list = key, envir = register_predict)
+    }
+}
+
+# ---- method_predict() constructor ----
+
+test_that("method_predict() accepts a default function with no variants", {
+    mp = method_predict(default = function(.x, new_data = NULL, ...) NULL)
+
+    expect_true(is.function(mp@default))
+    expect_equal(mp@variants, list())
+})
+
+test_that("method_predict() rejects a non-function, non-NULL default", {
+    expect_error(
+        method_predict(default = "not_a_function"),
+        "must be a function or"
+    )
+})
+
+test_that("method_predict() rejects non-function variants", {
+    expect_error(
+        method_predict(
+            default = function(.x, new_data = NULL, ...) NULL,
+            alt = "not_a_function"
+        ),
+        "must be functions"
+    )
+})
+
+# ---- making_predict() ----
+
+test_that("making_predict() carries the model function and model_type untouched", {
+    model_fn = new_fake_predict_model("predict_ut_build")
+    call_obj = making_predict(model_fn, S7::class_formula)
+
+    expect_s3_class(call_obj, "making_predict_call")
+    expect_identical(call_obj$obj, model_fn)
+    expect_identical(call_obj$model_type, S7::class_formula)
+})
+
+# ---- %<-% / making_predict_register(): input validation ----
+
+test_that("%<-% rejects a model function not built with MODEL_FN", {
+    plain_fn = function() NULL
+
+    expect_error(
+        making_predict(plain_fn, S7::class_formula) %<-%
+            method_predict(default = function(.x, new_data = NULL, ...) NULL),
+        "must be a function built with"
+    )
+})
+
+test_that("%<-% rejects a model_type that isn't a var_id subclass or a formula", {
+    model_fn = new_fake_predict_model("predict_ut_bad_model_type")
+
+    expect_error(
+        making_predict(model_fn, numeric) %<-%
+            method_predict(default = function(.x, new_data = NULL, ...) NULL),
+        "must be a class inheriting from"
+    )
+})
+
+test_that("%<-% accepts a var_id subclass (not just S7::class_formula) as model_type", {
+    model_fn = new_fake_predict_model("predict_ut_xby_model_type")
+    on.exit(clear_predict_key("predict_ut_xby_model_type_x_by"))
+
+    expect_no_error(
+        making_predict(model_fn, x_by) %<-%
+            method_predict(default = function(.x, new_data = NULL, ...) NULL)
+    )
+})
+
+test_that("%<-% rejects a right-hand side that isn't a method_predict object", {
+    model_fn = new_fake_predict_model("predict_ut_bad_rhs")
+
+    expect_error(
+        making_predict(model_fn, S7::class_formula) %<-%
+            list(default = function(.x, new_data = NULL, ...) NULL),
+        "Right-hand side of"
+    )
+})
+
+# ---- making_predict_register(): fresh registration vs. merge ----
+
+test_that("a later registration on the same key keeps the old default when the new one omits it", {
+    model_fn = new_fake_predict_model("predict_ut_merge", with_variant = TRUE)
+    on.exit(clear_predict_key("predict_ut_merge_formula"))
+
+    making_predict(model_fn, S7::class_formula) %<-%
+        method_predict(
+            default = function(.x, new_data = NULL, ...) {
+                tibble::tibble(.pred = .x@data$coef)
+            }
+        )
+    making_predict(model_fn, S7::class_formula) %<-%
+        method_predict(
+            alt = function(.x, new_data = NULL, ...) {
+                tibble::tibble(.pred = .x@data$coef * 10)
+            }
+        )
+
+    default_out = predict(fit_default(model_fn))
+    alt_out = predict(fit_variant(model_fn, "alt"))
+
+    expect_equal(default_out$.pred, 1)
+    expect_equal(alt_out$.pred, 20)
+})
+
+test_that("a later registration on the same key overwrites the default when a new one is supplied", {
+    model_fn = new_fake_predict_model(
+        "predict_ut_overwrite",
+        with_variant = TRUE
+    )
+    on.exit(clear_predict_key("predict_ut_overwrite_formula"))
+
+    making_predict(model_fn, S7::class_formula) %<-%
+        method_predict(
+            alt = function(.x, new_data = NULL, ...) {
+                tibble::tibble(.pred = .x@data$coef * 10)
+            }
+        )
+    making_predict(model_fn, S7::class_formula) %<-%
+        method_predict(
+            default = function(.x, new_data = NULL, ...) {
+                tibble::tibble(.pred = .x@data$coef * 100)
+            }
+        )
+
+    default_out = predict(fit_default(model_fn))
+    alt_out = predict(fit_variant(model_fn, "alt"))
+
+    expect_equal(default_out$.pred, 100)
+    expect_equal(alt_out$.pred, 20)
+})
+
+# ---- dispatch_predict() registry branches ----
+
+test_that("predict() resolves a named variant when one is registered", {
+    model_fn = new_fake_predict_model(
+        "predict_ut_variant_hit",
+        with_variant = TRUE
+    )
+    on.exit(clear_predict_key("predict_ut_variant_hit_formula"))
+
+    making_predict(model_fn, S7::class_formula) %<-%
+        method_predict(
+            default = function(.x, new_data = NULL, ...) {
+                tibble::tibble(.pred = .x@data$coef)
+            },
+            alt = function(.x, new_data = NULL, ...) {
+                tibble::tibble(.pred = .x@data$coef + 1000)
+            }
+        )
+
+    predict_out = predict(fit_variant(model_fn, "alt"))
+
+    expect_equal(predict_out$.pred, 1002)
+})
+
+test_that("predict() aborts when the variant name has no matching entry", {
+    model_fn = new_fake_predict_model(
+        "predict_ut_variant_miss",
+        with_variant = TRUE
+    )
+    on.exit(clear_predict_key("predict_ut_variant_miss_formula"))
+
+    making_predict(model_fn, S7::class_formula) %<-%
+        method_predict(
+            default = function(.x, new_data = NULL, ...) {
+                tibble::tibble(.pred = .x@data$coef)
+            }
+        )
+
+    expect_error(
+        predict(fit_variant(model_fn, "alt")),
+        "No predict entry for variant"
+    )
+})
+
+test_that("predict() aborts when method is \"default\" but no default function was registered", {
+    model_fn = new_fake_predict_model(
+        "predict_ut_no_default",
+        with_variant = TRUE
+    )
+    on.exit(clear_predict_key("predict_ut_no_default_formula"))
+
+    making_predict(model_fn, S7::class_formula) %<-%
+        method_predict(
+            alt = function(.x, new_data = NULL, ...) {
+                tibble::tibble(.pred = .x@data$coef)
+            }
+        )
+
+    expect_error(
+        predict(fit_default(model_fn)),
+        "predict function registered"
+    )
+})
+
+test_that("predict() aborts when a registered method returns something other than a data frame", {
+    model_fn = new_fake_predict_model("predict_ut_bad_return")
+    on.exit(clear_predict_key("predict_ut_bad_return_formula"))
+
+    making_predict(model_fn, S7::class_formula) %<-%
+        method_predict(
+            default = function(.x, new_data = NULL, ...) {
+                list(not_a_data_frame = TRUE)
+            }
+        )
+
+    expect_error(
+        predict(fit_default(model_fn)),
+        "must return a"
+    )
+})
+
+# ---- auto_predict() guard branches ----
+
+test_that("auto_predict() aborts when called directly on a non-class_stat_infer object", {
+    expect_error(auto_predict(list(a = 1)), "must inherit")
+})
+
+test_that("auto_predict() aborts when no method is implemented for a class_stat_infer subclass", {
+    dummy_cls = S7::new_class(
+        "predict_ut_no_auto_predict",
+        parent = class_stat_infer
+    )
+
+    expect_error(auto_predict(dummy_cls()), "method for")
+})
+
 # ---- predict() on class_lm_object, no new_data (training data) ----
 
 test_that("predict() with no new_data returns fitted values matching base R lm()", {
