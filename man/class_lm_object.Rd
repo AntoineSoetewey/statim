@@ -50,6 +50,19 @@ Uses \verb{@deviance} and \verb{@df_residual} only; \code{x_mat} is not needed.
 }
 }
 
+\section{predict() arguments}{
+
+\code{\link[=predict]{predict()}} on a \code{class_lm_object} accepts:
+\itemize{
+\item \code{new_data}: A data frame of new predictors. \code{NULL} (the default)
+returns fitted values and residual-based \code{truth} for the training data.
+\item \code{interval}: One of \code{"none"} (default), \code{"confidence"}, or
+\code{"prediction"}. Both are available for every \code{class_lm_object}, since
+\code{family} is always \code{"gaussian"} for OLS fits.
+\item \code{level}: Confidence level for the interval. Default \code{0.95}.
+}
+}
+
 \examples{
 # Inheriting from class_lm_object in a downstream package:
 my_lm = S7::new_class(

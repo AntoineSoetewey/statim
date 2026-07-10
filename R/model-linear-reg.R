@@ -99,6 +99,16 @@ LINEAR_REG = MODEL_FN(
 #' - **Multiple models** — incremental F-test or LRT across nested models.
 #'   Uses `@deviance` and `@df_residual` only; `x_mat` is not needed.
 #'
+#' @section predict() arguments:
+#' [predict()] on a `class_lm_object` accepts:
+#'
+#' - `new_data`: A data frame of new predictors. `NULL` (the default)
+#'   returns fitted values and residual-based `truth` for the training data.
+#' - `interval`: One of `"none"` (default), `"confidence"`, or
+#'   `"prediction"`. Both are available for every `class_lm_object`, since
+#'   `family` is always `"gaussian"` for OLS fits.
+#' - `level`: Confidence level for the interval. Default `0.95`.
+#'
 #' @seealso [anova()], [LINEAR_REG]
 #'
 #' @examples
