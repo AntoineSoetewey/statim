@@ -90,7 +90,7 @@ S7::method(auto_gauge, class_ttest_one) = function(x, ...) {
     )
 }
 
-S7::method(auto_gauge, class_ttest_two) = function(x, quiet = FALSE, ...) {
+S7::method(auto_gauge, class_ttest_two) = function(x, quiet = TRUE, ...) {
     if (!quiet) {
         cli::cli_inform(c(
             "Cohen's d for two-sample t-tests is approximated as {.code 2 * t_stat / sqrt(df)}.",
@@ -107,7 +107,7 @@ S7::method(auto_gauge, class_ttest_two) = function(x, quiet = FALSE, ...) {
     )
 }
 
-S7::method(auto_gauge, class_ttest_pairwise) = function(x, quiet = FALSE, ...) {
+S7::method(auto_gauge, class_ttest_pairwise) = function(x, quiet = TRUE, ...) {
     is_one_sample = x@var1 == x@var2
 
     if (!quiet && any(!is_one_sample)) {
