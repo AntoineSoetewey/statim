@@ -65,6 +65,30 @@ S7::method(gauge, cld_exec) = function(object, ...) {
     gauge_fn(object, ...)
 }
 
+#' Declare a gauge method for a stat and model type
+#'
+#' `making_gauge()` is the escape hatch for registering effect-size
+#' methods when a variant's `fn` intentionally returns a non-
+#' `class_stat_infer` object. When `fn` returns a `class_stat_infer`
+#' subclass, implement `auto_gauge()` on the result class instead — no
+#' registration needed.
+#'
+#' @param obj A stat function built with [HTEST_FN()] or [MODEL_FN()]
+#'   (e.g. `T_TEST`, `LINEAR_REG`).
+#' @param model_type An S7 variable mapper `<var_id>` class, or
+#'   `S7::class_formula`.
+#'
+#' @return A `making_gauge_call` object, consumed by `%<-%`.
+#'
+#' @seealso [auto_gauge()], [method_gauge()], [class_stat_infer]
+#'
+#' @examples
+#' # Only needed when fn returns a non-class_stat_infer object.
+#' # Prefer implementing auto_gauge() on your result class instead.
+#' making_gauge(T_TEST, x_by) %<-% method_gauge(
+#'     default = function(.x, ...) { ... }
+#' )
+#'
 #' @export
 making_gauge = function(obj, model_type) {
     structure(
@@ -111,6 +135,22 @@ making_gauge_register = function(lhs, rhs) {
     invisible(NULL)
 }
 
+#' Declare gauge methods for a stat result
+#'
+#' `method_gauge()` is the companion to `making_gauge()`. It collects
+#' effect-size functions for the base implementation and named variants,
+#' used only when `fn` returns a non-`class_stat_infer` object.
+#'
+#' @param default A function with signature `function(.x, ...)`, returning
+#'   a tibble with `metric` and `value` columns. Required.
+#' @param ... Named functions, one per variant. Names must match variant
+#'   names registered in `agendas()`. Omitted variants fall back to
+#'   `default` automatically.
+#'
+#' @return A `method_gauge` S7 object.
+#'
+#' @seealso [making_gauge()], [auto_gauge()], [class_stat_infer]
+#'
 #' @export
 method_gauge = S7::new_class(
     "method_gauge",
