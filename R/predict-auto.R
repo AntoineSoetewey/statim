@@ -43,11 +43,11 @@ S7::method(auto_predict, class_stat_infer) = function(x, ...) {
 }
 
 S7::method(auto_predict, class_lm_object) = function(
-        x,
-        new_data = NULL,
-        interval = c("none", "confidence", "prediction"),
-        level = 0.95,
-        ...
+    x,
+    new_data = NULL,
+    interval = c("none", "confidence", "prediction"),
+    level = 0.95,
+    ...
 ) {
     interval = rlang::arg_match(interval)
 
@@ -62,7 +62,9 @@ S7::method(auto_predict, class_lm_object) = function(
     fit = as.vector(x_new %*% x@beta)
     out = tibble::tibble(.pred = fit)
 
-    resp_name = as.character(attr(x@terms, "variables")[[attr(x@terms, "response") + 1L]])
+    resp_name = as.character(attr(x@terms, "variables")[[
+        attr(x@terms, "response") + 1L
+    ]])
     truth = if (is.null(new_data)) {
         x@fitted + x@residuals
     } else if (resp_name %in% names(new_data)) {

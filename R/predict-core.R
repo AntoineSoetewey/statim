@@ -36,17 +36,17 @@
 predict = S7::new_external_generic("stats", "predict", c("object", "new_data"))
 
 S7::method(predict, list(cld_exec, S7::class_missing)) = function(
-        object,
-        new_data,
-        ...
+    object,
+    new_data,
+    ...
 ) {
     dispatch_predict(object, new_data = NULL, ...)
 }
 
 S7::method(predict, list(cld_exec, S7::class_data.frame)) = function(
-        object,
-        new_data,
-        ...
+    object,
+    new_data,
+    ...
 ) {
     if (inherits(new_data, "data.table")) {
         new_data = as.data.frame(new_data)
@@ -158,7 +158,11 @@ making_predict_register = function(lhs, rhs) {
         )
     }
 
-    key = predict_registry_key(paste0(stat_cls, "_", model_type_name(model_type)))
+    key = predict_registry_key(paste0(
+        stat_cls,
+        "_",
+        model_type_name(model_type)
+    ))
     existing = register_predict[[key]]
     if (is.null(existing)) {
         register_predict[[key]] = rhs
