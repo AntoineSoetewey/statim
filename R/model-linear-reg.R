@@ -337,6 +337,7 @@ lm_to_lm_object = function(fit) {
     rss = sum(fit$residuals^2)
     df_res = fit$df.residual
     mm = stats::model.matrix(fit)
+    xlev = stats::.getXlevels(fit$terms, stats::model.frame(fit)) %||% list()
 
     class_lm_object(
         terms = fit$terms,
@@ -350,7 +351,7 @@ lm_to_lm_object = function(fit) {
         family = "gaussian",
         x_mat = as.numeric(mm),
         x_assign = attr(mm, "assign"),
-        x_levels = stats::.getXlevels(fit$terms, stats::model.frame(fit))
+        x_levels = xlev
     )
 }
 
