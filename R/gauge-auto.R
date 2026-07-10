@@ -90,12 +90,15 @@ S7::method(auto_gauge, class_ttest_one) = function(x, ...) {
     )
 }
 
-S7::method(auto_gauge, class_ttest_two) = function(x, ...) {
-    cli::cli_warn(c(
-        "Cohen's d for two-sample t-tests is approximated as {.code 2 * t_stat / sqrt(df)}.",
-        "i" = "This assumes roughly equal group sizes and may be inaccurate otherwise.",
-        "i" = "Exact Cohen's d requires per-group sample sizes, not currently stored on {.cls ttest_two}."
-    ))
+S7::method(auto_gauge, class_ttest_two) = function(x, quiet = FALSE, ...) {
+    if (!quiet) {
+        cli::cli_inform(c(
+            "Cohen's d for two-sample t-tests is approximated as {.code 2 * t_stat / sqrt(df)}.",
+            "i" = "This assumes roughly equal group sizes and may be inaccurate otherwise.",
+            "i" = "Exact Cohen's d requires per-group sample sizes, not currently stored on {.cls ttest_two}.",
+            "i" = "Pass {.code quiet = TRUE} to suppress this message."
+        ))
+    }
     d = 2 * x@t_stat / sqrt(x@df)
     tibble::tibble(
         group = x@group,
@@ -104,16 +107,28 @@ S7::method(auto_gauge, class_ttest_two) = function(x, ...) {
     )
 }
 
-S7::method(auto_gauge, class_ttest_pairwise) = function(x, ...) {
-    cli::cli_warn(c(
-        "Cohen's d for pairwise t-tests is approximated as {.code 2 * t_stat / sqrt(df)}.",
-        "i" = "This assumes roughly equal group sizes per pair and may be inaccurate otherwise."
-    ))
-    d = 2 * x@t_stat / sqrt(x@df)
+S7::method(auto_gauge, class_ttest_pairwise) = function(x, quiet = FALSE, ...) {
+    is_one_sample = x@var1 == x@var2
+
+    if (!quiet && any(!is_one_sample)) {
+        cli::cli_inform(c(
+            "Cohen's d for two-sample pairs is approximated as {.code 2 * t_stat / sqrt(df)}.",
+            "i" = "This assumes roughly equal group sizes per pair and may be inaccurate otherwise.",
+            "i" = "Pass {.code quiet = TRUE} to suppress this message."
+        ))
+    }
+
+    n = x@df + 1
+    d = ifelse(
+        is_one_sample,
+        x@t_stat / sqrt(n),
+        2 * x@t_stat / sqrt(x@df)
+    )
+
     tibble::tibble(
         var1 = x@var1,
         var2 = x@var2,
-        metric = "cohens_d_approx",
+        metric = ifelse(is_one_sample, "cohens_d", "cohens_d_approx"),
         value = d
     )
 }
