@@ -21,9 +21,15 @@
         add_variant_register(lhs, rhs)
     } else if (inherits(lhs, "making_tidy_call")) {
         making_tidy_register(lhs, rhs)
+    } else if (inherits(lhs, "making_glance_call")) {
+        making_glance_register(lhs, rhs)
+    } else if (inherits(lhs, "making_predict_call")) {
+        making_predict_register(lhs, rhs)
+    } else if (inherits(lhs, "making_gauge_call")) {
+        making_gauge_register(lhs, rhs)
     } else {
         cli::cli_abort(
-            "Left-hand side of {.code %<-%} must be an {.fn add_variant} or {.fn making_tidy} call."
+            "Left-hand side of {.code %<-%} must be an {.fn add_variant}, {.fn making_tidy}, {.fn making_glance}, {.fn making_predict}, or {.fn making_gauge} call."
         )
     }
 }
