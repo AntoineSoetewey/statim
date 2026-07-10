@@ -107,7 +107,6 @@ Collate:
     'tidy-auto.R'
     'predict-auto.R'
     'gauge-auto.R'
-    'save-excel.R'
     'global_variables.R'
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
