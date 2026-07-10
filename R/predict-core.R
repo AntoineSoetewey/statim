@@ -43,7 +43,7 @@ S7::method(predict, list(cld_exec, S7::class_missing)) = function(
     dispatch_predict(object, new_data = NULL, ...)
 }
 
-S7::method(predict, list(cld_exec, S7::class_data.frame)) = function(
+S7::method(predict, list(cld_exec, S7::class_missing)) = function(
     object,
     new_data,
     ...
