@@ -1,7 +1,10 @@
 # statim (development version)
 
-<!-- -  Initial CRAN submission. -->
--  Initial development version.
+<!-- -  Initial development version. -->
+
+# statim 0.1.0
+
+-  Initial CRAN submission.
 -  New and much modern approach to statistical inference in R
 -  Core API built with S7 — taking advantage of formal classes and constructors. 
 -  Two complementary interfaces:
@@ -22,3 +25,5 @@
             via("<method>") |> 
             conclude()
         ```
+
+
