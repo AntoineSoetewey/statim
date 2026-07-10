@@ -103,7 +103,12 @@ test_that("gauge() on a GLM returns exactly the four documented metrics", {
 
     expect_setequal(
         gauge_out$metric,
-        c("deviance_r2", "mcfadden_r2", "cohens_f2_deviance", "cohens_f2_mcfadden")
+        c(
+            "deviance_r2",
+            "mcfadden_r2",
+            "cohens_f2_deviance",
+            "cohens_f2_mcfadden"
+        )
     )
     expect_equal(nrow(gauge_out), 4L)
 })

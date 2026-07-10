@@ -10,7 +10,11 @@ test_that("predict() with no new_data returns fitted values matching base R lm()
     base_fit = lm(dist ~ speed, data = cars)
 
     expect_s3_class(predict_out, "tbl_df")
-    expect_equal(predict_out$.pred, unname(base_fit$fitted.values), tolerance = 1e-8)
+    expect_equal(
+        predict_out$.pred,
+        unname(base_fit$fitted.values),
+        tolerance = 1e-8
+    )
 })
 
 test_that("predict() with no new_data includes a truth column matching the response", {
@@ -114,8 +118,16 @@ test_that("predict() confidence interval matches base R predict.lm()", {
     base_fit = lm(dist ~ speed, data = cars)
     base_ci = predict(base_fit, interval = "confidence", level = 0.9)
 
-    expect_equal(predict_out$.pred_lower, unname(base_ci[, "lwr"]), tolerance = 1e-6)
-    expect_equal(predict_out$.pred_upper, unname(base_ci[, "upr"]), tolerance = 1e-6)
+    expect_equal(
+        predict_out$.pred_lower,
+        unname(base_ci[, "lwr"]),
+        tolerance = 1e-6
+    )
+    expect_equal(
+        predict_out$.pred_upper,
+        unname(base_ci[, "upr"]),
+        tolerance = 1e-6
+    )
 })
 
 test_that("predict() prediction interval matches base R predict.lm()", {
@@ -128,8 +140,16 @@ test_that("predict() prediction interval matches base R predict.lm()", {
     base_fit = lm(dist ~ speed, data = cars)
     base_pi = suppressWarnings(predict(base_fit, interval = "prediction"))
 
-    expect_equal(predict_out$.pred_lower, unname(base_pi[, "lwr"]), tolerance = 1e-6)
-    expect_equal(predict_out$.pred_upper, unname(base_pi[, "upr"]), tolerance = 1e-6)
+    expect_equal(
+        predict_out$.pred_lower,
+        unname(base_pi[, "lwr"]),
+        tolerance = 1e-6
+    )
+    expect_equal(
+        predict_out$.pred_upper,
+        unname(base_pi[, "upr"]),
+        tolerance = 1e-6
+    )
 })
 
 test_that("predict() prediction interval is wider than confidence interval", {
@@ -172,7 +192,9 @@ test_that("predict() with categorical predictors matches base R with unseen-safe
         prepare_model(LINEAR_REG) |>
         conclude()
 
-    new_dat = data.frame(Species = factor("setosa", levels = levels(iris$Species)))
+    new_dat = data.frame(
+        Species = factor("setosa", levels = levels(iris$Species))
+    )
     predict_out = predict(fit, new_data = new_dat)
     base_fit = lm(Sepal.Length ~ Species, data = iris)
 
@@ -233,11 +255,12 @@ test_that("predict() errors clearly when fn returns a non-class_stat_infer objec
 })
 
 test_that("predict() dispatches through making_predict once registered", {
-    making_predict(FAKE_PREDICT_MODEL, S7::class_formula) %<-% method_predict(
-        default = function(.x, new_data = NULL, ...) {
-            tibble::tibble(.pred = .x@data$coef)
-        }
-    )
+    making_predict(FAKE_PREDICT_MODEL, S7::class_formula) %<-%
+        method_predict(
+            default = function(.x, new_data = NULL, ...) {
+                tibble::tibble(.pred = .x@data$coef)
+            }
+        )
 
     fit = mtcars |>
         define_model(mpg ~ wt) |>
