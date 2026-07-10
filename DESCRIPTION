@@ -93,6 +93,7 @@ Collate:
     'htest-ttest.R'
     'tidy-ttest-def-two.R'
     'tidy-ttest-def-formula.R'
+    'gauge-ttest-def-formula.R'
     'htest-testcor-defs-rel.R'
     'htest-testcor-defs-formula.R'
     'htest-testcor.R'
