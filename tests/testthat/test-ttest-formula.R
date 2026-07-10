@@ -199,3 +199,15 @@ test_that("tidy() on T_TEST formula one-sample result has type column", {
     expect_true("type" %in% names(result))
     expect_equal(result$type[[1]], "one sample")
 })
+
+# ---- Effect sizes ----
+
+test_that("gauge() on the formula path emits a message unless quiet = TRUE", {
+    result = sleep |>
+        define_model(extra ~ group) |>
+        prepare_test(T_TEST) |>
+        conclude()
+
+    expect_message(gauge(result, quiet = FALSE), "approximated")
+    expect_no_message(gauge(result, quiet = TRUE))
+})
