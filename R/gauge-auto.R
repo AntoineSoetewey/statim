@@ -89,3 +89,31 @@ S7::method(auto_gauge, class_ttest_one) = function(x, ...) {
         value = d
     )
 }
+
+S7::method(auto_gauge, class_ttest_two) = function(x, ...) {
+    cli::cli_warn(c(
+        "Cohen's d for two-sample t-tests is approximated as {.code 2 * t_stat / sqrt(df)}.",
+        "i" = "This assumes roughly equal group sizes and may be inaccurate otherwise.",
+        "i" = "Exact Cohen's d requires per-group sample sizes, not currently stored on {.cls ttest_two}."
+    ))
+    d = 2 * x@t_stat / sqrt(x@df)
+    tibble::tibble(
+        group = x@group,
+        metric = "cohens_d_approx",
+        value = d
+    )
+}
+
+S7::method(auto_gauge, class_ttest_pairwise) = function(x, ...) {
+    cli::cli_warn(c(
+        "Cohen's d for pairwise t-tests is approximated as {.code 2 * t_stat / sqrt(df)}.",
+        "i" = "This assumes roughly equal group sizes per pair and may be inaccurate otherwise."
+    ))
+    d = 2 * x@t_stat / sqrt(x@df)
+    tibble::tibble(
+        var1 = x@var1,
+        var2 = x@var2,
+        metric = "cohens_d_approx",
+        value = d
+    )
+}
