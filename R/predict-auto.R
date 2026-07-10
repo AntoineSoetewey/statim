@@ -30,15 +30,19 @@
 #' @seealso [predict()], [making_predict()], [method_predict()], [class_stat_infer]
 #'
 #' @export
-auto_predict = S7::new_generic("auto_predict", "x", fun = function(x, new_data = NULL, ...) {
-    if (!is_class_stat_infer(x)) {
-        cli::cli_abort(c(
-            "{.arg x} must inherit {.cls class_stat_infer}.",
-            "x" = "Got {.cls {class(x)[[1]]}}."
-        ))
+auto_predict = S7::new_generic(
+    "auto_predict",
+    "x",
+    fun = function(x, new_data = NULL, ...) {
+        if (!is_class_stat_infer(x)) {
+            cli::cli_abort(c(
+                "{.arg x} must inherit {.cls class_stat_infer}.",
+                "x" = "Got {.cls {class(x)[[1]]}}."
+            ))
+        }
+        S7::S7_dispatch()
     }
-    S7::S7_dispatch()
-})
+)
 
 S7::method(auto_predict, class_stat_infer) = function(x, new_data = NULL, ...) {
     cli::cli_abort(c(
@@ -95,12 +99,12 @@ S7::method(auto_predict, class_lm_object) = function(
 }
 
 S7::method(auto_predict, class_glm_object) = function(
-        x,
-        new_data = NULL,
-        type = c("response", "link"),
-        interval = c("none", "confidence"),
-        level = 0.95,
-        ...
+    x,
+    new_data = NULL,
+    type = c("response", "link"),
+    interval = c("none", "confidence"),
+    level = 0.95,
+    ...
 ) {
     type = rlang::arg_match(type)
     interval = rlang::arg_match(interval)
