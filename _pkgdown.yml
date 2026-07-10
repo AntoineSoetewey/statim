@@ -100,6 +100,13 @@ reference:
     - LINEAR_REG
     - GLM
 
+  - subtitle: Post-hoc functions
+    desc: Functions used after execution
+    contents:
+    - predict
+    - gauge
+    - tidy
+
   - subtitle: Multiple Inline Codes
     desc: Analogue to `I()`, but only captures the expression and accepts multiple inline codes.
     contents:
@@ -188,6 +195,22 @@ reference:
     - auto_tidy
     - making_tidy
     - method_tidy
+    - modifying-assignment
+
+  - subtitle: Prediction implementer
+    desc: Add or modify `predict()` method for following `STAT_CONSTRUCTOR` objects
+    contents:
+    - auto_predict
+    - making_predict
+    - method_predict
+    - modifying-assignment
+
+  - subtitle: Effect size implementer
+    desc: Add or modify `gauge()` method for following `STAT_CONSTRUCTOR` objects
+    contents:
+    - auto_gauge
+    - making_gauge
+    - method_gauge
     - modifying-assignment
 
 footer:
