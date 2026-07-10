@@ -80,6 +80,8 @@ Collate:
     'hypothesis-validators.R'
     'stat-exec.R'
     'tidy-core.R'
+    'predict-core.R'
+    'gauge-core.R'
     'htest-impl-container.R'
     'htest-proptest-defs.R'
     'htest-proptest.R'
@@ -103,6 +105,8 @@ Collate:
     'model-glm.R'
     'display-meta.R'
     'tidy-auto.R'
+    'predict-auto.R'
+    'gauge-auto.R'
     'save-excel.R'
     'global_variables.R'
 Config/testthat/edition: 3
