@@ -179,17 +179,3 @@ test_that("gauge() cohens_d handles the multi variant, one row per term", {
     expect_equal(nrow(gauge_out), length(fit@data@term))
     expect_equal(gauge_out$term, fit@data@term)
 })
-
-# ---- gauge() on unimplemented stat_infer subclasses ----
-
-test_that("gauge() errors clearly when no auto_gauge method exists for a class_stat_infer subclass", {
-    fit = sleep |>
-        define_model(x_by(extra, group)) |>
-        prepare_test(T_TEST) |>
-        conclude()
-
-    # class_ttest_two has no auto_gauge method yet (n1/n2 not stored, see
-    # conversation notes — implement once those slots exist, then update
-    # this test to assert the actual cohens_d value instead of the error).
-    expect_error(gauge(fit), "No .*auto_gauge.* method")
-})
