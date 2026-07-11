@@ -121,7 +121,7 @@ S7::method(auto_predict, class_glm_object) = function(
         attr(x@terms, "response") + 1L
     ]])
     truth = if (is.null(new_data)) {
-        x@fitted
+        x@actual
     } else if (resp_name %in% names(new_data)) {
         new_data[[resp_name]]
     } else {
