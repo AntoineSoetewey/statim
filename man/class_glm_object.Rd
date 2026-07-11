@@ -86,6 +86,7 @@ obj = class_glm_object(
     aic = fit$aic,
     beta = coef(s)[, 1],
     std_beta = coef(s)[, 2],
+    actual = unname(fit$y),
     fitted = unname(fit$fitted.values),
     vcov = vcov(fit),
     x_mat = as.numeric(model.matrix(fit)),
