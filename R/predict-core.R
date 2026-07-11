@@ -41,7 +41,12 @@
 #' @export
 predict = S7::new_external_generic("stats", "predict", "object")
 
-S7::method(predict, cld_exec) = function(object, new_data = NULL, ..., check_type = TRUE) {
+S7::method(predict, cld_exec) = function(
+    object,
+    new_data = NULL,
+    ...,
+    check_type = TRUE
+) {
     if (!is.null(new_data) && !inherits(new_data, "data.frame")) {
         cli::cli_abort(c(
             "{.arg new_data} must be a data frame, or {.val NULL} to use the training data.",
