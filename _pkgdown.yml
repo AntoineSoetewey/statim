@@ -231,6 +231,7 @@ articles:
     - usage/model-infer
     - usage/anova-mod
     - usage/predict-examples
+    - usage/effect-size
     # - usage/multiple-exec
 
   - title: Pointers of statim you need to know

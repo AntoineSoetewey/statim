@@ -1,0 +1,142 @@
+---
+title: "Gauging effect size with {statim}"
+subtitle: "A practical guide using real clinical data"
+description: >
+    A guide on reporting effect size with statim R package.
+output:
+    rmarkdown::html_vignette:
+        toc: true
+vignette: |
+    %\VignetteIndexEntry{Gauging effect size with {statim}}
+    %\VignetteEngine{knitr::rmarkdown}
+    \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = FALSE,
+    comment = ""
+)
+fansi::set_knit_hooks(knitr::knit_hooks)
+```
+
+## Rationale
+
+A p-value answers one question: is this effect distinguishable from noise. It says nothing about whether the effect is *large*. Effect size is the separate quantity that answers "how big". Use `gauge()` from `{statim}` after evaluation of the estimation with `conclude()` to report it. This function reports Cohen's *d* for a t-test, Cohen's *h* for a proportion test, $R^2$ and Cohen's $f^2$ for a regression.
+
+Same shape as `predict()` and `tidy()`: one generic, used after `conclude()`, and dispatched on the `cld_exec` object from `conclude()`. When the result inside is a `class_stat_infer` subclass, (1) `gauge()` re-routes to `auto_gauge()` automatically, or (2) a `making_gauge()` registry exists for the rare case where a variant's `fn` returns something else. Nothing about calling `gauge()` changes depending on whether you're holding a t-test or a GLM, only the metric name in the output does.
+
+## Setup
+
+```{r}
+box::use(
+    statim[
+        define_model, prepare, state_null, conclude, gauge,
+        LINEAR_REG, GLM, T_TEST, P_TEST,
+        x_by, prop, PI
+    ],
+    stats[update, binomial]
+)
+
+box::use(
+    dplyr[mutate, glimpse],
+    readr[read_csv]
+)
+```
+
+The example data is the same: 
+
+```{r}
+heart = 
+    read_csv(system.file("extdata", "heart-disease.csv", package = "statim")) |>
+    mutate(
+        sex = factor(sex, levels = c(0, 1), labels = c("Female", "Male")),
+        target = factor(target, levels = c(0, 1), labels = c("No", "Yes"))
+    )
+glimpse(heart)
+```
+
+## Effect size for a regression
+
+Refit the two models from this [vignette](./model-infer.html):
+
+```{r}
+mod1 = heart |>
+    define_model(thalach ~ age + sex + chol) |>
+    prepare(LINEAR_REG) |>
+    conclude()
+
+mod2 = heart |>
+    define_model(target ~ age + chol + trestbps) |>
+    prepare(GLM) |>
+    update(family = binomial()) |>
+    conclude()
+```
+
+Then extract the effect size with `gauge()`: 
+
+```{r}
+gauge(mod1)
+```
+
+For a linear model, that's `r_squared`: The share of variance in `thalach` explained by age, sex, and cholesterol together, and `cohens_f2`, the same quantity rescaled onto Cohen's small/medium/large convention (`r2 / (1 - r2)`).
+
+By `GLM()`'s default, it has no residual sum of squares in the OLS sense so `gauge()` reports two $R^2$-analogues instead
+
+```{r}
+gauge(mod2)
+```
+
+*  `deviance_r2`, built from deviance the way `r_squared` is built from RSS
+
+*  `mcfadden_r2`, comparing the fitted model's log-likelihood against an intercept-only
+model. 
+
+The figure most commonly cited alongside a logistic regression. Each gets its own `cohens_f2` conversion, since the two don't agree closely enough to share one.
+
+## Effect size for a hypothesis test
+
+### t-test
+
+The same `gauge()` call works on `T_TEST()` and `P_TEST()` results too. Is cholesterol different between men and women in this cohort?
+
+```{r}
+chol_by_sex = 
+    heart |>
+    define_model(x_by(chol, sex)) |>
+    prepare(T_TEST) |>
+    conclude()
+
+chol_by_sex
+```
+
+By default, `TTEST()` under `x_by()` path doesn't store per-group sample sizes, so `auto_gauge()` approximates Cohen's *d* as `2 * t_stat / sqrt(df)`. It is "exact" under roughly equal group sizes, and reported as `cohens_d_approx` rather than `cohens_d` to flag the assumption. 
+
+```{r}
+gauge(chol_by_sex)
+```
+
+Optionally, you can pass `quiet = FALSE` to `gauge()` to print the same caveat as a message.
+
+### Proportion test
+
+And what fraction of this cohort has heart disease, against a hypothesized 50%?
+
+```{r}
+n_yes = sum(heart$target == "Yes")
+n_total = nrow(heart)
+
+disease_rate = define_model(prop(n_yes, n_total)) |>
+    prepare(P_TEST) |> 
+    state_null(PI() == 0.5) |> 
+    conclude()
+
+disease_rate
+```
+
+By default, `gauge()` for `P_TEST()` reports Cohen's *h*, the arcsine-transformed difference between the observed and hypothesized proportions. The standard effect size for a single proportion, since raw proportion differences aren't comparable across different baseline rates the way Cohen's *d* is for means.
+
+```{r}
+gauge(disease_rate)
+```
+
