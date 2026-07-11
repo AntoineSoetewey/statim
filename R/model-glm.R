@@ -77,6 +77,7 @@ GLM = MODEL_FN(
 #' - `null_logLik`: scalar log-likelihood of the intercept-only model.
 #' - `beta`: named numeric vector of coefficient estimates.
 #' - `std_beta`: named numeric vector of coefficient standard errors.
+#' - `actual`: numeric vector of the original values on the response scale.
 #' - `fitted`: numeric vector of fitted values on the response scale.
 #' - `vcov`: variance-covariance matrix of the coefficients, e.g.
 #'   `stats::vcov(fit)`. Required for [predict()] with `interval`.
@@ -161,6 +162,7 @@ class_glm_object = S7::new_class(
         null_logLik = S7::class_numeric,
 
         # ---- For prediction purposes ----
+        actual = S7::class_numeric,
         fitted = S7::class_numeric,
         vcov = S7::class_numeric,
         x_mat = S7::class_numeric,
@@ -289,6 +291,7 @@ glm_to_glm_object = function(fit) {
         null_logLik = as.numeric(stats::logLik(null_fit)),
         beta = coef_mat[, 1],
         std_beta = coef_mat[, 2],
+        actual = unname(fit$y),
         fitted = unname(fit$fitted.values),
         vcov = stats::vcov(fit),
         x_mat = as.numeric(mm),

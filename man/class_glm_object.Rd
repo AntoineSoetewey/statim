@@ -25,6 +25,7 @@ Constructor arguments (populated automatically by \link{GLM}):
 \item \code{null_logLik}: scalar log-likelihood of the intercept-only model.
 \item \code{beta}: named numeric vector of coefficient estimates.
 \item \code{std_beta}: named numeric vector of coefficient standard errors.
+\item \code{actual}: numeric vector of the original values on the response scale.
 \item \code{fitted}: numeric vector of fitted values on the response scale.
 \item \code{vcov}: variance-covariance matrix of the coefficients, e.g.
 \code{stats::vcov(fit)}. Required for \code{\link[=predict]{predict()}} with \code{interval}.
