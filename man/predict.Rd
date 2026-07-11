@@ -8,7 +8,7 @@
 An object of class \code{S7_external_generic} of length 4.
 }
 \usage{
-predict(object, new_data = NULL, ...)
+predict(object, new_data = NULL, ..., check_type = TRUE)
 }
 \arguments{
 \item{object}{A \code{cld_exec} object produced by \code{conclude()}.}
@@ -17,6 +17,10 @@ predict(object, new_data = NULL, ...)
 \code{NULL} (the default) uses the training data.}
 
 \item{...}{Passed to the dispatched method.}
+
+\item{check_type}{Check whether the returned output is a data frame. If \code{TRUE},
+\code{predict()} is enforcing the dispatched returned output to be a data frame. Default
+is \code{TRUE}.}
 }
 \value{
 A data frame (specifically a \code{tibble}) with \code{.pred}, \code{truth}

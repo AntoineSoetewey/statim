@@ -25,8 +25,11 @@
 #' @param new_data A data frame (or subclass, e.g. `tibble`, `data.table`).
 #'   `NULL` (the default) uses the training data.
 #' @param ... Passed to the dispatched method.
+#' @param check_type Check whether the returned output is a data frame. If `TRUE`,
+#'   `predict()` is enforcing the dispatched returned output to be a data frame. Default
+#'   is `TRUE`.
 #'
-#' @usage predict(object, new_data = NULL, ...)
+#' @usage predict(object, new_data = NULL, ..., check_type = TRUE)
 #'
 #' @return A data frame (specifically a `tibble`) with `.pred`, `truth`
 #'   when a response is available, and `.pred_lower`/`.pred_upper` when
@@ -38,19 +41,19 @@
 #' @export
 predict = S7::new_external_generic("stats", "predict", "object")
 
-S7::method(predict, cld_exec) = function(object, new_data = NULL, ...) {
+S7::method(predict, cld_exec) = function(object, new_data = NULL, ..., check_type = TRUE) {
     if (!is.null(new_data) && !inherits(new_data, "data.frame")) {
         cli::cli_abort(c(
             "{.arg new_data} must be a data frame, or {.val NULL} to use the training data.",
             "x" = "Got {.obj_type_friendly {new_data}}."
         ))
     }
-    dispatch_predict(object, new_data = new_data, ...)
+    dispatch_predict(object, new_data = new_data, ..., check_type = check_type)
 }
 
 #' @keywords internal
 #' @noRd
-dispatch_predict = function(object, new_data, ...) {
+dispatch_predict = function(object, new_data, ..., check_type = TRUE) {
     out = if (is_class_stat_infer(object@data)) {
         auto_predict(object@data, new_data = new_data, ...)
     } else {
@@ -89,11 +92,13 @@ dispatch_predict = function(object, new_data, ...) {
         predict_fn(object, new_data = new_data, ...)
     }
 
-    if (!inherits(out, "data.frame")) {
-        cli::cli_abort(c(
-            "{.fn predict} methods must return a {.cls data.frame} (a {.cls tibble} or {.cls data.table} included).",
-            "x" = "Got {.obj_type_friendly {out}}."
-        ))
+    if (check_type) {
+        if (!inherits(out, "data.frame")) {
+            cli::cli_abort(c(
+                "{.fn predict} methods must return a {.cls data.frame} (a {.cls tibble} or {.cls data.table} included).",
+                "x" = "Got {.obj_type_friendly {out}}."
+            ))
+        }
     }
 
     out
