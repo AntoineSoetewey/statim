@@ -220,6 +220,8 @@ S7::method(update, multi_lazy) = function(object, ...) {
                 m@recalibrate_spec$args,
                 dots
             )
+        } else if (S7::S7_inherits(m, test_lazy)) {
+            m@test_spec@args = utils::modifyList(m@test_spec@args, dots)
         } else {
             m@model_spec@args = utils::modifyList(m@model_spec@args, dots)
         }
@@ -239,11 +241,13 @@ S7::method(prepare_model, list(expanded_model, S7::class_function)) = function(
     ...
 ) {
     spec = as_model_spec(.model_fn)
+    dots = list(...)
     models = lapply(.x@models, function(dm) {
         model_lazy(
             var_id = dm@var_id,
             processed = dm@processed,
-            model_spec = spec
+            model_spec = spec,
+            recalibrate_spec = if (length(dots) > 0L) list(args = dots) else NULL
         )
     })
     multi_lazy(models = models, labels = .x@labels, args = list())
@@ -255,11 +259,13 @@ S7::method(prepare_test, list(expanded_model, S7::class_function)) = function(
     ...
 ) {
     spec = as_test_spec(.test)
+    dots = list(...)
     models = lapply(.x@models, function(dm) {
         test_lazy(
             var_id = dm@var_id,
             processed = dm@processed,
-            test_spec = spec
+            test_spec = spec,
+            recalibrate_spec = if (length(dots) > 0L) list(args = dots) else NULL
         )
     })
     multi_lazy(models = models, labels = .x@labels, args = list())
@@ -277,12 +283,15 @@ S7::method(prepare, list(expanded_model, S7::class_function)) = function(
         )
     })
 
+    dots = list(...)
+
     builder = if (is_test_spec(spec)) {
         function(dm) {
             test_lazy(
                 var_id = dm@var_id,
                 processed = dm@processed,
-                test_spec = spec
+                test_spec = spec,
+                recalibrate_spec = if (length(dots) > 0L) list(args = dots) else NULL
             )
         }
     } else if (is_model_spec(spec)) {
@@ -290,7 +299,8 @@ S7::method(prepare, list(expanded_model, S7::class_function)) = function(
             model_lazy(
                 var_id = dm@var_id,
                 processed = dm@processed,
-                model_spec = spec
+                model_spec = spec,
+                recalibrate_spec = if (length(dots) > 0L) list(args = dots) else NULL
             )
         }
     } else {
