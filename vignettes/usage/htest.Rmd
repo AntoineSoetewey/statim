@@ -58,7 +58,7 @@ box::use(
         # Current grammars
         define_model, prepare, via, state_null, conclude,
         # Multiple executions
-        write_models, update,
+        write_models, display, 
         # Mappers
         x_by, rel, prop, on,
         MU, RHO, PI
@@ -369,7 +369,8 @@ Interpretation: 33 of 207 men (15.9%), not distinguishable from the 15% baseline
 Every question above ran one test through one layout. `write_models()` lets you batch several layouts of the *same* test into a single pipeline, instead of writing out `define_model() |> prepare() |> conclude()` once per layout:
 
 ```{r}
-heart |>
+out = 
+    heart |>
     write_models(
         mod1 = on(trestbps),
         mod2 = x_by(thalach, sex),
@@ -377,9 +378,15 @@ heart |>
     ) |>
     prepare(T_TEST) |>
     conclude()
+
+out
 ```
 
-Each name becomes its own lazy model behind the scenes, `prepare(T_TEST)` attaches the same test to all three at once, and `conclude()` runs each independently and hands back a `<multi_exec>` — `tidy()` or `display()` on it to inspect the individual results, as covered in [Execution and Retrieval of Outputs](../developer/execution-methods.html#multiple-executions).
+Each name becomes its own lazy model behind the scenes, `prepare(T_TEST)` attaches the same test to all three at once, and `conclude()` runs each independently and hands back a `<multi_exec>` — `tidy()` or `display()` on it to inspect the individual results, as covered in [Execution and Retrieval of Outputs](../pointers/execution-methods.html#multiple-executions).
+
+```{r}
+display(out, 2)
+```
 
 On a side note, `prepare()`'s `...` forwards into the spec on a `write_models()` batch too, the same way it already does on a single `<def_var>`. So `.mu = 120` below reaches every model in the batch whose `fn` actually has a `.mu` formal:
 
