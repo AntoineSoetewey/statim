@@ -247,7 +247,11 @@ S7::method(prepare_model, list(expanded_model, S7::class_function)) = function(
             var_id = dm@var_id,
             processed = dm@processed,
             model_spec = spec,
-            recalibrate_spec = if (length(dots) > 0L) list(args = dots) else NULL
+            recalibrate_spec = if (length(dots) > 0L) {
+                list(args = dots)
+            } else {
+                NULL
+            }
         )
     })
     multi_lazy(models = models, labels = .x@labels, args = list())
@@ -265,7 +269,11 @@ S7::method(prepare_test, list(expanded_model, S7::class_function)) = function(
             var_id = dm@var_id,
             processed = dm@processed,
             test_spec = spec,
-            recalibrate_spec = if (length(dots) > 0L) list(args = dots) else NULL
+            recalibrate_spec = if (length(dots) > 0L) {
+                list(args = dots)
+            } else {
+                NULL
+            }
         )
     })
     multi_lazy(models = models, labels = .x@labels, args = list())
@@ -291,7 +299,11 @@ S7::method(prepare, list(expanded_model, S7::class_function)) = function(
                 var_id = dm@var_id,
                 processed = dm@processed,
                 test_spec = spec,
-                recalibrate_spec = if (length(dots) > 0L) list(args = dots) else NULL
+                recalibrate_spec = if (length(dots) > 0L) {
+                    list(args = dots)
+                } else {
+                    NULL
+                }
             )
         }
     } else if (is_model_spec(spec)) {
@@ -300,7 +312,11 @@ S7::method(prepare, list(expanded_model, S7::class_function)) = function(
                 var_id = dm@var_id,
                 processed = dm@processed,
                 model_spec = spec,
-                recalibrate_spec = if (length(dots) > 0L) list(args = dots) else NULL
+                recalibrate_spec = if (length(dots) > 0L) {
+                    list(args = dots)
+                } else {
+                    NULL
+                }
             )
         }
     } else {

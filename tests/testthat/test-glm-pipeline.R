@@ -40,7 +40,10 @@ test_that("coefficients property returns the expected tibble shape and values", 
     out = obj@coefficients
 
     expect_s3_class(out, "tbl_df")
-    expect_named(out, c("term", "estimate", "std_error", "statistic", "p_value"))
+    expect_named(
+        out,
+        c("term", "estimate", "std_error", "statistic", "p_value")
+    )
     expect_equal(nrow(out), length(obj@beta))
     expect_equal(out$term, names(obj@beta))
     expect_equal(out$estimate, unname(obj@beta))
@@ -58,7 +61,15 @@ test_that("fit_summary property returns the expected tibble shape and values", {
     expect_s3_class(out, "tbl_df")
     expect_named(
         out,
-        c("family", "link", "null_deviance", "deviance", "df_residual", "aic", "n_obs")
+        c(
+            "family",
+            "link",
+            "null_deviance",
+            "deviance",
+            "df_residual",
+            "aic",
+            "n_obs"
+        )
     )
     expect_equal(out$family, obj@family)
     expect_equal(out$link, obj@link)
