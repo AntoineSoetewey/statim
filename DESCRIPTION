@@ -30,7 +30,7 @@ Imports:
     stats,
     utils,
     tabstats (>= 0.2.0),
-    pillar
+    pillar 
 Suggests:
     testthat (>= 3.0.0),
     magrittr,
@@ -42,6 +42,7 @@ Suggests:
     purrr,
     tidyr,
     dplyr,
+    ggplot2, 
     boot,
     knitr,
     fansi,
