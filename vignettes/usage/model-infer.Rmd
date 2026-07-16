@@ -24,7 +24,7 @@ fansi::set_knit_hooks(knitr::knit_hooks)
 
 `vignette("htest", package = "statim")` covered the other half of `prepare()`: `prepare_test()`, feeding `T_TEST`, `COR_TEST`, and `P_TEST` into the same `define_model() |> prepare() |> conclude()` shape. This vignette covers the model-based half, `prepare_model()`, which takes the exact same shape and feeds it `LINEAR_REG` or `GLM` instead. Same `<var_id>` mappers, same verbs, same `conclude()` at the end. If a hypothesis question turns out to need a regression instead of a t-test, the pipeline you already wrote doesn't change shape, only the `<STAT_FN>` swapped in.
 
-Three questions from the same dataset, run as regressions instead of hypothesis tests.
+Three questions from the same dataset, run as regression models instead of hypothesis tests.
 
 ### Sample Problem
 
@@ -62,7 +62,7 @@ box::use(
 )
 ```
 
-Then import the CSV file from this package: 
+Then import the CSV file from this package:
 
 ```{r}
 heart = 
@@ -184,12 +184,12 @@ $$\text{logit}(P(\text{target}=\text{Yes})) = \beta_0 + \beta_1 \cdot \text{age}
 ```{r}
 heart |>
     define_model(target ~ age + chol + trestbps) |>
-    prepare_model(GLM) |>             # or prepare_model(GLM, family = binomial())
+    prepare_model(GLM) |> # or prepare_model(GLM, family = binomial())
     update(family = binomial()) |>
     conclude()
 ```
 
-Or you can just use their one-liner version:
+Or you can just use its one-liner version:
 
 ```{r}
 GLM(target ~ age + chol + trestbps, heart, family = binomial())
