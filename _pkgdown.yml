@@ -20,7 +20,7 @@ home:
 navbar:
   type: light
   structure:
-    left: [intro, reference, articles, news]
+    left: [intro, reference, articles, news, examples]
     right: [search, github, lightswitch, blog]
   components:
     intro:
@@ -29,6 +29,17 @@ navbar:
     reference:
       text: Reference
       href: reference/index.html
+    examples:
+      text: Examples
+      menu:
+      - text: "Hypothesis Testing"
+        href: articles/usage/htest.html
+      - text: "Regression Modelling"
+        href: articles/usage/model-infer.html
+      - text: "Effect Size"
+        href: articles/usage/effect-size.html
+      - text: "Prediction from Regression Models"
+        href: articles/usage/predict-examples.html
     github:
       icon: fab fa-github fa-lg
       href: https://github.com/s7-stats/statim
