@@ -28,7 +28,7 @@ fansi::set_knit_hooks(knitr::knit_hooks)
 
 Kutner, Nachtsheim, Neter, and Li's *Applied Linear Statistical Models* poses a different kind of question throughout its inference chapters: not "are these equal," but "is a specific weighted combination of these parameters above, below, or at some threshold." That's a linear contrast, and `{statim}` supports it through `via("contrast")` on the `x_by()` layout, accepting arbitrary weights (`.w`) and a comparison value (`.mu`) rather than the fixed `+1`/`-1` split a plain two-sample test assumes.
 
-This vignette isn't reproducing a specific textbook problem — the book's own contrast examples mostly involve three or more groups (its ANOVA chapters, already covered by `vignette("anova-mod", package = "statim")`), while `x_by()`'s `contrast` variant is built for exactly two. What it does share with the book is the *question type*: a weighted, non-zero-threshold claim instead of a plain equality. The two questions below work that question type through `{statim}`, using the same Welch-Satterthwaite machinery the book's contrast tests are built on.
+This vignette isn't reproducing a specific textbook problem. The book's own contrast examples mostly involve three or more groups (its ANOVA chapters, already covered by `vignette("anova-mod", package = "statim")`), while `TTEST`'s `x_by()`'s `contrast` variant is built for exactly two. What it does share with the book is the *question type*: a weighted, non-zero-threshold claim instead of a plain equality. The two questions below work that question type through `{statim}`, using the same Welch-Satterthwaite machinery the book's contrast tests are built on.
 
 ### Sample Problem
 
@@ -98,10 +98,6 @@ ToothGrowth |>
 ```
 
 Interpretation: *(fill in after knitting).*
-
-## Conclusion
-
-Both questions above are versions of the same claim shape: `.w`-weighted parameters compared against a `.mu` that isn't `0`. That's the shape a textbook contrast problem actually takes, and it's the shape a plain `t.test()` call has no argument for — `alternative` picks a direction, but nothing in base R's signature lets you scale one side of the comparison or set a non-zero threshold without pre-computing it by hand first. `state_null()` combined with `via("contrast")` is where the algebraic-expression pitch from `vignette("htest", package = "statim")` actually pays for itself.
 
 ## References
 
