@@ -24,18 +24,19 @@ fansi::set_knit_hooks(knitr::knit_hooks)
 
 ## Why this vignette exists
 
-`t.test(x, mu = 120)` works, but six months from now you won't remember whether `mu` was the value you're testing against or something else buried in the call. `{statim}` takes a new approach on how statistical inference in R is done. For instance, `{statim}` has another way to write the null hypothesis itself as an algebraic expression instead (e.g. `MU(x) == 120`, `RHO(x, y) == 0`), so the code declares what the hypothesis is, not which argument slot it lives in.
+While `t.test(x, alternative = "less")` works and is simple, there are times you won't remember the intent of the function call, e.g. which side of the inequality "less" refers to: 
 
-The question is, does that actually pay off? This vignette runs four real questions from a real dataset through `{statim}`, base R, and `{rstatix}`, and says plainly when the extra syntax isn't worth it.
+-  Is `x` hypothesized to be less than `mu`, or `mu` less than `x`?
+
+`{statim}` takes a different approach on how statistical inference in R is done. For instance, `{statim}` has another way to write the null hypothesis itself as an algebraic expression instead (e.g. `MU(x) < 120`, `RHO(x, y) == 0`), so the code declares what the null hypothesis is, direction included, rather than which argument slot lives in.
+
+`{statim}` is fully declarative, mainly through piped/grammar sementics like `{ggplot2}`, including on how you declare the estimation method in a statistical inference you want to perform. The question is, does that actually pay off? 
+
+This vignette runs four real questions from a real dataset through `{statim}`, base R, and `{rstatix}`, and is honest about where the extra syntax doesn't earn its keep. These four are the straightforward cases; the harder one, where the syntax stops being optional, is covered in the Conclusion below.
 
 ### Sample Problem
 
-The dataset: 303 patients from the Cleveland Clinic. Originally collected by
-Robert Detrano, M.D., Ph.D., and hosted at the UCI Machine Learning
-Repository (Heart Disease dataset, Cleveland subset). This copy was
-redistributed by Daniel Bourke's "zero-to-mastery-ml" repo, and is bundled
-with this package at `inst/extdata/heart-disease.csv` so the vignette builds
-without a network call.
+The dataset: 303 patients from the Cleveland Clinic. Originally collected by Robert Detrano, M.D., Ph.D., and hosted at the UCI Machine Learning Repository (Heart Disease dataset, Cleveland subset). This copy was redistributed by Daniel Bourke's "zero-to-mastery-ml" repo, and is bundled with this package at `inst/extdata/heart-disease.csv` so the vignette builds without a network call.
 
 The questions, framed as a cardiologist would ask them:
 
@@ -44,7 +45,7 @@ The questions, framed as a cardiologist would ask them:
 3. [Is there a linear relationship between age and maximum heart rate?](#q3)
 4. [Is the proportion of male patients with fasting blood sugar **above 120 mg/dL** different from an assumed population baseline of 15%?](#q4)
 
-One-sample t-test, two-sample t-test, correlation test, one-sample proportion test — the four tests almost every intro stats course covers, run on data that actually matters.
+They are answered by: one-sample t-test, two-sample t-test, correlation test, one-sample proportion test, respectively. 
 
 ## Setup
 
@@ -58,7 +59,7 @@ box::use(
         # Current grammars
         define_model, prepare, via, state_null, conclude,
         # Multiple executions
-        write_models, display, 
+        write_models, display,
         # Mappers
         x_by, rel, prop, on,
         MU, RHO, PI
@@ -75,7 +76,8 @@ box::use(
 Then import the CSV file from this package: 
 
 ```{r}
-heart = read_csv(system.file("extdata", "heart-disease.csv", package = "statim")) |>
+heart = 
+    read_csv(system.file("extdata", "heart-disease.csv", package = "statim")) |>
     mutate(
         sex = factor(sex, levels = c(0, 1), labels = c("Female", "Male")),
         fbs = factor(fbs, levels = c(0, 1), labels = c("Normal", "High"))
@@ -127,7 +129,9 @@ T_TEST(on(trestbps), heart, .mu = 120)
 heart |>
     define_model(trestbps ~ 1) |>
     prepare(T_TEST, .mu = 120) |>
+    # update(.mu = 120) |> 
     conclude()
+
 T_TEST(trestbps ~ 1, heart, .mu = 120)
 ```
 
@@ -148,7 +152,7 @@ t.test(trestbps ~ 1, heart, mu = 120)
 
 ### Verdict
 
-All of the packages addresses the problem by performing one-sample t-test in a single line of code. However, what `{statim}` buys instead is legibility of intent: `define_model()`, `prepare()`, `conclude()` read like a sentence, and you can do more with `{statim}`'s main API, whereas `t.test(x, mu = 120)` reads like an API you have to already know.
+All of the packages addresses the problem by performing one-sample t-test in a single line of code. However, what `{statim}` buys instead is legibility of intent: `define_model()`, `prepare()`, `conclude()` read like a sentence, and you can do more with `{statim}`'s main API, whereas `t.test(x, mu = 120)` reads like an API you have to already know. And also, `ttest-on` can utilize `state_null()`, it is not covered for the reason being the usage is not too different on declaring `.mu`. 
 
 Interpretation: 131.6 mmHg average, significantly above 120 ($p < 0.001$). This cohort runs elevated.
 
@@ -197,6 +201,7 @@ heart |>
         MU(thalach, sex == "Female") == MU(thalach, sex == "Male")
     ) |>
     conclude()
+
 T_TEST(x_by(thalach, sex), heart)
 ```
 
@@ -250,7 +255,10 @@ t.test(thalach ~ sex, data = heart)
 
 ### Verdict
 
-This is where the two designs actually diverge, not just in syntax. Empirically, `{statim}`, `{rstatix}`, and base R treat "compare two groups" as something the `<formula>` already encodes, `thalach ~ sex` says everything. However, `{statim}` goes beyond that with `x_by()` and `on()`. `x_by()` says the same thing, but then lets you go further: this layout has `state_null()` translation, and you can write out `MU(thalach, sex == "Female") == MU(thalach, sex == "Male)` as an actual algebraic expression, group filters and all. `on()`, on the other hand, has the same logic as `x_by()` one except it treats the variables to be independent to each other, and its null hypothesis expression doesn't use the `<sex == "Male>` `given` argument.
+This is where the two designs actually diverge, not just in syntax. Empirically, `{statim}`, `{rstatix}`, and base R treat "compare two groups" as something the `<formula>` already encodes, `thalach ~ sex` says everything. However, `{statim}` goes beyond that with `x_by()` and `on()`. `
+
+-  `x_by()` says the same thing, but then lets you go further: this layout has `state_null()` translation, and you can write out `MU(thalach, sex == "Female") == MU(thalach, sex == "Male")` as an actual algebraic expression, group filters and all.
+-  `on()`, on the other hand, has the same logic as `x_by()`'s except it treats the variables to be independent to each other, and its null hypothesis expression doesn't use the `<sex == "Male">` `given` argument.
 
 That's more typing for a question this simple. It stops being "more typing" and starts being "the only way to say what you mean" the moment the hypothesis isn't a straight group comparison anymore.
 
@@ -291,9 +299,9 @@ COR_TEST(rel(thalach, age), heart)
 ```{r}
 heart |>
     define_model(age ~ thalach) |>
-    prepare(COR_TEST) |> 
+    prepare(COR_TEST) |>
     conclude()
-COR_TEST(rel(thalach, age), heart)
+COR_TEST(age ~ thalach, heart)
 ```
 
 </details>
@@ -369,7 +377,7 @@ Interpretation: 33 of 207 men (15.9%), not distinguishable from the 15% baseline
 Every question above ran one test through one layout. `write_models()` lets you batch several layouts of the *same* test into a single pipeline, instead of writing out `define_model() |> prepare() |> conclude()` once per layout:
 
 ```{r}
-out = 
+out =
     heart |>
     write_models(
         mod1 = on(trestbps),
@@ -432,3 +440,4 @@ The safer default is to keep a batch to layouts that share the same estimation m
 `{statim}` makes sure the simplicity from base R and other packages like `{rstatix}` must exists, otherwise the steeper learning curve will get you. One-liner codes exist, the piped/grammar syntax is inherited to make sure the spirits of `{ggplot2}` and `{dplyr}` exist on `{statim}` space.
 
 What this vignette can't show you is the fifth question: a custom contrast, a hypothesis that isn't a straight equality, a test family that doesn't have a tidy formula shorthand yet. That's the actual bet `{statim}` is making: a consistent `define_model() |> prepare() |> state_null() |> conclude()` shape you can extend once, rather than learn a new argument convention per test. Four questions above are pretty straightforward and aren't the right test of that bet. Judge it on the harder one.
+
