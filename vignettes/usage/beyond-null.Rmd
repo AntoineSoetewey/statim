@@ -26,6 +26,8 @@ fansi::set_knit_hooks(knitr::knit_hooks)
 
 `vignette("htest", package = "statim")` covers the plain case: is one mean different from a fixed value, are two means different from each other, is a correlation zero. Every claim in that vignette reduces to `MU(a) == MU(b)` or its one-sample cousin. That's most of what an intro course asks, but it isn't all a textbook asks.
 
+This vignette is about *using* weighted, non-zero-threshold claims, not about how `state_null()` parses them. For the parsing mechanics — how a coefficient and comparison value are pulled out of an expression like `2 * MU(x) - MU(y) <= 0`, and why group order in that expression matters — see `vignette("hypothesis-expressions", package = "statim")`.
+
 Kutner, Nachtsheim, Neter, and Li's *Applied Linear Statistical Models* poses a different kind of question throughout its inference chapters: not "are these equal," but "is a specific weighted combination of these parameters above, below, or at some threshold." That's a linear contrast, and `{statim}` supports it through `via("contrast")` on the `x_by()` layout, accepting arbitrary weights (`.w`) and a comparison value (`.mu`) rather than the fixed `+1`/`-1` split a plain two-sample test assumes.
 
 This vignette isn't reproducing a specific textbook problem. The book's own contrast examples mostly involve three or more groups (its ANOVA chapters, already covered by `vignette("anova-mod", package = "statim")`), while `TTEST`'s `x_by()`'s `contrast` variant is built for exactly two. What it does share with the book is the *question type*: a weighted, non-zero-threshold claim instead of a plain equality. The two questions below work that question type through `{statim}`, using the same Welch-Satterthwaite machinery the book's contrast tests are built on.
@@ -38,6 +40,7 @@ The dataset: `ToothGrowth`, built into base R. Guinea pig odontoblast (tooth cel
 -  Orange juice (`OJ`)
 
 The data is bundled with R itself, so this vignette builds without a network call or an external file.
+
 
 The questions, framed the way a textbook exercise would:
 
@@ -78,7 +81,9 @@ ToothGrowth |>
     conclude()
 ```
 
-Interpretation: *(fill in after knitting — the estimate, t-statistic, and p-value above determine whether OJ's advantage clears the 2-unit bar or not).*
+Interpretation: 
+
+-  The estimated OJ-VC gap is 3.70, above the 2-unit bar, but `t_stat` (0.880) and `p_val` (0.191) are testing the gap *against* that bar, not against zero. At $\alpha = 0.05$, `p_val` is too large to reject $H_0$: there isn't enough evidence that OJ beats VC by more than 2 units. The one-sided 95% lower bound of 0.468 makes the same point — the true gap could plausibly be well under 2.
 
 ## Question 2: Does twice OJ's mean still fall short of VC's? {#q2}
 
@@ -91,13 +96,17 @@ ToothGrowth |>
     define_model(x_by(len, supp)) |>
     prepare(T_TEST) |>
     state_null(
+        # If no coefficient 
+        # it is hidden and it contains a coefficient of 1
         2 * MU(len, supp == "OJ") - MU(len, supp == "VC") <= 0
     ) |>
     via("contrast") |>
     conclude()
 ```
 
-Interpretation: *(fill in after knitting).*
+Interpretation: 
+
+-  `estimate` (24.363) is $2 \cdot \bar{x}_{\text{OJ}} - \bar{x}_{\text{VC}}$ itself, since `.mu` is 0 here. `p_val` is below `0.001`, so $H_0$ is rejected: twice OJ's mean does not fall short of VC's — it's well above it. The 95% lower bound of 19.593 says the same thing, since it sits nowhere near 0.
 
 ## References
 
