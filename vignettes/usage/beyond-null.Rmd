@@ -2,9 +2,7 @@
 title: "Beyond Equality: Custom Hypotheses with {statim}"
 subtitle: "Weighted claims, worked through with {statim}"
 description: >
-    A guide on stating and testing custom hypothesis claims with the
-    statim R package, covering weighted comparisons that go past a
-    plain equality between two means.
+    A guide on stating and testing custom null hypotheses.
 output:
     rmarkdown::html_vignette:
         toc: true
@@ -24,9 +22,9 @@ fansi::set_knit_hooks(knitr::knit_hooks)
 
 ## Why this vignette exists
 
-`vignette("htest", package = "statim")` covers the plain case: is one mean different from a fixed value, are two means different from each other, is a correlation zero. Every claim in that vignette reduces to `MU(a) == MU(b)` or its one-sample cousin. That's most of what an intro course asks, but it isn't all a textbook asks.
+`vignette("htest", package = "statim")` covers the plain case: is one mean different from a fixed value, are two means different from each other, is a correlation zero. Every null hypothesis in that vignette reduces to `MU(a) == MU(b)` or its one-sample cousin. That's most of what an intro course asks, but it isn't all a textbook asks.
 
-This vignette is about *using* weighted, non-zero-threshold claims, not about how `state_null()` parses them. For the parsing mechanics — how a coefficient and comparison value are pulled out of an expression like `2 * MU(x) - MU(y) <= 0`, and why group order in that expression matters — see `vignette("hypothesis-expressions", package = "statim")`.
+This vignette is about *using* weighted, non-zero-threshold claims, not about how `state_null()` parses them. For the parsing mechanics, see `vignette("hypothesis-expressions", package = "statim")` — this explains how a coefficient and comparison value are pulled out of an expression like `2 * MU(x) - MU(y) <= 0`, and why group order in that expression matters.
 
 Kutner, Nachtsheim, Neter, and Li's *Applied Linear Statistical Models* poses a different kind of question throughout its inference chapters: not "are these equal," but "is a specific weighted combination of these parameters above, below, or at some threshold." That's a linear contrast, and `{statim}` supports it through `via("contrast")` on the `x_by()` layout, accepting arbitrary weights (`.w`) and a comparison value (`.mu`) rather than the fixed `+1`/`-1` split a plain two-sample test assumes.
 
