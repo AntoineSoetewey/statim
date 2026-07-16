@@ -46,7 +46,6 @@ Suggests:
     knitr,
     fansi,
     lintr,
-    box,
     rstatix,
     readr,
     withr
