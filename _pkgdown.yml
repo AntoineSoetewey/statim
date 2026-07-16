@@ -36,6 +36,8 @@ navbar:
         href: articles/usage/htest.html
       - text: "Regression Modelling"
         href: articles/usage/model-infer.html
+      - text: "Beyond Equality: Custom Hypotheses with {statim}"
+        href: articles/usage/beyond-null.html
       - text: "Effect Size"
         href: articles/usage/effect-size.html
       - text: "Prediction from Regression Models"
@@ -240,6 +242,7 @@ articles:
     contents:
     - usage/htest
     - usage/model-infer
+    - usage/beyond-null
     - usage/anova-mod
     - usage/predict-examples
     - usage/effect-size
