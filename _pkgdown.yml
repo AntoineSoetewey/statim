@@ -233,7 +233,7 @@ footer:
   components:
     built_with: >
       Built with <a href="https://pkgdown.r-lib.org/">pkgdown</a>.
-      Visit my <a href="https://s7-stats.com">blog</a> for more content.
+#     Visit my <a href="https://s7-stats.com">blog</a> for more content.
 
 articles:
 
