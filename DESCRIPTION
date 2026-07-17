@@ -42,6 +42,7 @@ Suggests:
     purrr,
     tidyr,
     dplyr,
+    forcats, 
     ggplot2, 
     patchwork, 
     sysfonts, 
