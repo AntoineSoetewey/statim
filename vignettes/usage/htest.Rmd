@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 fansi::set_knit_hooks(knitr::knit_hooks)
 ```
 
-## Why this vignette exists
+## Rationale
 
 While `t.test(x, alternative = "less")` works and is simple, there are times you won't remember the intent of the function call, e.g. which side of the inequality "less" refers to: 
 
@@ -32,7 +32,7 @@ While `t.test(x, alternative = "less")` works and is simple, there are times you
 
 `{statim}` is fully declarative, mainly through piped/grammar sementics like `{ggplot2}`, including on how you declare the estimation method in a statistical inference you want to perform. The question is, does that actually pay off? 
 
-This vignette runs four real questions from a real dataset through `{statim}`, base R, and `{rstatix}`, and is honest about where the extra syntax doesn't earn its keep. These four are the straightforward cases; the harder one, where the syntax stops being optional, is covered in the Conclusion below.
+This vignette is a showcase of `{statim}` which runs four questions from a real dataset through `{statim}`, base R, and `{rstatix}`, and is honest about where the extra syntax doesn't earn its keep. These four are the straightforward cases; the harder one, where the syntax stops being optional, is covered in the Conclusion below.
 
 ### Sample Problem
 
