@@ -46,11 +46,11 @@ for full argument lists, variants, and result class details:
 
 Welch, B. L. (1947). The generalization of "Student's" problem when
 several different population variances are involved. \emph{Biometrika},
-34(1-2), 28-35. \url{https://doi.org/10.1093/biomet/34.1-2.28}
+34(1-2), 28-35. \doi{10.1093/biomet/34.1-2.28}
 
 Satterthwaite, F. E. (1946). An approximate distribution of estimates
 of variance components. \emph{Biometrics Bulletin}, 2(6), 110-114.
-\url{https://doi.org/10.2307/3002019}
+\doi{10.2307/3002019}
 
 Kutner, M. H., Nachtsheim, C. J., Neter, J., & Li, W. (2004).
 \emph{Applied Linear Statistical Models} (5th ed.). McGraw-Hill/Irwin.
