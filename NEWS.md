@@ -6,7 +6,7 @@
 
 -  Initial CRAN submission.
 -  New and much modern approach to statistical inference in R
--  Core API built with S7 — taking advantage of formal classes and constructors. 
+-  Core API built with S7, taking advantage of formal classes and constructors. 
 -  Two complementary interfaces:
 
     1.  Eager Form Approach:
@@ -23,7 +23,8 @@
             prepare_*(<<STAT_FN>>) |> 
             state_null(<expr>) |> 
             via("<method>") |> 
-            conclude()
+            conclude() |> 
+            <output-process-fn>()
         ```
 
 
