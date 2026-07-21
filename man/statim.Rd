@@ -6,13 +6,15 @@
 \alias{statim}
 \title{statim: A Declarative Interface for Statistical Inference}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 A declarative interface for statistical inference built on the S7 object system. The layouts of the statistical inference are described using expressive variable mappers, null hypotheses are stated as mathematical expressions over population parameters, and estimation is deferred until explicitly requested. Supports estimation method involving hypothesis testing and model-based inference with an extensible variant system for registering custom estimation methods.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://github.com/s7-stats/statim}
-  \item Report bugs at \url{https://github.com/s7-stats/statim/issues}
+  \item Report bugs at \url{https://s7-stats.github.io/statim, https://github.com/s7-stats/statim/issues}
 }
 
 }
