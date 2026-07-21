@@ -34,7 +34,7 @@ What does `{statim}` mean?
 
 ## Why statim?
 
-R has a rich statistical ecosystem. Statistical inference in general is served by an assortment of disconnected functions: the functions you're looking for may exist but they are scattered across different packages. 
+R has a dedicated rich ecosystem in statistics. Statistical inference in general is served by an assortment of disconnected functions: the functions you're looking for may exist but they are scattered across different packages. 
 
 R gained a grammar for graphics (`{ggplot2}`), and one for data manipulation (`{dplyr}`). And then there's `{statim}`, an attempt to re-imagine the "grammar of statistical inference" from the ground up. The core idea of `{statim}` in general is it's fully declarative, and that any inferential procedure can be described in [three steps](https://s7-stats.github.io/statim/articles/statim.html).
 

@@ -23,9 +23,10 @@ perform, then `{statim}` immediately delivers *how*.
 
 ## Why statim?
 
-R has a rich statistical ecosystem. Statistical inference in general is
-served by an assortment of disconnected functions: the functions you’re
-looking for may exist but they are scattered across different packages.
+R has a dedicated rich ecosystem in statistics. Statistical inference in
+general is served by an assortment of disconnected functions: the
+functions you’re looking for may exist but they are scattered across
+different packages.
 
 R gained a grammar for graphics (`{ggplot2}`), and one for data
 manipulation (`{dplyr}`). And then there’s `{statim}`, an attempt to
