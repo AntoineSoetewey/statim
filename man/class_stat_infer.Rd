@@ -56,10 +56,10 @@ S7::method(auto_tidy, my_result_boot) = function(x, ...) \{
 The built-in hierarchy is:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{class_stat_infer
-    ├── anova_able
-    │       └── class_lm_object
-    └── <your-own-output-class>
-            └── <your-own-subclass>
+    |-- anova_able
+    |       `-- class_lm_object
+    `-- <your-own-output-class>
+            `-- <your-own-subclass>
 }\if{html}{\out{</div>}}
 
 Downstream packages can extend the hierarchy further by using any

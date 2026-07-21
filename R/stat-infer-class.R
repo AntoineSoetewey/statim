@@ -46,10 +46,10 @@
 #'
 #' ```
 #' class_stat_infer
-#'     ├── anova_able
-#'     │       └── class_lm_object
-#'     └── <your-own-output-class>
-#'             └── <your-own-subclass>
+#'     |-- anova_able
+#'     |       `-- class_lm_object
+#'     `-- <your-own-output-class>
+#'             `-- <your-own-subclass>
 #' ```
 #'
 #' Downstream packages can extend the hierarchy further by using any
