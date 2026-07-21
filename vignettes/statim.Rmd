@@ -214,9 +214,9 @@ Any linear combination of parameters is valid on either side. For a full referen
 
 If you want to learn more on how to use this package, visit the following:
 
-1.  [Hypothesis Testing with {statim}](./usage/htest.html)
-2.  [Regression Modelling with {statim}](./usage/model-infer.html)
-3.  [ANOVA models from Linear Models with {statim}](./usage/anova-mod.html)
+1.  [Hypothesis Testing with {statim}](https://s7-stats.github.io/statim/articles/usage/htest.html)
+2.  [Regression Modelling with {statim}](https://s7-stats.github.io/statim/articles/usage/model-infer.html)
+3.  [ANOVA models from Linear Models with {statim}](https://s7-stats.github.io/statim/articles/usage/anova-mod.html)
 
 <!-- ## Generalization -->
 
