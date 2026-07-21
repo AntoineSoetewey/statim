@@ -14,8 +14,6 @@
 #'
 #'   Try run this to explore the structure: `names(model_processor(<var_id>, <data>))`.
 #'
-#'   \cr
-#'
 #'   Additional named arguments are user-supplied statistical parameters
 #'   (e.g. `.mu`, `.ci`). See [model_processor()] for the full `.proc`
 #'   schema per model type.
@@ -96,8 +94,6 @@ baseline = S7::new_class(
 #'   - `formula`: `$data`, `$vars`, `$formula`
 #'
 #'   Try run this to explore the structure: `names(model_processor(<var_id>, <data>))`.
-#'
-#'   \cr
 #'
 #'   Additional named arguments are user-supplied statistical parameters
 #'   (e.g. `.mu`, `.ci`). See [model_processor()] for the full `.proc`

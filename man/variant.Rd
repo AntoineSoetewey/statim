@@ -19,8 +19,6 @@ depend on the variable mapper \verb{<var_id>} used:
 
 Try run this to explore the structure: \verb{names(model_processor(<var_id>, <data>))}.
 
-\cr
-
 Additional named arguments are user-supplied statistical parameters
 (e.g. \code{.mu}, \code{.ci}). See \code{\link[=model_processor]{model_processor()}} for the full \code{.proc}
 schema per model type.
