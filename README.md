@@ -137,8 +137,8 @@ MIT + file LICENSE
 
 We are sincerely grateful for contributions; they are beneficial for the
 project and for us as maintainers. Please read
-[CONTRIBUTING.md](CONTRIBUTING.md) for development setup, pull request
-guidelines, and workflow notes.
+[CONTRIBUTING.md](https://github.com/s7-stats/statim/blob/master/.github/CONTRIBUTING.md)
+for development setup, pull request guidelines, and workflow notes.
 
 ## Code of Conduct
 
