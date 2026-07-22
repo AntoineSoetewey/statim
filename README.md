@@ -21,6 +21,23 @@ What does `{statim}` mean?
 be interpreted as: you declare *what* statistical inference you want to
 perform, then `{statim}` immediately delivers *how*.
 
+## Installation
+
+The stable version of package can be installed from CRAN:
+
+``` r
+# Stable version
+install.packages("statim")
+```
+
+You can install the current development version from GitHub:
+
+``` r
+# Development version from GitHub
+# install.packages("pak")
+pak::pak("s7-stats/statim")
+```
+
 ## Why statim?
 
 R has a dedicated rich ecosystem in statistics. Statistical inference in
@@ -108,24 +125,6 @@ The package is designed around three ideas:
     `<STAT_FN>` form (only be accessed with `via()` only). With these,
     you can bring your own engine, your own method, your own
     implementation, or use them to extend the current ones.
-
-## Installation
-
-The package is yet to be submitted into CRAN.
-
-``` r
-# Stable version (not yet released)
-install.packages("statim")
-```
-
-For the time being, you can install the current implementation on
-GitHub:
-
-``` r
-# Development version from GitHub
-# install.packages("pak")
-pak::pak("s7-stats/statim")
-```
 
 ## License
 
