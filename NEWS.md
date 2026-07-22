@@ -1,6 +1,8 @@
 # statim (development version)
 
-<!-- -  Initial development version. -->
+## Minor Improvements
+
+-  "Installation" from `README` fixed its consistency
 
 # statim 0.1.0
 
