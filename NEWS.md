@@ -1,9 +1,5 @@
 # statim (development version)
 
-## Minor Improvements
-
--  "Installation" from `README` fixed its consistency
-
 # statim 0.1.0
 
 -  Initial CRAN submission.
