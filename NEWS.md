@@ -3,6 +3,10 @@
 ## Minor Improvements
 
 -  "Installation" from `README` fixed its consistency
+-  Small revisions from `vignettes`, improving the quality. 
+
+    -  Fixing `usage/htest.Rmd` explanations. 
+    -  `statim.Rmd` has clarifications on its comparison to other packages. 
 
 # statim 0.1.0
 
