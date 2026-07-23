@@ -5,7 +5,7 @@
 -  "Installation" from `README` fixed its consistency
 -  Small revisions from `vignettes`, improving the quality. 
 
-    -  Fixing `usage/htest.Rmd` explanations. 
+    -  Fixing `usage/htest.Rmd` and `usage/model-infer.Rmd` explanations. 
     -  `statim.Rmd` has clarifications on its comparison to other packages. 
 
 # statim 0.1.0
