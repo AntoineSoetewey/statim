@@ -3,6 +3,10 @@
 \name{class_ttest_two}
 \alias{class_ttest_two}
 \title{Structured result container for two-sample t-tests}
+\value{
+An S7 object of class \code{ttest_two}, with the properties listed in
+Details. Not constructed manually; returned by \link{T_TEST} pipelines.
+}
 \description{
 An S7 class produced by \link{T_TEST} pipelines using \code{\link[=x_by]{x_by()}} as the variable mapper \verb{<var_id>}.
 Not constructed manually — use the pipeline instead.

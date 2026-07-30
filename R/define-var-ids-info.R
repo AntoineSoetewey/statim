@@ -47,6 +47,10 @@ var_id_info = S7::new_generic(
 #' @format NULL
 #' @usage NULL
 #'
+#' @returns An S7 object of class `var_inform` holding the Variable Mapper's
+#' type, arguments, extracted variables, and registration status. Returned
+#' by [var_id_info()], not constructed manually.
+#'
 #' @export
 class_var_inform = S7::new_class(
     name = "model_inform",

@@ -3,6 +3,11 @@
 \name{class_ttest_pairwise}
 \alias{class_ttest_pairwise}
 \title{Structured result container for pairwise t-tests}
+\value{
+An S7 object of class \code{ttest_pairwise}, with the properties
+listed in Details. Not constructed manually; returned by \link{T_TEST}
+pipelines using \code{\link[=pairwise]{pairwise()}}.
+}
 \description{
 An S7 class produced by \link{T_TEST} pipelines using \code{\link[=pairwise]{pairwise()}} as the
 variable mapper \verb{<var_id>}. Not constructed manually — use the pipeline instead.

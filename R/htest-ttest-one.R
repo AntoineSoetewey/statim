@@ -27,6 +27,9 @@
 #' Both `base` and `multi` return a `class_ttest_one`, so [auto_tidy()] and
 #' [print()] are inherited by `multi` for free.
 #'
+#' @returns An S7 object of class `ttest_one`, with the properties listed in
+#' Details. Not constructed manually; returned by [T_TEST] pipelines.
+#'
 #' @seealso [T_TEST], [ttest-on], [auto_tidy()], [class_stat_infer]
 #'
 #' @export

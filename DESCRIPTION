@@ -11,11 +11,11 @@ Authors@R: c(
            role = "aut",
            comment = c(ORCID = "0000-0001-8159-0804"))
     )
-Description: A declarative interface for statistical inference built on the S7 object 
-    system. The layouts of the statistical inference are described using expressive variable mappers, 
-    null hypotheses are stated as mathematical expressions over population parameters, 
+Description: A declarative interface for statistical inference built on the S7 object
+    system. The layouts of the statistical inference are described using expressive variable mappers,
+    null hypotheses are stated as mathematical expressions over population parameters,
     and estimation is deferred until explicitly requested. Supports estimation method involving
-    hypothesis testing and model-based inference with an extensible variant system for 
+    hypothesis testing and model-based inference with an extensible variant system for
     registering custom estimation methods.
 License: MIT + file LICENSE
 Encoding: UTF-8

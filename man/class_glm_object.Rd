@@ -3,6 +3,11 @@
 \name{class_glm_object}
 \alias{class_glm_object}
 \title{Structured result container for GLM fits}
+\value{
+An S7 object of class \code{glm_object} holding the fitted GLM's
+terms, coefficients, dispersion, and family information. Not constructed
+manually; populated internally by \link{GLM}.
+}
 \description{
 An S7 class produced by \link{GLM} pipelines. Not constructed manually —
 use \code{define_model() |> prepare_model(GLM) |> conclude()} instead.

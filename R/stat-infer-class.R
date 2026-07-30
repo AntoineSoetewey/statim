@@ -55,6 +55,11 @@
 #' Downstream packages can extend the hierarchy further by using any
 #' `class_stat_infer` subclass as a `parent` in `S7::new_class()`.
 #'
+#' @returns An S7 abstract class generator. `class_stat_infer` cannot be
+#' instantiated directly, so calling it raises an error. It exists only as a
+#' parent class for the concrete result classes described in the Class
+#' hierarchy section above.
+#'
 #' @seealso [baseline()], [variant()], [auto_tidy()], [class_lm_object]
 #'
 #' @export

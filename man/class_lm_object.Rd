@@ -3,6 +3,11 @@
 \name{class_lm_object}
 \alias{class_lm_object}
 \title{Structured result container for linear model fits}
+\value{
+An S7 object of class \code{lm_object} holding the fitted model's
+terms, coefficients, residuals, and dispersion. Not constructed manually;
+populated internally by the linear regression pipeline.
+}
 \description{
 An S7 class produced by \link{LINEAR_REG} pipelines. Not constructed manually —
 use \code{define_model() |> prepare_model(LINEAR_REG) |> conclude()} instead.

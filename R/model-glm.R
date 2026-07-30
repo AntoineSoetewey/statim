@@ -23,7 +23,6 @@
 #'     update(family = binomial()) |>
 #'     conclude()
 #'
-#' \dontrun{
 #' # model comparison via anova()
 #' mod1 = mtcars |>
 #'     define_model(am ~ 1) |>
@@ -42,7 +41,6 @@
 #'     conclude()
 #'
 #' anova(mod1, mod2, mod3)
-#' }
 #'
 #' @export
 GLM = MODEL_FN(
@@ -97,6 +95,10 @@ GLM = MODEL_FN(
 #'   `statistic`, `p_value`.
 #' - `fit_summary`: tibble with columns `family`, `link`, `null_deviance`,
 #'   `deviance`, `df_residual`, `aic`, `n_obs`.
+#'
+#' @returns An S7 object of class `glm_object` holding the fitted GLM's
+#' terms, coefficients, dispersion, and family information. Not constructed
+#' manually; populated internally by [GLM].
 #'
 #' @section predict() arguments:
 #' [predict()] on a `class_glm_object` accepts:

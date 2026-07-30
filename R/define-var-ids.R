@@ -11,6 +11,11 @@
 #' @format NULL
 #' @usage NULL
 #'
+#' @returns An S7 abstract class generator. `var_id` cannot be instantiated
+#' directly, so calling it raises an error. It exists only as a parent class
+#' for the concrete Variable Mapper subclasses ([x_by()], [rel()],
+#' [pairwise()], [prop()]).
+#'
 #' @seealso [x_by()], [rel()], [pairwise()], [prop()]
 #'
 #' @export

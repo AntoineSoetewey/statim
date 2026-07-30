@@ -3,6 +3,10 @@
 \name{class_p_test}
 \alias{class_p_test}
 \title{Structured result container for proportion tests}
+\value{
+An S7 object of class \code{p_test}, with the properties listed in
+Details. Not constructed manually; returned by \link{P_TEST} pipelines.
+}
 \description{
 An S7 class produced by \link{P_TEST} pipelines using \code{\link[=prop]{prop()}} as the model
 ID. Not constructed manually — use the pipeline instead.

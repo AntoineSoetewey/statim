@@ -116,6 +116,9 @@ T_TEST = HTEST_FN(
 #' Both the default (`base`) and `contrast` return a `class_ttest_two`, so
 #' [auto_tidy()] and [print()] are inherited by `contrast` for free.
 #'
+#' @returns An S7 object of class `ttest_two`, with the properties listed in
+#' Details. Not constructed manually; returned by [T_TEST] pipelines.
+#'
 #' @seealso [T_TEST], [auto_tidy()], [class_stat_infer]
 #'
 #' @export
@@ -226,6 +229,10 @@ S7::method(print, class_ttest_two) = function(x, ...) {
 #' When [pairwise()] uses `direction = "eq"`, `var1` and `var2` are
 #' identical (each variable tested against itself). [print()] detects this
 #' and renders a diagonal-only matrix.
+#'
+#' @returns An S7 object of class `ttest_pairwise`, with the properties
+#' listed in Details. Not constructed manually; returned by [T_TEST]
+#' pipelines using [pairwise()].
 #'
 #' @seealso [T_TEST], [ttest-pairwise], [auto_tidy()], [class_stat_infer]
 #'

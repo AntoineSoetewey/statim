@@ -15,6 +15,11 @@ is required.}
 
 \item{...}{Passed through S7 method compatibility.}
 }
+\value{
+A named list. The default method returns an empty list; each
+registered method returns a list shaped for its \code{var_id} subclass (for
+example, \code{x_data}/\code{group_data} for \code{\link[=x_by]{x_by()}}, or \code{x}/\code{n} for \code{\link[=prop]{prop()}}).
+}
 \description{
 A function for development use to extract the information in Variable Mappers.
 }

@@ -35,7 +35,6 @@ mtcars |>
     update(family = binomial()) |>
     conclude()
 
-\dontrun{
 # model comparison via anova()
 mod1 = mtcars |>
     define_model(am ~ 1) |>
@@ -54,6 +53,5 @@ mod3 = mtcars |>
     conclude()
 
 anova(mod1, mod2, mod3)
-}
 
 }

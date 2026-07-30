@@ -90,6 +90,10 @@ LINEAR_REG = MODEL_FN(
 #'   adjusted R-squared, sigma, n, residual df, F-statistic, df1, df2, and
 #'   F p-value.
 #'
+#' @returns An S7 object of class `lm_object` holding the fitted model's
+#' terms, coefficients, residuals, and dispersion. Not constructed manually;
+#' populated internally by the linear regression pipeline.
+#'
 #' @section anova() protocol:
 #' `class_lm_object` supports two [anova()] modes:
 #'

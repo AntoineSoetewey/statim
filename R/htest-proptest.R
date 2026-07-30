@@ -124,6 +124,9 @@ P_TEST = HTEST_FN(
 #' Both `default` and `prop` return a `class_p_test`, so [auto_tidy()] and
 #' [print()] are inherited by `prop` for free.
 #'
+#' @returns An S7 object of class `p_test`, with the properties listed in
+#' Details. Not constructed manually; returned by [P_TEST] pipelines.
+#'
 #' @seealso [P_TEST], [auto_tidy()], [class_stat_infer]
 #'
 #' @export

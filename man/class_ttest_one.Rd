@@ -3,6 +3,10 @@
 \name{class_ttest_one}
 \alias{class_ttest_one}
 \title{Structured result container for one-sample t-tests}
+\value{
+An S7 object of class \code{ttest_one}, with the properties listed in
+Details. Not constructed manually; returned by \link{T_TEST} pipelines.
+}
 \description{
 An S7 class produced by \link{T_TEST} pipelines using \code{\link[=on]{on()}} as the variable
 mapper \verb{<var_id>}. Not constructed manually — use the pipeline instead.

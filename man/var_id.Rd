@@ -3,6 +3,12 @@
 \name{var_id}
 \alias{var_id}
 \title{Base class for Variable Mapper objects}
+\value{
+An S7 abstract class generator. \code{var_id} cannot be instantiated
+directly, so calling it raises an error. It exists only as a parent class
+for the concrete Variable Mapper subclasses (\code{\link[=x_by]{x_by()}}, \code{\link[=rel]{rel()}},
+\code{\link[=pairwise]{pairwise()}}, \code{\link[=prop]{prop()}}).
+}
 \description{
 \code{var_id} is the abstract parent class for all Variable Mapper objects in
 \code{{statim}}. Variable Mappers emulate R's formula interface, as they capture

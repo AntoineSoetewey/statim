@@ -6,6 +6,11 @@
 \usage{
 param_obj()
 }
+\value{
+An S7 abstract class generator. \code{param_obj} cannot be
+instantiated directly, so calling it raises an error. It exists only as a
+parent class for the concrete parameter classes (\code{MU}, \code{PI}, \code{RHO}).
+}
 \description{
 \code{param_obj} is the abstract base S7 class for all population parameter
 objects, analogous to \code{\link[=var_id]{var_id()}}. Concrete subclasses (\code{MU}, \code{PI},\code{RHO})

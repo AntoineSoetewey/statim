@@ -11,6 +11,10 @@
 #' Methods accept an optional `data` argument — a data frame, or `NULL`
 #' to resolve variables from the calling environment.
 #'
+#' @returns A named list. The default method returns an empty list; each
+#' registered method returns a list shaped for its `var_id` subclass (for
+#' example, `x_data`/`group_data` for [x_by()], or `x`/`n` for [prop()]).
+#'
 #' @name model-processor
 #' @export
 model_processor = S7::new_generic(

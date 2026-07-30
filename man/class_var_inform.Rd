@@ -3,6 +3,11 @@
 \name{class_var_inform}
 \alias{class_var_inform}
 \title{Output class for Variable Mapper metadata}
+\value{
+An S7 object of class \code{var_inform} holding the Variable Mapper's
+type, arguments, extracted variables, and registration status. Returned
+by \code{\link[=var_id_info]{var_id_info()}}, not constructed manually.
+}
 \description{
 \code{class_var_inform} is the S7 output class returned by \code{\link[=var_id_info]{var_id_info()}}.
 \code{model_type} is derived automatically from the stored \code{var_id} object.

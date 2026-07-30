@@ -6,6 +6,12 @@
 \usage{
 class_stat_infer()
 }
+\value{
+An S7 abstract class generator. \code{class_stat_infer} cannot be
+instantiated directly, so calling it raises an error. It exists only as a
+parent class for the concrete result classes described in the Class
+hierarchy section above.
+}
 \description{
 \code{class_stat_infer} is the base abstract S7 class for all result objects returned
 by \code{fn} in \code{\link[=baseline]{baseline()}} and \code{\link[=variant]{variant()}}. Concrete result classes like
