@@ -61,7 +61,7 @@ LifeCycleSavings |>
     prepare_model(LINEAR_REG) |>
     conclude()
 
-\donttest{
+\dontrun{
 # display() -> show up to n models in full
 LifeCycleSavings |>
     write_models(
