@@ -7,7 +7,7 @@ output:
     rmarkdown::html_vignette:
         toc: true
 vignette: |
-    %\VignetteIndexEntry{Beyond equality: custom hypotheses with statim}
+    %\VignetteIndexEntry{Beyond Equality: Custom Hypotheses with {statim}}
     %\VignetteEngine{knitr::rmarkdown}
     \usepackage[utf8]{inputenc}
 ---
